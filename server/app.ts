@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadCorpus } from './corpus/loader.ts';
+import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +10,9 @@ const __dirname = path.dirname(__filename);
 export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
+
+// Initialize Ayah Engine in background / warm up
+initAyahEngine();
 
 // Health check endpoint for Cloud Run
 app.get('/api/health', (req, res) => {
@@ -43,9 +47,18 @@ app.get('/api/corpus/stats', (req, res) => {
   });
 });
 
-// Stubs for the 3 core modes + OCR
+// Ayah matching endpoint
+app.post('/api/ayah/search', (req, res) => {
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchAyah(query);
+  res.json(result);
+});
+
+// Alias for backward compatibility
 app.post('/api/ayah/match', (req, res) => {
-  res.json({ status: 'scaffold_ready', mode: 'ayah', results: [] });
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchAyah(query);
+  res.json(result);
 });
 
 app.post('/api/hadith/match', (req, res) => {
