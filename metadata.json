@@ -1,0 +1,6 @@
+{
+  "name": "بيان | Bayan",
+  "description": "أداة للتحقق من نصوص القرآن الكريم وتخريج الأحاديث بدرجاتها المعتمدة والسؤال بالدليل المبني على المصادر الموثقة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
