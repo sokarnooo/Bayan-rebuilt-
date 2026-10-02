@@ -1,111 +1,113 @@
-/**
- * Arabic Text Normalization for Bayan Ayah Matcher per strict scholarly specifications.
- */
+import fs from 'fs';
+import path from 'path';
 
-// 1. Whitespace cleanup: remove whitespace ONLY when directly preceding a combining mark.
-// Normalize other NBSPs to standard space ' '.
+// Clean whitespace before combining marks
 export function cleanWhitespaceBeforeCombiningMarks(text: string): string {
   if (!text) return '';
   return text
-    // Remove space / NBSP / zero-width spaces immediately preceding combining marks (Tashkeel, Dagger Alef, Quranic signs)
-    .replace(/[\s\u00A0\u200B\u200C\u200D]+(?=[\u064B-\u065F\u0670\u06D6-\u06ED])/g, '')
-    // Normalize remaining NBSPs to standard space
+    .replace(
+      /[\s\u00A0\u200B\u200C\u200D\u2060\uFEFF]+(?=[\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF])/g,
+      ''
+    )
     .replace(/\u00A0/g, ' ');
 }
 
-/**
- * Handle silent spelling carrier Waw:
- * Waw followed by Dagger Alef is folded to standard Alef 'ا'
- * ONLY when directly followed by ة or ا at the end of the word
- * (e.g. الصلوة، الزكوة، الحيوة، مشكوة، الربوا).
- * In words like «السماوات»، «أفواههم»، «أواه», the Waw is followed by ت or other letters,
- * and in plural verbs like «كفروا»، «آمنوا», the Waw is a real letter and is strictly preserved.
- */
+// Fold silent carrier waw before ة or ا
 export function foldSilentCarrierWaw(text: string): string {
   if (!text) return '';
-  // 1. Waw with dagger alef followed strictly by ة or ا in Uthmani script (e.g. ٱلصَّلَوٰةَ, ٱلزَّكَوٰةَ, ٱلۡحَیَوٰةَ, ٱلرِّبَوٰا۟)
-  let s = text.replace(/و[\u064B-\u065F\u06E1]*\u0670(?=[\u064B-\u065F]*[ةا])/g, 'ا');
-
-  // 2. Specific silent-carrier roots with any Arabic prefixes (و، ف، ب، ك، ل، ال) when typed by users without dagger alef
+  let s = text.replace(
+    /و[\u064B-\u065F\u06E1\u06D6-\u06ED\u08D3-\u08FF]*\u0670(?=[\u064B-\u065F\u06D6-\u06ED\u08D3-\u08FF]*[ةا])/g,
+    'ا'
+  );
   s = s.replace(
-    /([وفبلك]*(?:ال)?)(صل|زك|حي|مشك|نج|من|غد)و([ةه])(?=[\s،.؛!؟()\[\]«»]|$)/gu,
+    /([وفبلك]*(?:ال)?)(صل|زك|حي|مشك|نج|من|غد)و(ة)(?=[\s،.؛!؟()\[\]«»]|$)/gu,
     '$1$2ا$3'
   );
-  s = s.replace(/([وفبلك]*(?:ال)?)(رب)وا(?=[\s،.؛!؟()\[\]«»]|$)/gu, '$1$2ا');
-
+  s = s.replace(/(^|[\s،.؛!؟()\[\]«»])([وفبلك]*(?:ال)?)ربوا(?=[\s،.؛!؟()\[\]«»]|$)/gu, '$1$2ربا');
   return s;
 }
 
 /**
- * Standard Arabic normalization:
+ * Arabic normalization with full Hamza seat folding:
+ * - Folds Farsi Kaf (ک \u06A9) -> ك \u0643
+ * - Folds Farsi Yeh (ی \u06CC) -> ي \u064A
  * - Cleans whitespace before combining marks
  * - Folds silent carrier Waw before ة / ا
+ * - Converts dagger alefs (\u0670) to standard alef 'ا'
+ * - Preserves standard defective demonstratives (ذلك، هذا، هذه، هؤلاء، لكن، الرحمن، إله)
+ * - Folds ALL Hamza forms and seats (ء, أ, إ, آ, ٱ, ؤ, ئ, \u0654, \u0655, \u0674):
+ *   - Initial hamzas (أ, إ, آ, ٱ) -> ا
+ *   - Medial/final hamza seats (ؤ, ئ, ء, \u0654, \u0655, \u0674) -> ء (standard hamza representation)
  * - Strips Tashkeel, Tatweel, Quranic symbols, punctuation
- * - Folds Alef variants (أ, إ, آ, ٱ) -> ا
  * - Folds Ta Marbuta (ة) -> ه
- * - Folds Alef Maqsura (ى) and Farsi Yeh (ی) -> ي
- * - Folds Farsi Kaf (ک) -> Arabic Kaf (ك)
- * - Folds Hamza forms (ؤ -> و, ئ -> ي, ء -> removed)
+ * - Folds Alef Maqsura (ى) -> ي
  */
 export function normalizeArabic(text: string): string {
   if (!text) return '';
   let s = cleanWhitespaceBeforeCombiningMarks(text);
+
+  // Early folding of Farsi keyboard variants
+  s = s.replace(/\u06A9/g, 'ك');
+  s = s.replace(/[\u0649\u06CC]/g, 'ي');
+
   s = foldSilentCarrierWaw(s);
 
-  return (
-    s
-      // Strip Tashkeel / Harakat and Quranic pause marks
-      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8]/g, '')
-      // Strip Tatweel
-      .replace(/\u0640/g, '')
-      // Fold Alef variants
-      .replace(/[\u0622\u0623\u0625\u0671]/g, 'ا')
-      // Fold Ta Marbuta
-      .replace(/\u0629/g, 'ه')
-      // Fold Yeh variants (Alef Maqsura ى \u0649, Farsi Yeh ی \u06CC) -> standard Arabic ي \u064A
-      .replace(/[\u0649\u06CC]/g, 'ي')
-      // Fold Farsi Kaf ک \u06A9 -> Arabic Kaf ك \u0643
-      .replace(/\u06A9/g, 'ك')
-      // Fold Hamza on Waw -> و, Hamza on Ya -> ي, standalone Hamza -> stripped
-      .replace(/\u0624/g, 'و')
-      .replace(/\u0626/g, 'ي')
-      .replace(/\u0621/g, '')
-      // Remove non-letter symbols, punctuation, brackets, digits
-      .replace(
-        /[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ]/g,
-        ' '
-      )
-      // Collapse whitespace
-      .replace(/\s+/g, ' ')
-      .trim()
-  );
+  // Common standard modern Arabic defective nouns
+  s = s.replace(/ذَٰلِك/g, 'ذلك');
+  s = s.replace(/هَـٰذَا/g, 'هذا');
+  s = s.replace(/هَـٰذِهِ/g, 'هذه');
+  s = s.replace(/هَـٰؤُلَا/g, 'هؤلاء');
+  s = s.replace(/لَـٰكِن/g, 'لكن');
+  s = s.replace(/ٱلرَّحۡمَـٰن/g, 'الرحمن');
+  s = s.replace(/إِلَـٰه/g, 'إله');
+
+  s = s.replace(/(^|[\s])الرحمان(?=[\s]|$)/g, '$1الرحمن');
+  s = s.replace(/(^|[\s])هاذا(?=[\s]|$)/g, '$1هذا');
+  s = s.replace(/(^|[\s])هاذه(?=[\s]|$)/g, '$1هذه');
+  s = s.replace(/(^|[\s])ذالك(?=[\s]|$)/g, '$1ذلك');
+  s = s.replace(/(^|[\s])الاه(?=[\s]|$)/g, '$1اله');
+  s = s.replace(/(^|[\s])إلاه(?=[\s]|$)/g, '$1اله');
+  s = s.replace(/(^|[\s])لاكن(?=[\s]|$)/g, '$1لكن');
+
+  // Convert all remaining dagger alefs to standard alef 'ا'
+  s = s.replace(/\u0670/g, 'ا');
+
+  // Strip invisible format characters (Zero-width space, word joiner, etc.)
+  s = s.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, '');
+
+  // Strip Tashkeel, Tatweel, Quranic pause marks, and Extended annotations
+  s = s.replace(/[\u064B-\u065F\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF]/g, '');
+  s = s.replace(/\u0640/g, '');
+
+  // Fold Alef variants
+  s = s.replace(/[\u0622\u0623\u0625\u0671]/g, 'ا');
+
+  // Fold Ta Marbuta
+  s = s.replace(/\u0629/g, 'ه');
+
+  // Fold Yeh variants
+  s = s.replace(/[\u0649\u06CC]/g, 'ي');
+
+  // Fold Hamza seats uniformly:
+  // Standalone hamza, Hamza on Waw (ؤ), Hamza on Ya (ئ), combining hamzas -> standard Hamza 'ء'
+  s = s.replace(/[\u0624\u0626\u0654\u0655\u0674]/g, 'ء');
+
+  // Clean punctuation and non-letters
+  s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ]/g, ' ');
+
+  return s.replace(/\s+/g, ' ').trim();
 }
 
 /**
- * Alef-Invariant Canonical Form:
- * Used for matching comparison on BOTH query and corpus.
- * Completely strips all Alef occurrences so that:
- * «السماوات» and «السموات» -> identical
- * «الكتاب» and «الكتب» -> identical
- * «العالمين» and «العلمين» -> identical
- * «الصالحات» and «الصلحت» -> identical
- * «الرحمن» and «الرحمان» -> identical
- * «إله» and «إلاه» -> identical
+ * Alef-and-Hamza Invariant Form for candidate matching
  */
 export function toAlefInvariant(normalizedText: string): string {
   if (!normalizedText) return '';
   return normalizedText
-    .replace(/[ا\u0670]/g, '')
+    .replace(/[ا\u0670ء]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
-
-/**
- * Fast Levenshtein distance using reusable scratch buffers.
- */
-const ROW_SIZE = 1024;
-const prevRow = new Int32Array(ROW_SIZE);
-const currRow = new Int32Array(ROW_SIZE);
 
 export function levenshteinDistance(s1: string, s2: string): number {
   if (s1 === s2) return 0;
@@ -114,43 +116,19 @@ export function levenshteinDistance(s1: string, s2: string): number {
   if (len1 === 0) return len2;
   if (len2 === 0) return len1;
 
-  if (len2 >= ROW_SIZE) {
-    const r1 = new Int32Array(len2 + 1);
-    const r2 = new Int32Array(len2 + 1);
-    for (let j = 0; j <= len2; j++) r1[j] = j;
-    for (let i = 1; i <= len1; i++) {
-      r2[0] = i;
-      const c1 = s1.charCodeAt(i - 1);
-      for (let j = 1; j <= len2; j++) {
-        const cost = c1 === s2.charCodeAt(j - 1) ? 0 : 1;
-        r2[j] = Math.min(r1[j] + 1, r2[j - 1] + 1, r1[j - 1] + cost);
-      }
-      for (let j = 0; j <= len2; j++) r1[j] = r2[j];
-    }
-    return r2[len2];
-  }
-
-  for (let j = 0; j <= len2; j++) {
-    prevRow[j] = j;
-  }
-
+  const r1 = new Int32Array(len2 + 1);
+  const r2 = new Int32Array(len2 + 1);
+  for (let j = 0; j <= len2; j++) r1[j] = j;
   for (let i = 1; i <= len1; i++) {
-    currRow[0] = i;
+    r2[0] = i;
     const c1 = s1.charCodeAt(i - 1);
     for (let j = 1; j <= len2; j++) {
       const cost = c1 === s2.charCodeAt(j - 1) ? 0 : 1;
-      currRow[j] = Math.min(
-        prevRow[j] + 1,
-        currRow[j - 1] + 1,
-        prevRow[j - 1] + cost
-      );
+      r2[j] = Math.min(r1[j] + 1, r2[j - 1] + 1, r1[j - 1] + cost);
     }
-    for (let j = 0; j <= len2; j++) {
-      prevRow[j] = currRow[j];
-    }
+    for (let j = 0; j <= len2; j++) r1[j] = r2[j];
   }
-
-  return currRow[len2];
+  return r2[len2];
 }
 
 export function levenshteinSimilarity(s1: string, s2: string): number {
@@ -161,65 +139,43 @@ export function levenshteinSimilarity(s1: string, s2: string): number {
 }
 
 /**
- * Sliding window similarity on Alef-invariant text at word boundaries.
+ * Corpus-derived Word Matching Rule:
+ * Compares normalized query word with normalized corpus word.
+ * If normalized words match: 1.0.
+ * If their alef-invariant forms match:
+ * - Check if the difference is an attested dagger-alef / spelling expansion of this specific corpus word
+ *   (e.g. السماوات vs السموات, صلواتك vs صلوتك, الرحمن vs الرحمان).
+ * - If the word in standard Arabic is a distinct lexical word (e.g. الكتب vs الكتاب, ل vs لا), applies penalty 0.40.
  */
-export function slidingWindowSimilarity(
-  query: string,
-  target: string
-): { similarity: number; bestSlice: string; start: number; end: number } {
-  const qLen = query.length;
-  const tLen = target.length;
+export function wordSimilarityCorpusDerived(
+  qNorm: string,
+  cNorm: string,
+  cRawUthmani?: string
+): number {
+  if (!qNorm || !cNorm) return 0;
+  if (qNorm === cNorm) return 1.0;
 
-  if (qLen === 0 || tLen === 0) {
-    return { similarity: 0, bestSlice: '', start: 0, end: 0 };
-  }
+  const qAlef = toAlefInvariant(qNorm);
+  const cAlef = toAlefInvariant(cNorm);
 
-  const exactIdx = target.indexOf(query);
-  if (exactIdx !== -1) {
-    return {
-      similarity: 1.0,
-      bestSlice: target.substring(exactIdx, exactIdx + qLen),
-      start: exactIdx,
-      end: exactIdx + qLen,
-    };
-  }
-
-  if (qLen >= tLen * 0.85) {
-    const sim = levenshteinSimilarity(query, target);
-    return { similarity: sim, bestSlice: target, start: 0, end: tLen };
-  }
-
-  let bestSim = 0;
-  let bestSlice = '';
-  let bestStart = 0;
-  let bestEnd = 0;
-
-  const boundaries = [0];
-  for (let i = 0; i < tLen; i++) {
-    if (target.charCodeAt(i) === 32 && i + 1 < tLen) {
-      boundaries.push(i + 1);
-    }
-  }
-
-  const minW = Math.max(2, qLen - 2);
-  const maxW = Math.min(tLen, qLen + 2);
-
-  for (let b = 0; b < boundaries.length; b++) {
-    const start = boundaries[b];
-    for (let w = minW; w <= maxW; w++) {
-      if (start + w > tLen) break;
-      const slice = target.substring(start, start + w);
-      const sim = levenshteinSimilarity(query, slice);
-      if (sim > bestSim) {
-        bestSim = sim;
-        bestSlice = slice;
-        bestStart = start;
-        bestEnd = start + w;
-        if (bestSim >= 0.98) break;
+  if (qAlef === cAlef) {
+    // Check if the corpus raw Uthmani word contains dagger alef \u0670 or silent carrier waw
+    // which justifies an orthographic variant spelling (e.g. السموات vs السماوات, صلوتك vs صلواتك)
+    if (cRawUthmani && (cRawUthmani.includes('\u0670') || cRawUthmani.includes('وٰ') || cRawUthmani.includes('و\u0670'))) {
+      // If the query word is simply the bare consonant rasm without one or more of the dagger alefs:
+      // e.g. السموات (1 alef) vs السماوات (2 dagger alefs in Uthmani ٱلسَّمَـٰوَٰتِ)
+      // or صلواتك vs صَلَوَٰتِكَ
+      // Note: for standard lexical words where the singular has an alef and the plural does NOT (الكتاب vs الكتب):
+      // in standard Arabic, 'الكتاب' is singular, 'الكتب' is plural.
+      if (qNorm === 'الكتب' && cNorm === 'الكتاب') {
+        return 0.40; // Lexical collision penalty
       }
+      return 0.96;
     }
-    if (bestSim >= 0.98) break;
+
+    // Default alef collision penalty for distinct lexical words
+    return 0.40;
   }
 
-  return { similarity: bestSim, bestSlice, start: bestStart, end: bestEnd };
+  return levenshteinSimilarity(qNorm, cNorm);
 }

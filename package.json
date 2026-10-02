@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "tsx server/server.ts",
     "build": "vite build",
     "start": "tsx server/server.ts",
     "lint": "tsc --noEmit"

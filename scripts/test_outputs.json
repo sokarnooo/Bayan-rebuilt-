@@ -1,0 +1,2633 @@
+{
+  "1a_al_ikhlas_alone": {
+    "query": "قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفوا أحد",
+    "normalizedQuery": "قل هو الله احد الله الصمد لم يلد ولم يولد ولم يكن له كفوا احد",
+    "alefInvariantQuery": "قل هو لله حد لله لصمد لم يلد ولم يولد ولم يكن له كفو حد",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 112,
+        "verse": 1,
+        "startVerse": 1,
+        "endVerse": 4,
+        "verseRange": "1–4",
+        "isRange": true,
+        "surah": {
+          "arabic": "سُوْرَةُ الْاِخْلَاصِ",
+          "english": "Sincerity",
+          "revelation": "Mecca"
+        },
+        "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+        "translation": "Say, \"He is Allah, [who is] One Allah, the Eternal Refuge He neither begets nor is born Nor is there to Him any equivalent",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "full",
+        "coverageRatio": 1,
+        "matchedSlice": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+        "matchedTokens": [
+          "قُلۡ",
+          "هُوَ",
+          "ٱللَّهُ",
+          "أَحَدٌ",
+          "ٱللَّهُ",
+          "ٱلصَّمَدُ",
+          "لَمۡ",
+          "یَلِدۡ",
+          "وَلَمۡ",
+          "یُولَدۡ",
+          "وَلَمۡ",
+          "یَكُن",
+          "لَّهُۥ",
+          "كُفُوًا",
+          "أَحَدُۢ"
+        ],
+        "breakdown": [
+          {
+            "verse": 1,
+            "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ",
+            "translation": "Say, \"He is Allah, [who is] One",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ"
+          },
+          {
+            "verse": 2,
+            "text": "ٱللَّهُ ٱلصَّمَدُ",
+            "translation": "Allah, the Eternal Refuge",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 2,
+            "totalWordCount": 2,
+            "matchedSlice": "ٱللَّهُ ٱلصَّمَدُ"
+          },
+          {
+            "verse": 3,
+            "text": "لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ",
+            "translation": "He neither begets nor is born",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ"
+          },
+          {
+            "verse": 4,
+            "text": "وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+            "translation": "Nor is there to Him any equivalent",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 5,
+            "totalWordCount": 5,
+            "matchedSlice": "وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 20.46
+  },
+  "1b_al_ikhlas_with_basmala": {
+    "query": "بسم الله الرحمن الرحيم قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفوا أحد",
+    "normalizedQuery": "بسم الله الرحمن الرحيم قل هو الله احد الله الصمد لم يلد ولم يولد ولم يكن له كفوا احد",
+    "alefInvariantQuery": "بسم لله لرحمن لرحيم قل هو لله حد لله لصمد لم يلد ولم يولد ولم يكن له كفو حد",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 112,
+        "verse": 1,
+        "startVerse": 1,
+        "endVerse": 4,
+        "verseRange": "1–4",
+        "isRange": true,
+        "surah": {
+          "arabic": "سُوْرَةُ الْاِخْلَاصِ",
+          "english": "Sincerity",
+          "revelation": "Mecca"
+        },
+        "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+        "translation": "Say, \"He is Allah, [who is] One Allah, the Eternal Refuge He neither begets nor is born Nor is there to Him any equivalent",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "full",
+        "coverageRatio": 1,
+        "matchedSlice": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+        "matchedTokens": [
+          "قُلۡ",
+          "هُوَ",
+          "ٱللَّهُ",
+          "أَحَدٌ",
+          "ٱللَّهُ",
+          "ٱلصَّمَدُ",
+          "لَمۡ",
+          "یَلِدۡ",
+          "وَلَمۡ",
+          "یُولَدۡ",
+          "وَلَمۡ",
+          "یَكُن",
+          "لَّهُۥ",
+          "كُفُوًا",
+          "أَحَدُۢ"
+        ],
+        "breakdown": [
+          {
+            "verse": 1,
+            "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ",
+            "translation": "Say, \"He is Allah, [who is] One",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ"
+          },
+          {
+            "verse": 2,
+            "text": "ٱللَّهُ ٱلصَّمَدُ",
+            "translation": "Allah, the Eternal Refuge",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 2,
+            "totalWordCount": 2,
+            "matchedSlice": "ٱللَّهُ ٱلصَّمَدُ"
+          },
+          {
+            "verse": 3,
+            "text": "لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ",
+            "translation": "He neither begets nor is born",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ"
+          },
+          {
+            "verse": 4,
+            "text": "وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
+            "translation": "Nor is there to Him any equivalent",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 5,
+            "totalWordCount": 5,
+            "matchedSlice": "وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ"
+          }
+        ],
+        "leadingBasmalaIgnored": true
+      }
+    ],
+    "referralRequired": false,
+    "notice": "تم تجاهل البسملة في بداية السورة أثناء المطابقة لأنها ليست جزءاً من الآية الأولى في هذه السورة",
+    "executionTimeMs": 62.81
+  },
+  "1c_al_fatihah_in_full": {
+    "query": "بسم الله الرحمن الرحيم الحمد لله رب العالمين الرحمن الرحيم مالك يوم الدين إياك نعبد وإياك نستعين اهدنا الصراط المستقيم صراط الذين أنعمت عليهم غير المغضوب عليهم ولا الضالين",
+    "normalizedQuery": "بسم الله الرحمن الرحيم الحمد لله رب العالمين الرحمن الرحيم مالك يوم الدين اياك نعبد واياك نستعين اهدنا الصراط المستقيم صراط الذين انعمت عليهم غير المغضوب عليهم ولا الضالين",
+    "alefInvariantQuery": "بسم لله لرحمن لرحيم لحمد لله رب لعلمين لرحمن لرحيم ملك يوم لدين يك نعبد ويك نستعين هدن لصرط لمستقيم صرط لذين نعمت عليهم غير لمغضوب عليهم ول لضلين",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 1,
+        "verse": 1,
+        "startVerse": 1,
+        "endVerse": 7,
+        "verseRange": "1–7",
+        "isRange": true,
+        "surah": {
+          "arabic": "سُوْرَةُ الْفَاتِحَةِ",
+          "english": "The Opening",
+          "revelation": "Mecca"
+        },
+        "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ مَـٰلِكِ یَوۡمِ ٱلدِّینِ إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِیمَ صِرَٰطَ ٱلَّذِینَ أَنۡعَمۡتَ عَلَیۡهِمۡ غَیۡرِ ٱلۡمَغۡضُوبِ عَلَیۡهِمۡ وَلَا ٱلضَّاۤلِّینَ",
+        "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful [All] praise is [due] to Allah, Lord of the worlds The Entirely Merciful, the Especially Merciful Sovereign of the Day of Recompense It is You we worship and You we ask for help Guide us to the straight path The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "full",
+        "coverageRatio": 1,
+        "matchedSlice": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ مَـٰلِكِ یَوۡمِ ٱلدِّینِ إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِیمَ صِرَٰطَ ٱلَّذِینَ أَنۡعَمۡتَ عَلَیۡهِمۡ غَیۡرِ ٱلۡمَغۡضُوبِ عَلَیۡهِمۡ وَلَا ٱلضَّاۤلِّینَ",
+        "matchedTokens": [
+          "بِسۡمِ",
+          "ٱللَّهِ",
+          "ٱلرَّحۡمَـٰنِ",
+          "ٱلرَّحِیمِ",
+          "ٱلۡحَمۡدُ",
+          "لِلَّهِ",
+          "رَبِّ",
+          "ٱلۡعَـٰلَمِینَ",
+          "ٱلرَّحۡمَـٰنِ",
+          "ٱلرَّحِیمِ",
+          "مَـٰلِكِ",
+          "یَوۡمِ",
+          "ٱلدِّینِ",
+          "إِیَّاكَ",
+          "نَعۡبُدُ",
+          "وَإِیَّاكَ",
+          "نَسۡتَعِینُ",
+          "ٱهۡدِنَا",
+          "ٱلصِّرَٰطَ",
+          "ٱلۡمُسۡتَقِیمَ",
+          "صِرَٰطَ",
+          "ٱلَّذِینَ",
+          "أَنۡعَمۡتَ",
+          "عَلَیۡهِمۡ",
+          "غَیۡرِ",
+          "ٱلۡمَغۡضُوبِ",
+          "عَلَیۡهِمۡ",
+          "وَلَا",
+          "ٱلضَّاۤلِّینَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 1,
+            "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
+            "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ"
+          },
+          {
+            "verse": 2,
+            "text": "ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
+            "translation": "[All] praise is [due] to Allah, Lord of the worlds",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ"
+          },
+          {
+            "verse": 3,
+            "text": "ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
+            "translation": "The Entirely Merciful, the Especially Merciful",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 2,
+            "totalWordCount": 2,
+            "matchedSlice": "ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ"
+          },
+          {
+            "verse": 4,
+            "text": "مَـٰلِكِ یَوۡمِ ٱلدِّینِ",
+            "translation": "Sovereign of the Day of Recompense",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 3,
+            "totalWordCount": 3,
+            "matchedSlice": "مَـٰلِكِ یَوۡمِ ٱلدِّینِ"
+          },
+          {
+            "verse": 5,
+            "text": "إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ",
+            "translation": "It is You we worship and You we ask for help",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 4,
+            "totalWordCount": 4,
+            "matchedSlice": "إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ"
+          },
+          {
+            "verse": 6,
+            "text": "ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِیمَ",
+            "translation": "Guide us to the straight path",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 3,
+            "totalWordCount": 3,
+            "matchedSlice": "ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِیمَ"
+          },
+          {
+            "verse": 7,
+            "text": "صِرَٰطَ ٱلَّذِینَ أَنۡعَمۡتَ عَلَیۡهِمۡ غَیۡرِ ٱلۡمَغۡضُوبِ عَلَیۡهِمۡ وَلَا ٱلضَّاۤلِّینَ",
+            "translation": "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 9,
+            "totalWordCount": 9,
+            "matchedSlice": "صِرَٰطَ ٱلَّذِینَ أَنۡعَمۡتَ عَلَیۡهِمۡ غَیۡرِ ٱلۡمَغۡضُوبِ عَلَیۡهِمۡ وَلَا ٱلضَّاۤلِّینَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 131.25
+  },
+  "1d_baqarah_last_two": {
+    "query": "آمن الرسول بما أنزل إليه من ربه والمؤمنون كل آمن بالله وملائكته وكتبه ورسله لا نفرق بين أحد من رسله وقالوا سمعنا وأطعنا غفرانك ربنا وإليك المصير لا يكلف الله نفسا إلا وسعها لها ما كسبت وعليها ما اكتسبت ربنا لا تؤاخذنا إن نسينا أو أخطأنا ربنا ولا تحمل علينا إصرا كما حملته على الذين من قبلنا ربنا ولا تحملنا ما لا طاقة لنا به واعف عنا واغفر لنا وارحمنا أنت مولانا فانصرنا على القوم الكافرين",
+    "normalizedQuery": "امن الرسول بما انزل اليه من ربه والمومنون كل امن بالله وملايكته وكتبه ورسله لا نفرق بين احد من رسله وقالوا سمعنا واطعنا غفرانك ربنا واليك المصير لا يكلف الله نفسا الا وسعها لها ما كسبت وعليها ما اكتسبت ربنا لا تواخذنا ان نسينا او اخطانا ربنا ولا تحمل علينا اصرا كما حملته علي الذين من قبلنا ربنا ولا تحملنا ما لا طاقه لنا به واعف عنا واغفر لنا وارحمنا انت مولانا فانصرنا علي القوم الكافرين",
+    "alefInvariantQuery": "من لرسول بم نزل ليه من ربه ولمومنون كل من بلله ومليكته وكتبه ورسله ل نفرق بين حد من رسله وقلو سمعن وطعن غفرنك ربن وليك لمصير ل يكلف لله نفس ل وسعه له م كسبت وعليه م كتسبت ربن ل توخذن ن نسين و خطن ربن ول تحمل علين صر كم حملته علي لذين من قبلن ربن ول تحملن م ل طقه لن به وعف عن وغفر لن ورحمن نت مولن فنصرن علي لقوم لكفرين",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 285,
+        "startVerse": 285,
+        "endVerse": 286,
+        "verseRange": "285–286",
+        "isRange": true,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ءَامَنَ ٱلرَّسُولُ بِمَاۤ أُنزِلَ إِلَیۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰۤئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَیۡنَ أَحَدࣲ مِّن رُّسُلِهِۦۚ وَقَالُوا۟ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَیۡكَ ٱلۡمَصِیرُ لَا یُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَیۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَاۤ إِن نَّسِینَاۤ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَیۡنَاۤ إِصۡرࣰا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِینَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَاۤۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَـٰفِرِینَ",
+        "translation": "The Messenger has believed in what was revealed to him from his Lord, and [so have] the believers. All of them have believed in Allah and His angels and His books and His messengers, [saying], \"We make no distinction between any of His messengers.\" And they say, \"We hear and we obey. [We seek] Your forgiveness, our Lord, and to You is the [final] destination Allah does not charge a soul except [with that within] its capacity. It will have [the consequence of] what [good] it has gained, and it will bear [the consequence of] what [evil] it has earned. \"Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "full",
+        "coverageRatio": 1,
+        "matchedSlice": "ءَامَنَ ٱلرَّسُولُ بِمَاۤ أُنزِلَ إِلَیۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰۤئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَیۡنَ أَحَدࣲ مِّن رُّسُلِهِۦۚ وَقَالُوا۟ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَیۡكَ ٱلۡمَصِیرُ لَا یُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَیۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَاۤ إِن نَّسِینَاۤ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَیۡنَاۤ إِصۡرࣰا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِینَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَاۤۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَـٰفِرِینَ",
+        "matchedTokens": [
+          "ءَامَنَ",
+          "ٱلرَّسُولُ",
+          "بِمَاۤ",
+          "أُنزِلَ",
+          "إِلَیۡهِ",
+          "مِن",
+          "رَّبِّهِۦ",
+          "وَٱلۡمُؤۡمِنُونَۚ",
+          "كُلٌّ",
+          "ءَامَنَ",
+          "بِٱللَّهِ",
+          "وَمَلَـٰۤئِكَتِهِۦ",
+          "وَكُتُبِهِۦ",
+          "وَرُسُلِهِۦ",
+          "لَا",
+          "نُفَرِّقُ",
+          "بَیۡنَ",
+          "أَحَدࣲ",
+          "مِّن",
+          "رُّسُلِهِۦۚ",
+          "وَقَالُوا۟",
+          "سَمِعۡنَا",
+          "وَأَطَعۡنَاۖ",
+          "غُفۡرَانَكَ",
+          "رَبَّنَا",
+          "وَإِلَیۡكَ",
+          "ٱلۡمَصِیرُ",
+          "لَا",
+          "یُكَلِّفُ",
+          "ٱللَّهُ",
+          "نَفۡسًا",
+          "إِلَّا",
+          "وُسۡعَهَاۚ",
+          "لَهَا",
+          "مَا",
+          "كَسَبَتۡ",
+          "وَعَلَیۡهَا",
+          "مَا",
+          "ٱكۡتَسَبَتۡۗ",
+          "رَبَّنَا",
+          "لَا",
+          "تُؤَاخِذۡنَاۤ",
+          "إِن",
+          "نَّسِینَاۤ",
+          "أَوۡ",
+          "أَخۡطَأۡنَاۚ",
+          "رَبَّنَا",
+          "وَلَا",
+          "تَحۡمِلۡ",
+          "عَلَیۡنَاۤ",
+          "إِصۡرࣰا",
+          "كَمَا",
+          "حَمَلۡتَهُۥ",
+          "عَلَى",
+          "ٱلَّذِینَ",
+          "مِن",
+          "قَبۡلِنَاۚ",
+          "رَبَّنَا",
+          "وَلَا",
+          "تُحَمِّلۡنَا",
+          "مَا",
+          "لَا",
+          "طَاقَةَ",
+          "لَنَا",
+          "بِهِۦۖ",
+          "وَٱعۡفُ",
+          "عَنَّا",
+          "وَٱغۡفِرۡ",
+          "لَنَا",
+          "وَٱرۡحَمۡنَاۤۚ",
+          "أَنتَ",
+          "مَوۡلَىٰنَا",
+          "فَٱنصُرۡنَا",
+          "عَلَى",
+          "ٱلۡقَوۡمِ",
+          "ٱلۡكَـٰفِرِینَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 285,
+            "text": "ءَامَنَ ٱلرَّسُولُ بِمَاۤ أُنزِلَ إِلَیۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰۤئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَیۡنَ أَحَدࣲ مِّن رُّسُلِهِۦۚ وَقَالُوا۟ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَیۡكَ ٱلۡمَصِیرُ",
+            "translation": "The Messenger has believed in what was revealed to him from his Lord, and [so have] the believers. All of them have believed in Allah and His angels and His books and His messengers, [saying], \"We make no distinction between any of His messengers.\" And they say, \"We hear and we obey. [We seek] Your forgiveness, our Lord, and to You is the [final] destination",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 27,
+            "totalWordCount": 27,
+            "matchedSlice": "ءَامَنَ ٱلرَّسُولُ بِمَاۤ أُنزِلَ إِلَیۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰۤئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَیۡنَ أَحَدࣲ مِّن رُّسُلِهِۦۚ وَقَالُوا۟ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَیۡكَ ٱلۡمَصِیرُ"
+          },
+          {
+            "verse": 286,
+            "text": "لَا یُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَیۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَاۤ إِن نَّسِینَاۤ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَیۡنَاۤ إِصۡرࣰا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِینَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَاۤۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَـٰفِرِینَ",
+            "translation": "Allah does not charge a soul except [with that within] its capacity. It will have [the consequence of] what [good] it has gained, and it will bear [the consequence of] what [evil] it has earned. \"Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 49,
+            "totalWordCount": 49,
+            "matchedSlice": "لَا یُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَیۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَاۤ إِن نَّسِینَاۤ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَیۡنَاۤ إِصۡرࣰا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِینَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَاۤۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَـٰفِرِینَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 170.15
+  },
+  "1e_end_255_start_256": {
+    "query": "وهو العلي العظيم لا اكراه في الدين",
+    "normalizedQuery": "وهو العلي العظيم لا اكراه في الدين",
+    "alefInvariantQuery": "وهو لعلي لعظيم ل كره في لدين",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 255,
+        "startVerse": 255,
+        "endVerse": 256,
+        "verseRange": "255–256",
+        "isRange": true,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ لَاۤ إِكۡرَاهَ فِی ٱلدِّینِۖ قَد تَّبَیَّنَ ٱلرُّشۡدُ مِنَ ٱلۡغَیِّۚ فَمَن یَكۡفُرۡ بِٱلطَّـٰغُوتِ وَیُؤۡمِنۢ بِٱللَّهِ فَقَدِ ٱسۡتَمۡسَكَ بِٱلۡعُرۡوَةِ ٱلۡوُثۡقَىٰ لَا ٱنفِصَامَ لَهَاۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great There shall be no compulsion in [acceptance of] the religion. The right course has become clear from the wrong. So whoever disbelieves in Taghut and believes in Allah has grasped the most trustworthy handhold with no break in it. And Allah is Hearing and Knowing",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.09,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ لَاۤ إِكۡرَاهَ فِی ٱلدِّینِۖ قَد تَّبَیَّنَ ٱلرُّشۡدُ مِنَ ٱلۡغَیِّۚ فَمَن یَكۡفُرۡ بِٱلطَّـٰغُوتِ وَیُؤۡمِنۢ بِٱللَّهِ فَقَدِ ٱسۡتَمۡسَكَ بِٱلۡعُرۡوَةِ ٱلۡوُثۡقَىٰ لَا ٱنفِصَامَ لَهَاۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+        "matchedTokens": [
+          "وَهُوَ",
+          "ٱلۡعَلِیُّ",
+          "ٱلۡعَظِیمُ",
+          "لَاۤ",
+          "إِكۡرَاهَ",
+          "فِی",
+          "ٱلدِّینِۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 255,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.06,
+            "matchedWordCount": 3,
+            "totalWordCount": 50,
+            "matchedSlice": "وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ"
+          },
+          {
+            "verse": 256,
+            "text": "لَاۤ إِكۡرَاهَ فِی ٱلدِّینِۖ قَد تَّبَیَّنَ ٱلرُّشۡدُ مِنَ ٱلۡغَیِّۚ فَمَن یَكۡفُرۡ بِٱلطَّـٰغُوتِ وَیُؤۡمِنۢ بِٱللَّهِ فَقَدِ ٱسۡتَمۡسَكَ بِٱلۡعُرۡوَةِ ٱلۡوُثۡقَىٰ لَا ٱنفِصَامَ لَهَاۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+            "translation": "There shall be no compulsion in [acceptance of] the religion. The right course has become clear from the wrong. So whoever disbelieves in Taghut and believes in Allah has grasped the most trustworthy handhold with no break in it. And Allah is Hearing and Knowing",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.17,
+            "matchedWordCount": 4,
+            "totalWordCount": 24,
+            "matchedSlice": "لَاۤ إِكۡرَاهَ فِی ٱلدِّینِۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 1.73
+  },
+  "1f_two_surahs_different": {
+    "query": "قل هو الله أحد قل أعوذ برب الفلق",
+    "normalizedQuery": "قل هو الله احد قل اعوذ برب الفلق",
+    "alefInvariantQuery": "قل هو لله حد قل عوذ برب لفلق",
+    "state": "not_found",
+    "topConfidence": 0,
+    "totalMatches": 0,
+    "results": [],
+    "referralRequired": true,
+    "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
+    "executionTimeMs": 6.43
+  },
+  "2a_allah_la_ilaha_illa_huwa_hayy_qayyum": {
+    "query": "الله لا اله الا هو الحي القيوم",
+    "normalizedQuery": "الله لا اله الا هو الحي القيوم",
+    "alefInvariantQuery": "لله ل له ل هو لحي لقيوم",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 2,
+    "results": [
+      {
+        "chapter": 3,
+        "verse": 2,
+        "startVerse": 2,
+        "endVerse": 2,
+        "verseRange": "2",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ اٰلِ عِمْرٰنَ",
+          "english": "The Family of Imraan",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "full",
+        "coverageRatio": 1,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+        "matchedTokens": [
+          "ٱللَّهُ",
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ",
+          "ٱلۡحَیُّ",
+          "ٱلۡقَیُّومُ"
+        ],
+        "breakdown": [
+          {
+            "verse": 2,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence",
+            "confidence": 100,
+            "coverage": "full",
+            "coverageRatio": 1,
+            "matchedWordCount": 7,
+            "totalWordCount": 7,
+            "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 2,
+        "verse": 255,
+        "startVerse": 255,
+        "endVerse": 255,
+        "verseRange": "255",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.14,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "matchedTokens": [
+          "ٱللَّهُ",
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ",
+          "ٱلۡحَیُّ",
+          "ٱلۡقَیُّومُۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 255,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.14,
+            "matchedWordCount": 7,
+            "totalWordCount": 50,
+            "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 25.78
+  },
+  "2b_la_ilaha_illa_huwa": {
+    "query": "لا اله الا هو",
+    "normalizedQuery": "لا اله الا هو",
+    "alefInvariantQuery": "ل له ل هو",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 29,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 163,
+        "startVerse": 163,
+        "endVerse": 163,
+        "verseRange": "163",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "وَإِلَـٰهُكُمۡ إِلَـٰهࣱ وَٰحِدࣱۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+        "translation": "And your god is one God. There is no deity [worthy of worship] except Him, the Entirely Merciful, the Especially Merciful",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.44,
+        "matchedSlice": "وَإِلَـٰهُكُمۡ إِلَـٰهࣱ وَٰحِدࣱۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+        "matchedTokens": [
+          "لَّاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 163,
+            "text": "وَإِلَـٰهُكُمۡ إِلَـٰهࣱ وَٰحِدࣱۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+            "translation": "And your god is one God. There is no deity [worthy of worship] except Him, the Entirely Merciful, the Especially Merciful",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.44,
+            "matchedWordCount": 4,
+            "totalWordCount": 9,
+            "matchedSlice": "لَّاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 2,
+        "verse": 255,
+        "startVerse": 255,
+        "endVerse": 255,
+        "verseRange": "255",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.08,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 255,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.08,
+            "matchedWordCount": 4,
+            "totalWordCount": 50,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 3,
+        "verse": 2,
+        "startVerse": 2,
+        "endVerse": 2,
+        "verseRange": "2",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ اٰلِ عِمْرٰنَ",
+          "english": "The Family of Imraan",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.57,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 2,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.57,
+            "matchedWordCount": 4,
+            "totalWordCount": 7,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 3,
+        "verse": 6,
+        "startVerse": 6,
+        "endVerse": 6,
+        "verseRange": "6",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ اٰلِ عِمْرٰنَ",
+          "english": "The Family of Imraan",
+          "revelation": "Madina"
+        },
+        "text": "هُوَ ٱلَّذِی یُصَوِّرُكُمۡ فِی ٱلۡأَرۡحَامِ كَیۡفَ یَشَاۤءُۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+        "translation": "It is He who forms you in the wombs however He wills. There is no deity except Him, the Exalted in Might, the Wise",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.31,
+        "matchedSlice": "هُوَ ٱلَّذِی یُصَوِّرُكُمۡ فِی ٱلۡأَرۡحَامِ كَیۡفَ یَشَاۤءُۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 6,
+            "text": "هُوَ ٱلَّذِی یُصَوِّرُكُمۡ فِی ٱلۡأَرۡحَامِ كَیۡفَ یَشَاۤءُۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+            "translation": "It is He who forms you in the wombs however He wills. There is no deity except Him, the Exalted in Might, the Wise",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.31,
+            "matchedWordCount": 4,
+            "totalWordCount": 13,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 3,
+        "verse": 18,
+        "startVerse": 18,
+        "endVerse": 18,
+        "verseRange": "18",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ اٰلِ عِمْرٰنَ",
+          "english": "The Family of Imraan",
+          "revelation": "Madina"
+        },
+        "text": "شَهِدَ ٱللَّهُ أَنَّهُۥ لَاۤ إِلَـٰهَ إِلَّا هُوَ وَٱلۡمَلَـٰۤئِكَةُ وَأُو۟لُوا۟ ٱلۡعِلۡمِ قَاۤئِمَۢا بِٱلۡقِسۡطِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+        "translation": "Allah witnesses that there is no deity except Him, and [so do] the angels and those of knowledge - [that He is] maintaining [creation] in justice. There is no deity except Him, the Exalted in Might, the Wise",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.22,
+        "matchedSlice": "شَهِدَ ٱللَّهُ أَنَّهُۥ لَاۤ إِلَـٰهَ إِلَّا هُوَ وَٱلۡمَلَـٰۤئِكَةُ وَأُو۟لُوا۟ ٱلۡعِلۡمِ قَاۤئِمَۢا بِٱلۡقِسۡطِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 18,
+            "text": "شَهِدَ ٱللَّهُ أَنَّهُۥ لَاۤ إِلَـٰهَ إِلَّا هُوَ وَٱلۡمَلَـٰۤئِكَةُ وَأُو۟لُوا۟ ٱلۡعِلۡمِ قَاۤئِمَۢا بِٱلۡقِسۡطِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
+            "translation": "Allah witnesses that there is no deity except Him, and [so do] the angels and those of knowledge - [that He is] maintaining [creation] in justice. There is no deity except Him, the Exalted in Might, the Wise",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.22,
+            "matchedWordCount": 4,
+            "totalWordCount": 18,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 4,
+        "verse": 87,
+        "startVerse": 87,
+        "endVerse": 87,
+        "verseRange": "87",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ النِّسَآءِ",
+          "english": "The Women",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ لَیَجۡمَعَنَّكُمۡ إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۗ وَمَنۡ أَصۡدَقُ مِنَ ٱللَّهِ حَدِیثࣰا",
+        "translation": "Allah - there is no deity except Him. He will surely assemble you for [account on] the Day of Resurrection, about which there is no doubt. And who is more truthful than Allah in statement",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.24,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ لَیَجۡمَعَنَّكُمۡ إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۗ وَمَنۡ أَصۡدَقُ مِنَ ٱللَّهِ حَدِیثࣰا",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 87,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ لَیَجۡمَعَنَّكُمۡ إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۗ وَمَنۡ أَصۡدَقُ مِنَ ٱللَّهِ حَدِیثࣰا",
+            "translation": "Allah - there is no deity except Him. He will surely assemble you for [account on] the Day of Resurrection, about which there is no doubt. And who is more truthful than Allah in statement",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.24,
+            "matchedWordCount": 4,
+            "totalWordCount": 17,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 6,
+        "verse": 102,
+        "startVerse": 102,
+        "endVerse": 102,
+        "verseRange": "102",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْاَنْعَامِ",
+          "english": "The Cattle",
+          "revelation": "Mecca"
+        },
+        "text": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ خَـٰلِقُ كُلِّ شَیۡءࣲ فَٱعۡبُدُوهُۚ وَهُوَ عَلَىٰ كُلِّ شَیۡءࣲ وَكِیلࣱ",
+        "translation": "That is Allah, your Lord; there is no deity except Him, the Creator of all things, so worship Him. And He is Disposer of all things",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.25,
+        "matchedSlice": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ خَـٰلِقُ كُلِّ شَیۡءࣲ فَٱعۡبُدُوهُۚ وَهُوَ عَلَىٰ كُلِّ شَیۡءࣲ وَكِیلࣱ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 102,
+            "text": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ خَـٰلِقُ كُلِّ شَیۡءࣲ فَٱعۡبُدُوهُۚ وَهُوَ عَلَىٰ كُلِّ شَیۡءࣲ وَكِیلࣱ",
+            "translation": "That is Allah, your Lord; there is no deity except Him, the Creator of all things, so worship Him. And He is Disposer of all things",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.25,
+            "matchedWordCount": 4,
+            "totalWordCount": 16,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 6,
+        "verse": 106,
+        "startVerse": 106,
+        "endVerse": 106,
+        "verseRange": "106",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْاَنْعَامِ",
+          "english": "The Cattle",
+          "revelation": "Mecca"
+        },
+        "text": "ٱتَّبِعۡ مَاۤ أُوحِیَ إِلَیۡكَ مِن رَّبِّكَۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ وَأَعۡرِضۡ عَنِ ٱلۡمُشۡرِكِینَ",
+        "translation": "Follow, [O Muhammad], what has been revealed to you from your Lord - there is no deity except Him - and turn away from those who associate others with Allah",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.31,
+        "matchedSlice": "ٱتَّبِعۡ مَاۤ أُوحِیَ إِلَیۡكَ مِن رَّبِّكَۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ وَأَعۡرِضۡ عَنِ ٱلۡمُشۡرِكِینَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 106,
+            "text": "ٱتَّبِعۡ مَاۤ أُوحِیَ إِلَیۡكَ مِن رَّبِّكَۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ وَأَعۡرِضۡ عَنِ ٱلۡمُشۡرِكِینَ",
+            "translation": "Follow, [O Muhammad], what has been revealed to you from your Lord - there is no deity except Him - and turn away from those who associate others with Allah",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.31,
+            "matchedWordCount": 4,
+            "totalWordCount": 13,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 7,
+        "verse": 158,
+        "startVerse": 158,
+        "endVerse": 158,
+        "verseRange": "158",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْاَعْرَافِ",
+          "english": "The Heights",
+          "revelation": "Mecca"
+        },
+        "text": "قُلۡ یَـٰۤأَیُّهَا ٱلنَّاسُ إِنِّی رَسُولُ ٱللَّهِ إِلَیۡكُمۡ جَمِیعًا ٱلَّذِی لَهُۥ مُلۡكُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ فَءَامِنُوا۟ بِٱللَّهِ وَرَسُولِهِ ٱلنَّبِیِّ ٱلۡأُمِّیِّ ٱلَّذِی یُؤۡمِنُ بِٱللَّهِ وَكَلِمَـٰتِهِۦ وَٱتَّبِعُوهُ لَعَلَّكُمۡ تَهۡتَدُونَ",
+        "translation": "Say, [O Muhammad], \"O mankind, indeed I am the Messenger of Allah to you all, [from Him] to whom belongs the dominion of the heavens and the earth. There is no deity except Him; He gives life and causes death.\" So believe in Allah and His Messenger, the unlettered prophet, who believes in Allah and His words, and follow him that you may be guided",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.13,
+        "matchedSlice": "قُلۡ یَـٰۤأَیُّهَا ٱلنَّاسُ إِنِّی رَسُولُ ٱللَّهِ إِلَیۡكُمۡ جَمِیعًا ٱلَّذِی لَهُۥ مُلۡكُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ فَءَامِنُوا۟ بِٱللَّهِ وَرَسُولِهِ ٱلنَّبِیِّ ٱلۡأُمِّیِّ ٱلَّذِی یُؤۡمِنُ بِٱللَّهِ وَكَلِمَـٰتِهِۦ وَٱتَّبِعُوهُ لَعَلَّكُمۡ تَهۡتَدُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 158,
+            "text": "قُلۡ یَـٰۤأَیُّهَا ٱلنَّاسُ إِنِّی رَسُولُ ٱللَّهِ إِلَیۡكُمۡ جَمِیعًا ٱلَّذِی لَهُۥ مُلۡكُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ فَءَامِنُوا۟ بِٱللَّهِ وَرَسُولِهِ ٱلنَّبِیِّ ٱلۡأُمِّیِّ ٱلَّذِی یُؤۡمِنُ بِٱللَّهِ وَكَلِمَـٰتِهِۦ وَٱتَّبِعُوهُ لَعَلَّكُمۡ تَهۡتَدُونَ",
+            "translation": "Say, [O Muhammad], \"O mankind, indeed I am the Messenger of Allah to you all, [from Him] to whom belongs the dominion of the heavens and the earth. There is no deity except Him; He gives life and causes death.\" So believe in Allah and His Messenger, the unlettered prophet, who believes in Allah and His words, and follow him that you may be guided",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.13,
+            "matchedWordCount": 4,
+            "totalWordCount": 31,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 9,
+        "verse": 31,
+        "startVerse": 31,
+        "endVerse": 31,
+        "verseRange": "31",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّوْبَةِ",
+          "english": "The Repentance",
+          "revelation": "Madina"
+        },
+        "text": "ٱتَّخَذُوۤا۟ أَحۡبَارَهُمۡ وَرُهۡبَـٰنَهُمۡ أَرۡبَابࣰا مِّن دُونِ ٱللَّهِ وَٱلۡمَسِیحَ ٱبۡنَ مَرۡیَمَ وَمَاۤ أُمِرُوۤا۟ إِلَّا لِیَعۡبُدُوۤا۟ إِلَـٰهࣰا وَٰحِدࣰاۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَۚ سُبۡحَـٰنَهُۥ عَمَّا یُشۡرِكُونَ",
+        "translation": "They have taken their scholars and monks as lords besides Allah, and [also] the Messiah, the son of Mary. And they were not commanded except to worship one God; there is no deity except Him. Exalted is He above whatever they associate with Him",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.17,
+        "matchedSlice": "ٱتَّخَذُوۤا۟ أَحۡبَارَهُمۡ وَرُهۡبَـٰنَهُمۡ أَرۡبَابࣰا مِّن دُونِ ٱللَّهِ وَٱلۡمَسِیحَ ٱبۡنَ مَرۡیَمَ وَمَاۤ أُمِرُوۤا۟ إِلَّا لِیَعۡبُدُوۤا۟ إِلَـٰهࣰا وَٰحِدࣰاۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَۚ سُبۡحَـٰنَهُۥ عَمَّا یُشۡرِكُونَ",
+        "matchedTokens": [
+          "لَّاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 31,
+            "text": "ٱتَّخَذُوۤا۟ أَحۡبَارَهُمۡ وَرُهۡبَـٰنَهُمۡ أَرۡبَابࣰا مِّن دُونِ ٱللَّهِ وَٱلۡمَسِیحَ ٱبۡنَ مَرۡیَمَ وَمَاۤ أُمِرُوۤا۟ إِلَّا لِیَعۡبُدُوۤا۟ إِلَـٰهࣰا وَٰحِدࣰاۖ لَّاۤ إِلَـٰهَ إِلَّا هُوَۚ سُبۡحَـٰنَهُۥ عَمَّا یُشۡرِكُونَ",
+            "translation": "They have taken their scholars and monks as lords besides Allah, and [also] the Messiah, the son of Mary. And they were not commanded except to worship one God; there is no deity except Him. Exalted is He above whatever they associate with Him",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.17,
+            "matchedWordCount": 4,
+            "totalWordCount": 23,
+            "matchedSlice": "لَّاۤ إِلَـٰهَ إِلَّا هُوَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 9,
+        "verse": 129,
+        "startVerse": 129,
+        "endVerse": 129,
+        "verseRange": "129",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّوْبَةِ",
+          "english": "The Repentance",
+          "revelation": "Madina"
+        },
+        "text": "فَإِن تَوَلَّوۡا۟ فَقُلۡ حَسۡبِیَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَلَیۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ",
+        "translation": "But if they turn away, [O Muhammad], say, \"Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.27,
+        "matchedSlice": "فَإِن تَوَلَّوۡا۟ فَقُلۡ حَسۡبِیَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَلَیۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 129,
+            "text": "فَإِن تَوَلَّوۡا۟ فَقُلۡ حَسۡبِیَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَلَیۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ",
+            "translation": "But if they turn away, [O Muhammad], say, \"Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.27,
+            "matchedWordCount": 4,
+            "totalWordCount": 15,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 11,
+        "verse": 14,
+        "startVerse": 14,
+        "endVerse": 14,
+        "verseRange": "14",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ هُوْدٍ",
+          "english": "Hud",
+          "revelation": "Mecca"
+        },
+        "text": "فَإِلَّمۡ یَسۡتَجِیبُوا۟ لَكُمۡ فَٱعۡلَمُوۤا۟ أَنَّمَاۤ أُنزِلَ بِعِلۡمِ ٱللَّهِ وَأَن لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَهَلۡ أَنتُم مُّسۡلِمُونَ",
+        "translation": "And if they do not respond to you - then know that the Qur'an was revealed with the knowledge of Allah and that there is no deity except Him. Then, would you [not] be Muslims",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.25,
+        "matchedSlice": "فَإِلَّمۡ یَسۡتَجِیبُوا۟ لَكُمۡ فَٱعۡلَمُوۤا۟ أَنَّمَاۤ أُنزِلَ بِعِلۡمِ ٱللَّهِ وَأَن لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَهَلۡ أَنتُم مُّسۡلِمُونَ",
+        "matchedTokens": [
+          "لَّاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 14,
+            "text": "فَإِلَّمۡ یَسۡتَجِیبُوا۟ لَكُمۡ فَٱعۡلَمُوۤا۟ أَنَّمَاۤ أُنزِلَ بِعِلۡمِ ٱللَّهِ وَأَن لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَهَلۡ أَنتُم مُّسۡلِمُونَ",
+            "translation": "And if they do not respond to you - then know that the Qur'an was revealed with the knowledge of Allah and that there is no deity except Him. Then, would you [not] be Muslims",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.25,
+            "matchedWordCount": 4,
+            "totalWordCount": 16,
+            "matchedSlice": "لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 13,
+        "verse": 30,
+        "startVerse": 30,
+        "endVerse": 30,
+        "verseRange": "30",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الرَّعْدِ",
+          "english": "The Thunder",
+          "revelation": "Madina"
+        },
+        "text": "كَذَٰلِكَ أَرۡسَلۡنَـٰكَ فِیۤ أُمَّةࣲ قَدۡ خَلَتۡ مِن قَبۡلِهَاۤ أُمَمࣱ لِّتَتۡلُوَا۟ عَلَیۡهِمُ ٱلَّذِیۤ أَوۡحَیۡنَاۤ إِلَیۡكَ وَهُمۡ یَكۡفُرُونَ بِٱلرَّحۡمَـٰنِۚ قُلۡ هُوَ رَبِّی لَاۤ إِلَـٰهَ إِلَّا هُوَ عَلَیۡهِ تَوَكَّلۡتُ وَإِلَیۡهِ مَتَابِ",
+        "translation": "Thus have We sent you to a community before which [other] communities have passed on so you might recite to them that which We revealed to you, while they disbelieve in the Most Merciful. Say, \"He is my Lord; there is no deity except Him. Upon Him I rely, and to Him is my return",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.14,
+        "matchedSlice": "كَذَٰلِكَ أَرۡسَلۡنَـٰكَ فِیۤ أُمَّةࣲ قَدۡ خَلَتۡ مِن قَبۡلِهَاۤ أُمَمࣱ لِّتَتۡلُوَا۟ عَلَیۡهِمُ ٱلَّذِیۤ أَوۡحَیۡنَاۤ إِلَیۡكَ وَهُمۡ یَكۡفُرُونَ بِٱلرَّحۡمَـٰنِۚ قُلۡ هُوَ رَبِّی لَاۤ إِلَـٰهَ إِلَّا هُوَ عَلَیۡهِ تَوَكَّلۡتُ وَإِلَیۡهِ مَتَابِ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 30,
+            "text": "كَذَٰلِكَ أَرۡسَلۡنَـٰكَ فِیۤ أُمَّةࣲ قَدۡ خَلَتۡ مِن قَبۡلِهَاۤ أُمَمࣱ لِّتَتۡلُوَا۟ عَلَیۡهِمُ ٱلَّذِیۤ أَوۡحَیۡنَاۤ إِلَیۡكَ وَهُمۡ یَكۡفُرُونَ بِٱلرَّحۡمَـٰنِۚ قُلۡ هُوَ رَبِّی لَاۤ إِلَـٰهَ إِلَّا هُوَ عَلَیۡهِ تَوَكَّلۡتُ وَإِلَیۡهِ مَتَابِ",
+            "translation": "Thus have We sent you to a community before which [other] communities have passed on so you might recite to them that which We revealed to you, while they disbelieve in the Most Merciful. Say, \"He is my Lord; there is no deity except Him. Upon Him I rely, and to Him is my return",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.14,
+            "matchedWordCount": 4,
+            "totalWordCount": 28,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 20,
+        "verse": 8,
+        "startVerse": 8,
+        "endVerse": 8,
+        "verseRange": "8",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ طٰهٰ",
+          "english": "Taa-Haa",
+          "revelation": "Mecca"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡأَسۡمَاۤءُ ٱلۡحُسۡنَىٰ",
+        "translation": "Allah - there is no deity except Him. To Him belong the best names",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.5,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡأَسۡمَاۤءُ ٱلۡحُسۡنَىٰ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 8,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡأَسۡمَاۤءُ ٱلۡحُسۡنَىٰ",
+            "translation": "Allah - there is no deity except Him. To Him belong the best names",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.5,
+            "matchedWordCount": 4,
+            "totalWordCount": 8,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 20,
+        "verse": 98,
+        "startVerse": 98,
+        "endVerse": 98,
+        "verseRange": "98",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ طٰهٰ",
+          "english": "Taa-Haa",
+          "revelation": "Mecca"
+        },
+        "text": "إِنَّمَاۤ إِلَـٰهُكُمُ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَسِعَ كُلَّ شَیۡءٍ عِلۡمࣰا",
+        "translation": "Your god is only Allah, except for whom there is no deity. He has encompassed all things in knowledge",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.33,
+        "matchedSlice": "إِنَّمَاۤ إِلَـٰهُكُمُ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَسِعَ كُلَّ شَیۡءٍ عِلۡمࣰا",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 98,
+            "text": "إِنَّمَاۤ إِلَـٰهُكُمُ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَسِعَ كُلَّ شَیۡءٍ عِلۡمࣰا",
+            "translation": "Your god is only Allah, except for whom there is no deity. He has encompassed all things in knowledge",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.33,
+            "matchedWordCount": 4,
+            "totalWordCount": 12,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 23,
+        "verse": 116,
+        "startVerse": 116,
+        "endVerse": 116,
+        "verseRange": "116",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُؤْمِنُوْنَ",
+          "english": "The Believers",
+          "revelation": "Mecca"
+        },
+        "text": "فَتَعَـٰلَى ٱللَّهُ ٱلۡمَلِكُ ٱلۡحَقُّۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡكَرِیمِ",
+        "translation": "So exalted is Allah, the Sovereign, the Truth; there is no deity except Him, Lord of the Noble Throne",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.36,
+        "matchedSlice": "فَتَعَـٰلَى ٱللَّهُ ٱلۡمَلِكُ ٱلۡحَقُّۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡكَرِیمِ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 116,
+            "text": "فَتَعَـٰلَى ٱللَّهُ ٱلۡمَلِكُ ٱلۡحَقُّۖ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡكَرِیمِ",
+            "translation": "So exalted is Allah, the Sovereign, the Truth; there is no deity except Him, Lord of the Noble Throne",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.36,
+            "matchedWordCount": 4,
+            "totalWordCount": 11,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 27,
+        "verse": 26,
+        "startVerse": 26,
+        "endVerse": 26,
+        "verseRange": "26",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ النَّمْلِ",
+          "english": "The Ant",
+          "revelation": "Mecca"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ۩",
+        "translation": "Allah - there is no deity except Him, Lord of the Great Throne",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.5,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ۩",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 26,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِیمِ۩",
+            "translation": "Allah - there is no deity except Him, Lord of the Great Throne",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.5,
+            "matchedWordCount": 4,
+            "totalWordCount": 8,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 28,
+        "verse": 70,
+        "startVerse": 70,
+        "endVerse": 70,
+        "verseRange": "70",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْقَصَصِ",
+          "english": "The Stories",
+          "revelation": "Mecca"
+        },
+        "text": "وَهُوَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡحَمۡدُ فِی ٱلۡأُولَىٰ وَٱلۡءَاخِرَةِۖ وَلَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+        "translation": "And He is Allah; there is no deity except Him. To Him is [due all] praise in the first [life] and the Hereafter. And His is the [final] decision, and to Him you will be returned",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.27,
+        "matchedSlice": "وَهُوَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡحَمۡدُ فِی ٱلۡأُولَىٰ وَٱلۡءَاخِرَةِۖ وَلَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 70,
+            "text": "وَهُوَ ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ لَهُ ٱلۡحَمۡدُ فِی ٱلۡأُولَىٰ وَٱلۡءَاخِرَةِۖ وَلَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+            "translation": "And He is Allah; there is no deity except Him. To Him is [due all] praise in the first [life] and the Hereafter. And His is the [final] decision, and to Him you will be returned",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.27,
+            "matchedWordCount": 4,
+            "totalWordCount": 15,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 28,
+        "verse": 88,
+        "startVerse": 88,
+        "endVerse": 88,
+        "verseRange": "88",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْقَصَصِ",
+          "english": "The Stories",
+          "revelation": "Mecca"
+        },
+        "text": "وَلَا تَدۡعُ مَعَ ٱللَّهِ إِلَـٰهًا ءَاخَرَۘ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ كُلُّ شَیۡءٍ هَالِكٌ إِلَّا وَجۡهَهُۥۚ لَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+        "translation": "And do not invoke with Allah another deity. There is no deity except Him. Everything will be destroyed except His Face. His is the judgement, and to Him you will be returned",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.21,
+        "matchedSlice": "وَلَا تَدۡعُ مَعَ ٱللَّهِ إِلَـٰهًا ءَاخَرَۘ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ كُلُّ شَیۡءٍ هَالِكٌ إِلَّا وَجۡهَهُۥۚ لَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 88,
+            "text": "وَلَا تَدۡعُ مَعَ ٱللَّهِ إِلَـٰهًا ءَاخَرَۘ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ كُلُّ شَیۡءٍ هَالِكٌ إِلَّا وَجۡهَهُۥۚ لَهُ ٱلۡحُكۡمُ وَإِلَیۡهِ تُرۡجَعُونَ",
+            "translation": "And do not invoke with Allah another deity. There is no deity except Him. Everything will be destroyed except His Face. His is the judgement, and to Him you will be returned",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.21,
+            "matchedWordCount": 4,
+            "totalWordCount": 19,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 35,
+        "verse": 3,
+        "startVerse": 3,
+        "endVerse": 3,
+        "verseRange": "3",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ فَاطِرٍ",
+          "english": "The Originator",
+          "revelation": "Mecca"
+        },
+        "text": "یَـٰۤأَیُّهَا ٱلنَّاسُ ٱذۡكُرُوا۟ نِعۡمَتَ ٱللَّهِ عَلَیۡكُمۡۚ هَلۡ مِنۡ خَـٰلِقٍ غَیۡرُ ٱللَّهِ یَرۡزُقُكُم مِّنَ ٱلسَّمَاۤءِ وَٱلۡأَرۡضِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+        "translation": "O mankind, remember the favor of Allah upon you. Is there any creator other than Allah who provides for you from the heaven and earth? There is no deity except Him, so how are you deluded",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.19,
+        "matchedSlice": "یَـٰۤأَیُّهَا ٱلنَّاسُ ٱذۡكُرُوا۟ نِعۡمَتَ ٱللَّهِ عَلَیۡكُمۡۚ هَلۡ مِنۡ خَـٰلِقٍ غَیۡرُ ٱللَّهِ یَرۡزُقُكُم مِّنَ ٱلسَّمَاۤءِ وَٱلۡأَرۡضِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 3,
+            "text": "یَـٰۤأَیُّهَا ٱلنَّاسُ ٱذۡكُرُوا۟ نِعۡمَتَ ٱللَّهِ عَلَیۡكُمۡۚ هَلۡ مِنۡ خَـٰلِقٍ غَیۡرُ ٱللَّهِ یَرۡزُقُكُم مِّنَ ٱلسَّمَاۤءِ وَٱلۡأَرۡضِۚ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+            "translation": "O mankind, remember the favor of Allah upon you. Is there any creator other than Allah who provides for you from the heaven and earth? There is no deity except Him, so how are you deluded",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.19,
+            "matchedWordCount": 4,
+            "totalWordCount": 21,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 39,
+        "verse": 6,
+        "startVerse": 6,
+        "endVerse": 6,
+        "verseRange": "6",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الزُّمَرِ",
+          "english": "The Groups",
+          "revelation": "Mecca"
+        },
+        "text": "خَلَقَكُم مِّن نَّفۡسࣲ وَٰحِدَةࣲ ثُمَّ جَعَلَ مِنۡهَا زَوۡجَهَا وَأَنزَلَ لَكُم مِّنَ ٱلۡأَنۡعَـٰمِ ثَمَـٰنِیَةَ أَزۡوَٰجࣲۚ یَخۡلُقُكُمۡ فِی بُطُونِ أُمَّهَـٰتِكُمۡ خَلۡقࣰا مِّنۢ بَعۡدِ خَلۡقࣲ فِی ظُلُمَـٰتࣲ ثَلَـٰثࣲۚ ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ لَهُ ٱلۡمُلۡكُۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُصۡرَفُونَ",
+        "translation": "He created you from one soul. Then He made from it its mate, and He produced for you from the grazing livestock eight mates. He creates you in the wombs of your mothers, creation after creation, within three darknesses. That is Allah, your Lord; to Him belongs dominion. There is no deity except Him, so how are you averted",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.11,
+        "matchedSlice": "خَلَقَكُم مِّن نَّفۡسࣲ وَٰحِدَةࣲ ثُمَّ جَعَلَ مِنۡهَا زَوۡجَهَا وَأَنزَلَ لَكُم مِّنَ ٱلۡأَنۡعَـٰمِ ثَمَـٰنِیَةَ أَزۡوَٰجࣲۚ یَخۡلُقُكُمۡ فِی بُطُونِ أُمَّهَـٰتِكُمۡ خَلۡقࣰا مِّنۢ بَعۡدِ خَلۡقࣲ فِی ظُلُمَـٰتࣲ ثَلَـٰثࣲۚ ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ لَهُ ٱلۡمُلۡكُۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُصۡرَفُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 6,
+            "text": "خَلَقَكُم مِّن نَّفۡسࣲ وَٰحِدَةࣲ ثُمَّ جَعَلَ مِنۡهَا زَوۡجَهَا وَأَنزَلَ لَكُم مِّنَ ٱلۡأَنۡعَـٰمِ ثَمَـٰنِیَةَ أَزۡوَٰجࣲۚ یَخۡلُقُكُمۡ فِی بُطُونِ أُمَّهَـٰتِكُمۡ خَلۡقࣰا مِّنۢ بَعۡدِ خَلۡقࣲ فِی ظُلُمَـٰتࣲ ثَلَـٰثࣲۚ ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ لَهُ ٱلۡمُلۡكُۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُصۡرَفُونَ",
+            "translation": "He created you from one soul. Then He made from it its mate, and He produced for you from the grazing livestock eight mates. He creates you in the wombs of your mothers, creation after creation, within three darknesses. That is Allah, your Lord; to Him belongs dominion. There is no deity except Him, so how are you averted",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.11,
+            "matchedWordCount": 4,
+            "totalWordCount": 36,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 40,
+        "verse": 3,
+        "startVerse": 3,
+        "endVerse": 3,
+        "verseRange": "3",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُؤْمِنِ",
+          "english": "The Forgiver",
+          "revelation": "Mecca"
+        },
+        "text": "غَافِرِ ٱلذَّنۢبِ وَقَابِلِ ٱلتَّوۡبِ شَدِیدِ ٱلۡعِقَابِ ذِی ٱلطَّوۡلِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ إِلَیۡهِ ٱلۡمَصِیرُ",
+        "translation": "The forgiver of sin, acceptor of repentance, severe in punishment, owner of abundance. There is no deity except Him; to Him is the destination",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.29,
+        "matchedSlice": "غَافِرِ ٱلذَّنۢبِ وَقَابِلِ ٱلتَّوۡبِ شَدِیدِ ٱلۡعِقَابِ ذِی ٱلطَّوۡلِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ إِلَیۡهِ ٱلۡمَصِیرُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 3,
+            "text": "غَافِرِ ٱلذَّنۢبِ وَقَابِلِ ٱلتَّوۡبِ شَدِیدِ ٱلۡعِقَابِ ذِی ٱلطَّوۡلِۖ لَاۤ إِلَـٰهَ إِلَّا هُوَۖ إِلَیۡهِ ٱلۡمَصِیرُ",
+            "translation": "The forgiver of sin, acceptor of repentance, severe in punishment, owner of abundance. There is no deity except Him; to Him is the destination",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.29,
+            "matchedWordCount": 4,
+            "totalWordCount": 14,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 40,
+        "verse": 62,
+        "startVerse": 62,
+        "endVerse": 62,
+        "verseRange": "62",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُؤْمِنِ",
+          "english": "The Forgiver",
+          "revelation": "Mecca"
+        },
+        "text": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ خَـٰلِقُ كُلِّ شَیۡءࣲ لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+        "translation": "That is Allah, your Lord, Creator of all things; there is no deity except Him, so how are you deluded",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.33,
+        "matchedSlice": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ خَـٰلِقُ كُلِّ شَیۡءࣲ لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+        "matchedTokens": [
+          "لَّاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 62,
+            "text": "ذَٰلِكُمُ ٱللَّهُ رَبُّكُمۡ خَـٰلِقُ كُلِّ شَیۡءࣲ لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ فَأَنَّىٰ تُؤۡفَكُونَ",
+            "translation": "That is Allah, your Lord, Creator of all things; there is no deity except Him, so how are you deluded",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.33,
+            "matchedWordCount": 4,
+            "totalWordCount": 12,
+            "matchedSlice": "لَّاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 40,
+        "verse": 65,
+        "startVerse": 65,
+        "endVerse": 65,
+        "verseRange": "65",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُؤْمِنِ",
+          "english": "The Forgiver",
+          "revelation": "Mecca"
+        },
+        "text": "هُوَ ٱلۡحَیُّ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱدۡعُوهُ مُخۡلِصِینَ لَهُ ٱلدِّینَۗ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
+        "translation": "He is the Ever-Living; there is no deity except Him, so call upon Him, [being] sincere to Him in religion. [All] praise is [due] to Allah, Lord of the worlds",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.29,
+        "matchedSlice": "هُوَ ٱلۡحَیُّ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱدۡعُوهُ مُخۡلِصِینَ لَهُ ٱلدِّینَۗ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 65,
+            "text": "هُوَ ٱلۡحَیُّ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱدۡعُوهُ مُخۡلِصِینَ لَهُ ٱلدِّینَۗ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
+            "translation": "He is the Ever-Living; there is no deity except Him, so call upon Him, [being] sincere to Him in religion. [All] praise is [due] to Allah, Lord of the worlds",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.29,
+            "matchedWordCount": 4,
+            "totalWordCount": 14,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 44,
+        "verse": 8,
+        "startVerse": 8,
+        "endVerse": 8,
+        "verseRange": "8",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الدُّخَانِ",
+          "english": "The Smoke",
+          "revelation": "Mecca"
+        },
+        "text": "لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ رَبُّكُمۡ وَرَبُّ ءَابَاۤئِكُمُ ٱلۡأَوَّلِینَ",
+        "translation": "There is no deity except Him; He gives life and causes death. [He is] your Lord and the Lord of your first forefathers",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.4,
+        "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ رَبُّكُمۡ وَرَبُّ ءَابَاۤئِكُمُ ٱلۡأَوَّلِینَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 8,
+            "text": "لَاۤ إِلَـٰهَ إِلَّا هُوَ یُحۡیِۦ وَیُمِیتُۖ رَبُّكُمۡ وَرَبُّ ءَابَاۤئِكُمُ ٱلۡأَوَّلِینَ",
+            "translation": "There is no deity except Him; He gives life and causes death. [He is] your Lord and the Lord of your first forefathers",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.4,
+            "matchedWordCount": 4,
+            "totalWordCount": 10,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 59,
+        "verse": 22,
+        "startVerse": 22,
+        "endVerse": 22,
+        "verseRange": "22",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْحَشْرِ",
+          "english": "The Exile",
+          "revelation": "Madina"
+        },
+        "text": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَـٰلِمُ ٱلۡغَیۡبِ وَٱلشَّهَـٰدَةِۖ هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+        "translation": "He is Allah, other than whom there is no deity, Knower of the unseen and the witnessed. He is the Entirely Merciful, the Especially Merciful",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.31,
+        "matchedSlice": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَـٰلِمُ ٱلۡغَیۡبِ وَٱلشَّهَـٰدَةِۖ هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۖ"
+        ],
+        "breakdown": [
+          {
+            "verse": 22,
+            "text": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَۖ عَـٰلِمُ ٱلۡغَیۡبِ وَٱلشَّهَـٰدَةِۖ هُوَ ٱلرَّحۡمَـٰنُ ٱلرَّحِیمُ",
+            "translation": "He is Allah, other than whom there is no deity, Knower of the unseen and the witnessed. He is the Entirely Merciful, the Especially Merciful",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.31,
+            "matchedWordCount": 4,
+            "totalWordCount": 13,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۖ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 59,
+        "verse": 23,
+        "startVerse": 23,
+        "endVerse": 23,
+        "verseRange": "23",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْحَشْرِ",
+          "english": "The Exile",
+          "revelation": "Madina"
+        },
+        "text": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡمَلِكُ ٱلۡقُدُّوسُ ٱلسَّلَـٰمُ ٱلۡمُؤۡمِنُ ٱلۡمُهَیۡمِنُ ٱلۡعَزِیزُ ٱلۡجَبَّارُ ٱلۡمُتَكَبِّرُۚ سُبۡحَـٰنَ ٱللَّهِ عَمَّا یُشۡرِكُونَ",
+        "translation": "He is Allah, other than whom there is no deity, the Sovereign, the Pure, the Perfection, the Bestower of Faith, the Overseer, the Exalted in Might, the Compeller, the Superior. Exalted is Allah above whatever they associate with Him",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.21,
+        "matchedSlice": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡمَلِكُ ٱلۡقُدُّوسُ ٱلسَّلَـٰمُ ٱلۡمُؤۡمِنُ ٱلۡمُهَیۡمِنُ ٱلۡعَزِیزُ ٱلۡجَبَّارُ ٱلۡمُتَكَبِّرُۚ سُبۡحَـٰنَ ٱللَّهِ عَمَّا یُشۡرِكُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 23,
+            "text": "هُوَ ٱللَّهُ ٱلَّذِی لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡمَلِكُ ٱلۡقُدُّوسُ ٱلسَّلَـٰمُ ٱلۡمُؤۡمِنُ ٱلۡمُهَیۡمِنُ ٱلۡعَزِیزُ ٱلۡجَبَّارُ ٱلۡمُتَكَبِّرُۚ سُبۡحَـٰنَ ٱللَّهِ عَمَّا یُشۡرِكُونَ",
+            "translation": "He is Allah, other than whom there is no deity, the Sovereign, the Pure, the Perfection, the Bestower of Faith, the Overseer, the Exalted in Might, the Compeller, the Superior. Exalted is Allah above whatever they associate with Him",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.21,
+            "matchedWordCount": 4,
+            "totalWordCount": 19,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 64,
+        "verse": 13,
+        "startVerse": 13,
+        "endVerse": 13,
+        "verseRange": "13",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّغَابُنِ",
+          "english": "Mutual Disillusion",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَعَلَى ٱللَّهِ فَلۡیَتَوَكَّلِ ٱلۡمُؤۡمِنُونَ",
+        "translation": "Allah - there is no deity except Him. And upon Allah let the believers rely",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.44,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَعَلَى ٱللَّهِ فَلۡیَتَوَكَّلِ ٱلۡمُؤۡمِنُونَ",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 13,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَۚ وَعَلَى ٱللَّهِ فَلۡیَتَوَكَّلِ ٱلۡمُؤۡمِنُونَ",
+            "translation": "Allah - there is no deity except Him. And upon Allah let the believers rely",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.44,
+            "matchedWordCount": 4,
+            "totalWordCount": 9,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 73,
+        "verse": 9,
+        "startVerse": 9,
+        "endVerse": 9,
+        "verseRange": "9",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُزَّمِّلِ",
+          "english": "The Enshrouded One",
+          "revelation": "Mecca"
+        },
+        "text": "رَّبُّ ٱلۡمَشۡرِقِ وَٱلۡمَغۡرِبِ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱتَّخِذۡهُ وَكِیلࣰا",
+        "translation": "[He is] the Lord of the East and the West; there is no deity except Him, so take Him as Disposer of [your] affairs",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.44,
+        "matchedSlice": "رَّبُّ ٱلۡمَشۡرِقِ وَٱلۡمَغۡرِبِ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱتَّخِذۡهُ وَكِیلࣰا",
+        "matchedTokens": [
+          "لَاۤ",
+          "إِلَـٰهَ",
+          "إِلَّا",
+          "هُوَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 9,
+            "text": "رَّبُّ ٱلۡمَشۡرِقِ وَٱلۡمَغۡرِبِ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱتَّخِذۡهُ وَكِیلࣰا",
+            "translation": "[He is] the Lord of the East and the West; there is no deity except Him, so take Him as Disposer of [your] affairs",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.44,
+            "matchedWordCount": 4,
+            "totalWordCount": 9,
+            "matchedSlice": "لَاۤ إِلَـٰهَ إِلَّا هُوَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 9.85
+  },
+  "6a_dhalika_al_kutub": {
+    "query": "ذلك الكتب لا ريب فيه",
+    "normalizedQuery": "ذلك الكتب لا ريب فيه",
+    "alefInvariantQuery": "ذلك لكتب ل ريب فيه",
+    "state": "close_match",
+    "topConfidence": 88,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 2,
+        "startVerse": 2,
+        "endVerse": 2,
+        "verseRange": "2",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+        "confidence": 88,
+        "state": "close_match",
+        "coverage": "fragment",
+        "coverageRatio": 0.71,
+        "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "matchedTokens": [
+          "ذَٰلِكَ",
+          "لَا",
+          "رَیۡبَۛ",
+          "فِیهِۛ"
+        ],
+        "breakdown": [
+          {
+            "verse": 2,
+            "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+            "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+            "confidence": 88,
+            "coverage": "fragment",
+            "coverageRatio": 0.71,
+            "matchedWordCount": 5,
+            "totalWordCount": 7,
+            "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 2.58
+  },
+  "6b_dhalika_al_kitab": {
+    "query": "ذلك الكتاب لا ريب فيه",
+    "normalizedQuery": "ذلك الكتاب لا ريب فيه",
+    "alefInvariantQuery": "ذلك لكتب ل ريب فيه",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 2,
+        "startVerse": 2,
+        "endVerse": 2,
+        "verseRange": "2",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.71,
+        "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "matchedTokens": [
+          "ذَٰلِكَ",
+          "ٱلۡكِتَـٰبُ",
+          "لَا",
+          "رَیۡبَۛ",
+          "فِیهِۛ"
+        ],
+        "breakdown": [
+          {
+            "verse": 2,
+            "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+            "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.71,
+            "matchedWordCount": 5,
+            "totalWordCount": 7,
+            "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 1.84
+  },
+  "6c_salawatika": {
+    "query": "خذ من اموالهم صدقة تطهرهم وتزكيهم بها وصل عليهم ان صلواتك سكن لهم",
+    "normalizedQuery": "خذ من اموالهم صدقه تطهرهم وتزكيهم بها وصل عليهم ان صلواتك سكن لهم",
+    "alefInvariantQuery": "خذ من مولهم صدقه تطهرهم وتزكيهم به وصل عليهم ن صلوتك سكن لهم",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 9,
+        "verse": 103,
+        "startVerse": 103,
+        "endVerse": 103,
+        "verseRange": "103",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّوْبَةِ",
+          "english": "The Repentance",
+          "revelation": "Madina"
+        },
+        "text": "خُذۡ مِنۡ أَمۡوَٰلِهِمۡ صَدَقَةࣰ تُطَهِّرُهُمۡ وَتُزَكِّیهِم بِهَا وَصَلِّ عَلَیۡهِمۡۖ إِنَّ صَلَوٰتَكَ سَكَنࣱ لَّهُمۡۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+        "translation": "Take, [O, Muhammad], from their wealth a charity by which you purify them and cause them increase, and invoke [Allah 's blessings] upon them. Indeed, your invocations are reassurance for them. And Allah is Hearing and Knowing",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.81,
+        "matchedSlice": "خُذۡ مِنۡ أَمۡوَٰلِهِمۡ صَدَقَةࣰ تُطَهِّرُهُمۡ وَتُزَكِّیهِم بِهَا وَصَلِّ عَلَیۡهِمۡۖ إِنَّ صَلَوٰتَكَ سَكَنࣱ لَّهُمۡۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+        "matchedTokens": [
+          "خُذۡ",
+          "مِنۡ",
+          "أَمۡوَٰلِهِمۡ",
+          "صَدَقَةࣰ",
+          "تُطَهِّرُهُمۡ",
+          "وَتُزَكِّیهِم",
+          "بِهَا",
+          "وَصَلِّ",
+          "عَلَیۡهِمۡۖ",
+          "إِنَّ",
+          "صَلَوٰتَكَ",
+          "سَكَنࣱ",
+          "لَّهُمۡۗ"
+        ],
+        "breakdown": [
+          {
+            "verse": 103,
+            "text": "خُذۡ مِنۡ أَمۡوَٰلِهِمۡ صَدَقَةࣰ تُطَهِّرُهُمۡ وَتُزَكِّیهِم بِهَا وَصَلِّ عَلَیۡهِمۡۖ إِنَّ صَلَوٰتَكَ سَكَنࣱ لَّهُمۡۗ وَٱللَّهُ سَمِیعٌ عَلِیمٌ",
+            "translation": "Take, [O, Muhammad], from their wealth a charity by which you purify them and cause them increase, and invoke [Allah 's blessings] upon them. Indeed, your invocations are reassurance for them. And Allah is Hearing and Knowing",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.81,
+            "matchedWordCount": 13,
+            "totalWordCount": 16,
+            "matchedSlice": "خُذۡ مِنۡ أَمۡوَٰلِهِمۡ صَدَقَةࣰ تُطَهِّرُهُمۡ وَتُزَكِّیهِم بِهَا وَصَلِّ عَلَیۡهِمۡۖ إِنَّ صَلَوٰتَكَ سَكَنࣱ لَّهُمۡۗ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 33.86
+  },
+  "8a_aqimu_salat_wa_atu_zakat": {
+    "query": "أقيموا الصلاة وآتوا الزكاة",
+    "normalizedQuery": "اقيموا الصلاه واتوا الزكاه",
+    "alefInvariantQuery": "قيمو لصله وتو لزكه",
+    "state": "matched",
+    "topConfidence": 96,
+    "totalMatches": 12,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 43,
+        "startVerse": 43,
+        "endVerse": 43,
+        "verseRange": "43",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱرۡكَعُوا۟ مَعَ ٱلرَّٰكِعِینَ",
+        "translation": "And establish prayer and give zakah and bow with those who bow [in worship and obedience]",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.57,
+        "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱرۡكَعُوا۟ مَعَ ٱلرَّٰكِعِینَ",
+        "matchedTokens": [
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 43,
+            "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱرۡكَعُوا۟ مَعَ ٱلرَّٰكِعِینَ",
+            "translation": "And establish prayer and give zakah and bow with those who bow [in worship and obedience]",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.57,
+            "matchedWordCount": 4,
+            "totalWordCount": 7,
+            "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 2,
+        "verse": 83,
+        "startVerse": 83,
+        "endVerse": 83,
+        "verseRange": "83",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "وَإِذۡ أَخَذۡنَا مِیثَـٰقَ بَنِیۤ إِسۡرَٰۤءِیلَ لَا تَعۡبُدُونَ إِلَّا ٱللَّهَ وَبِٱلۡوَٰلِدَیۡنِ إِحۡسَانࣰا وَذِی ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَقُولُوا۟ لِلنَّاسِ حُسۡنࣰا وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ ثُمَّ تَوَلَّیۡتُمۡ إِلَّا قَلِیلࣰا مِّنكُمۡ وَأَنتُم مُّعۡرِضُونَ",
+        "translation": "And [recall] when We took the covenant from the Children of Israel, [enjoining upon them], \"Do not worship except Allah; and to parents do good and to relatives, orphans, and the needy. And speak to people good [words] and establish prayer and give zakah.\" Then you turned away, except a few of you, and you were refusing",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.14,
+        "matchedSlice": "وَإِذۡ أَخَذۡنَا مِیثَـٰقَ بَنِیۤ إِسۡرَٰۤءِیلَ لَا تَعۡبُدُونَ إِلَّا ٱللَّهَ وَبِٱلۡوَٰلِدَیۡنِ إِحۡسَانࣰا وَذِی ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَقُولُوا۟ لِلنَّاسِ حُسۡنࣰا وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ ثُمَّ تَوَلَّیۡتُمۡ إِلَّا قَلِیلࣰا مِّنكُمۡ وَأَنتُم مُّعۡرِضُونَ",
+        "matchedTokens": [
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 83,
+            "text": "وَإِذۡ أَخَذۡنَا مِیثَـٰقَ بَنِیۤ إِسۡرَٰۤءِیلَ لَا تَعۡبُدُونَ إِلَّا ٱللَّهَ وَبِٱلۡوَٰلِدَیۡنِ إِحۡسَانࣰا وَذِی ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَقُولُوا۟ لِلنَّاسِ حُسۡنࣰا وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ ثُمَّ تَوَلَّیۡتُمۡ إِلَّا قَلِیلࣰا مِّنكُمۡ وَأَنتُم مُّعۡرِضُونَ",
+            "translation": "And [recall] when We took the covenant from the Children of Israel, [enjoining upon them], \"Do not worship except Allah; and to parents do good and to relatives, orphans, and the needy. And speak to people good [words] and establish prayer and give zakah.\" Then you turned away, except a few of you, and you were refusing",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.14,
+            "matchedWordCount": 4,
+            "totalWordCount": 29,
+            "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 2,
+        "verse": 110,
+        "startVerse": 110,
+        "endVerse": 110,
+        "verseRange": "110",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِۗ إِنَّ ٱللَّهَ بِمَا تَعۡمَلُونَ بَصِیرࣱ",
+        "translation": "And establish prayer and give zakah, and whatever good you put forward for yourselves - you will find it with Allah. Indeed, Allah of what you do, is Seeing",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.24,
+        "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِۗ إِنَّ ٱللَّهَ بِمَا تَعۡمَلُونَ بَصِیرࣱ",
+        "matchedTokens": [
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 110,
+            "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِۗ إِنَّ ٱللَّهَ بِمَا تَعۡمَلُونَ بَصِیرࣱ",
+            "translation": "And establish prayer and give zakah, and whatever good you put forward for yourselves - you will find it with Allah. Indeed, Allah of what you do, is Seeing",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.24,
+            "matchedWordCount": 4,
+            "totalWordCount": 17,
+            "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 4,
+        "verse": 77,
+        "startVerse": 77,
+        "endVerse": 77,
+        "verseRange": "77",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ النِّسَآءِ",
+          "english": "The Women",
+          "revelation": "Madina"
+        },
+        "text": "أَلَمۡ تَرَ إِلَى ٱلَّذِینَ قِیلَ لَهُمۡ كُفُّوۤا۟ أَیۡدِیَكُمۡ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ فَلَمَّا كُتِبَ عَلَیۡهِمُ ٱلۡقِتَالُ إِذَا فَرِیقࣱ مِّنۡهُمۡ یَخۡشَوۡنَ ٱلنَّاسَ كَخَشۡیَةِ ٱللَّهِ أَوۡ أَشَدَّ خَشۡیَةࣰۚ وَقَالُوا۟ رَبَّنَا لِمَ كَتَبۡتَ عَلَیۡنَا ٱلۡقِتَالَ لَوۡلَاۤ أَخَّرۡتَنَاۤ إِلَىٰۤ أَجَلࣲ قَرِیبࣲۗ قُلۡ مَتَـٰعُ ٱلدُّنۡیَا قَلِیلࣱ وَٱلۡءَاخِرَةُ خَیۡرࣱ لِّمَنِ ٱتَّقَىٰ وَلَا تُظۡلَمُونَ فَتِیلًا",
+        "translation": "Have you not seen those who were told, \"Restrain your hands [from fighting] and establish prayer and give zakah\"? But then when fighting was ordained for them, at once a party of them feared men as they fear Allah or with [even] greater fear. They said, \"Our Lord, why have You decreed upon us fighting? If only You had postponed [it for] us for a short time.\" Say, The enjoyment of this world is little, and the Hereafter is better for he who fears Allah. And injustice will not be done to you, [even] as much as a thread [inside a date seed]",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.08,
+        "matchedSlice": "أَلَمۡ تَرَ إِلَى ٱلَّذِینَ قِیلَ لَهُمۡ كُفُّوۤا۟ أَیۡدِیَكُمۡ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ فَلَمَّا كُتِبَ عَلَیۡهِمُ ٱلۡقِتَالُ إِذَا فَرِیقࣱ مِّنۡهُمۡ یَخۡشَوۡنَ ٱلنَّاسَ كَخَشۡیَةِ ٱللَّهِ أَوۡ أَشَدَّ خَشۡیَةࣰۚ وَقَالُوا۟ رَبَّنَا لِمَ كَتَبۡتَ عَلَیۡنَا ٱلۡقِتَالَ لَوۡلَاۤ أَخَّرۡتَنَاۤ إِلَىٰۤ أَجَلࣲ قَرِیبࣲۗ قُلۡ مَتَـٰعُ ٱلدُّنۡیَا قَلِیلࣱ وَٱلۡءَاخِرَةُ خَیۡرࣱ لِّمَنِ ٱتَّقَىٰ وَلَا تُظۡلَمُونَ فَتِیلًا",
+        "matchedTokens": [
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 77,
+            "text": "أَلَمۡ تَرَ إِلَى ٱلَّذِینَ قِیلَ لَهُمۡ كُفُّوۤا۟ أَیۡدِیَكُمۡ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ فَلَمَّا كُتِبَ عَلَیۡهِمُ ٱلۡقِتَالُ إِذَا فَرِیقࣱ مِّنۡهُمۡ یَخۡشَوۡنَ ٱلنَّاسَ كَخَشۡیَةِ ٱللَّهِ أَوۡ أَشَدَّ خَشۡیَةࣰۚ وَقَالُوا۟ رَبَّنَا لِمَ كَتَبۡتَ عَلَیۡنَا ٱلۡقِتَالَ لَوۡلَاۤ أَخَّرۡتَنَاۤ إِلَىٰۤ أَجَلࣲ قَرِیبࣲۗ قُلۡ مَتَـٰعُ ٱلدُّنۡیَا قَلِیلࣱ وَٱلۡءَاخِرَةُ خَیۡرࣱ لِّمَنِ ٱتَّقَىٰ وَلَا تُظۡلَمُونَ فَتِیلًا",
+            "translation": "Have you not seen those who were told, \"Restrain your hands [from fighting] and establish prayer and give zakah\"? But then when fighting was ordained for them, at once a party of them feared men as they fear Allah or with [even] greater fear. They said, \"Our Lord, why have You decreed upon us fighting? If only You had postponed [it for] us for a short time.\" Say, The enjoyment of this world is little, and the Hereafter is better for he who fears Allah. And injustice will not be done to you, [even] as much as a thread [inside a date seed]",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.08,
+            "matchedWordCount": 4,
+            "totalWordCount": 48,
+            "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 22,
+        "verse": 41,
+        "startVerse": 41,
+        "endVerse": 41,
+        "verseRange": "41",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْحَجِّ",
+          "english": "The Pilgrimage",
+          "revelation": "Madina"
+        },
+        "text": "ٱلَّذِینَ إِن مَّكَّنَّـٰهُمۡ فِی ٱلۡأَرۡضِ أَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ وَأَمَرُوا۟ بِٱلۡمَعۡرُوفِ وَنَهَوۡا۟ عَنِ ٱلۡمُنكَرِۗ وَلِلَّهِ عَـٰقِبَةُ ٱلۡأُمُورِ",
+        "translation": "[And they are] those who, if We give them authority in the land, establish prayer and give zakah and enjoin what is right and forbid what is wrong. And to Allah belongs the outcome of [all] matters",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.24,
+        "matchedSlice": "ٱلَّذِینَ إِن مَّكَّنَّـٰهُمۡ فِی ٱلۡأَرۡضِ أَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ وَأَمَرُوا۟ بِٱلۡمَعۡرُوفِ وَنَهَوۡا۟ عَنِ ٱلۡمُنكَرِۗ وَلِلَّهِ عَـٰقِبَةُ ٱلۡأُمُورِ",
+        "matchedTokens": [
+          "أَقَامُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتَوُا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 41,
+            "text": "ٱلَّذِینَ إِن مَّكَّنَّـٰهُمۡ فِی ٱلۡأَرۡضِ أَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ وَأَمَرُوا۟ بِٱلۡمَعۡرُوفِ وَنَهَوۡا۟ عَنِ ٱلۡمُنكَرِۗ وَلِلَّهِ عَـٰقِبَةُ ٱلۡأُمُورِ",
+            "translation": "[And they are] those who, if We give them authority in the land, establish prayer and give zakah and enjoin what is right and forbid what is wrong. And to Allah belongs the outcome of [all] matters",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.24,
+            "matchedWordCount": 4,
+            "totalWordCount": 17,
+            "matchedSlice": "أَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 22,
+        "verse": 78,
+        "startVerse": 78,
+        "endVerse": 78,
+        "verseRange": "78",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْحَجِّ",
+          "english": "The Pilgrimage",
+          "revelation": "Madina"
+        },
+        "text": "وَجَـٰهِدُوا۟ فِی ٱللَّهِ حَقَّ جِهَادِهِۦۚ هُوَ ٱجۡتَبَىٰكُمۡ وَمَا جَعَلَ عَلَیۡكُمۡ فِی ٱلدِّینِ مِنۡ حَرَجࣲۚ مِّلَّةَ أَبِیكُمۡ إِبۡرَٰهِیمَۚ هُوَ سَمَّىٰكُمُ ٱلۡمُسۡلِمِینَ مِن قَبۡلُ وَفِی هَـٰذَا لِیَكُونَ ٱلرَّسُولُ شَهِیدًا عَلَیۡكُمۡ وَتَكُونُوا۟ شُهَدَاۤءَ عَلَى ٱلنَّاسِۚ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱعۡتَصِمُوا۟ بِٱللَّهِ هُوَ مَوۡلَىٰكُمۡۖ فَنِعۡمَ ٱلۡمَوۡلَىٰ وَنِعۡمَ ٱلنَّصِیرُ",
+        "translation": "And strive for Allah with the striving due to Him. He has chosen you and has not placed upon you in the religion any difficulty. [It is] the religion of your father, Abraham. Allah named you \"Muslims\" before [in former scriptures] and in this [revelation] that the Messenger may be a witness over you and you may be witnesses over the people. So establish prayer and give zakah and hold fast to Allah. He is your protector; and excellent is the protector, and excellent is the helper",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.09,
+        "matchedSlice": "وَجَـٰهِدُوا۟ فِی ٱللَّهِ حَقَّ جِهَادِهِۦۚ هُوَ ٱجۡتَبَىٰكُمۡ وَمَا جَعَلَ عَلَیۡكُمۡ فِی ٱلدِّینِ مِنۡ حَرَجࣲۚ مِّلَّةَ أَبِیكُمۡ إِبۡرَٰهِیمَۚ هُوَ سَمَّىٰكُمُ ٱلۡمُسۡلِمِینَ مِن قَبۡلُ وَفِی هَـٰذَا لِیَكُونَ ٱلرَّسُولُ شَهِیدًا عَلَیۡكُمۡ وَتَكُونُوا۟ شُهَدَاۤءَ عَلَى ٱلنَّاسِۚ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱعۡتَصِمُوا۟ بِٱللَّهِ هُوَ مَوۡلَىٰكُمۡۖ فَنِعۡمَ ٱلۡمَوۡلَىٰ وَنِعۡمَ ٱلنَّصِیرُ",
+        "matchedTokens": [
+          "فَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 78,
+            "text": "وَجَـٰهِدُوا۟ فِی ٱللَّهِ حَقَّ جِهَادِهِۦۚ هُوَ ٱجۡتَبَىٰكُمۡ وَمَا جَعَلَ عَلَیۡكُمۡ فِی ٱلدِّینِ مِنۡ حَرَجࣲۚ مِّلَّةَ أَبِیكُمۡ إِبۡرَٰهِیمَۚ هُوَ سَمَّىٰكُمُ ٱلۡمُسۡلِمِینَ مِن قَبۡلُ وَفِی هَـٰذَا لِیَكُونَ ٱلرَّسُولُ شَهِیدًا عَلَیۡكُمۡ وَتَكُونُوا۟ شُهَدَاۤءَ عَلَى ٱلنَّاسِۚ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱعۡتَصِمُوا۟ بِٱللَّهِ هُوَ مَوۡلَىٰكُمۡۖ فَنِعۡمَ ٱلۡمَوۡلَىٰ وَنِعۡمَ ٱلنَّصِیرُ",
+            "translation": "And strive for Allah with the striving due to Him. He has chosen you and has not placed upon you in the religion any difficulty. [It is] the religion of your father, Abraham. Allah named you \"Muslims\" before [in former scriptures] and in this [revelation] that the Messenger may be a witness over you and you may be witnesses over the people. So establish prayer and give zakah and hold fast to Allah. He is your protector; and excellent is the protector, and excellent is the helper",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.09,
+            "matchedWordCount": 4,
+            "totalWordCount": 44,
+            "matchedSlice": "فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 24,
+        "verse": 56,
+        "startVerse": 56,
+        "endVerse": 56,
+        "verseRange": "56",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ النُّوْرِ",
+          "english": "The Light",
+          "revelation": "Madina"
+        },
+        "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱلرَّسُولَ لَعَلَّكُمۡ تُرۡحَمُونَ",
+        "translation": "And establish prayer and give zakah and obey the Messenger - that you may receive mercy",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.5,
+        "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱلرَّسُولَ لَعَلَّكُمۡ تُرۡحَمُونَ",
+        "matchedTokens": [
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 56,
+            "text": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱلرَّسُولَ لَعَلَّكُمۡ تُرۡحَمُونَ",
+            "translation": "And establish prayer and give zakah and obey the Messenger - that you may receive mercy",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.5,
+            "matchedWordCount": 4,
+            "totalWordCount": 8,
+            "matchedSlice": "وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 58,
+        "verse": 13,
+        "startVerse": 13,
+        "endVerse": 13,
+        "verseRange": "13",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُجَادَلَةِ",
+          "english": "The Pleading Woman",
+          "revelation": "Madina"
+        },
+        "text": "ءَأَشۡفَقۡتُمۡ أَن تُقَدِّمُوا۟ بَیۡنَ یَدَیۡ نَجۡوَىٰكُمۡ صَدَقَـٰتࣲۚ فَإِذۡ لَمۡ تَفۡعَلُوا۟ وَتَابَ ٱللَّهُ عَلَیۡكُمۡ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱللَّهَ وَرَسُولَهُۥۚ وَٱللَّهُ خَبِیرُۢ بِمَا تَعۡمَلُونَ",
+        "translation": "Have you feared to present before your consultation charities? Then when you do not and Allah has forgiven you, then [at least] establish prayer and give zakah and obey Allah and His Messenger. And Allah is Acquainted with what you do",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.17,
+        "matchedSlice": "ءَأَشۡفَقۡتُمۡ أَن تُقَدِّمُوا۟ بَیۡنَ یَدَیۡ نَجۡوَىٰكُمۡ صَدَقَـٰتࣲۚ فَإِذۡ لَمۡ تَفۡعَلُوا۟ وَتَابَ ٱللَّهُ عَلَیۡكُمۡ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱللَّهَ وَرَسُولَهُۥۚ وَٱللَّهُ خَبِیرُۢ بِمَا تَعۡمَلُونَ",
+        "matchedTokens": [
+          "فَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 13,
+            "text": "ءَأَشۡفَقۡتُمۡ أَن تُقَدِّمُوا۟ بَیۡنَ یَدَیۡ نَجۡوَىٰكُمۡ صَدَقَـٰتࣲۚ فَإِذۡ لَمۡ تَفۡعَلُوا۟ وَتَابَ ٱللَّهُ عَلَیۡكُمۡ فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَطِیعُوا۟ ٱللَّهَ وَرَسُولَهُۥۚ وَٱللَّهُ خَبِیرُۢ بِمَا تَعۡمَلُونَ",
+            "translation": "Have you feared to present before your consultation charities? Then when you do not and Allah has forgiven you, then [at least] establish prayer and give zakah and obey Allah and His Messenger. And Allah is Acquainted with what you do",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.17,
+            "matchedWordCount": 4,
+            "totalWordCount": 24,
+            "matchedSlice": "فَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 73,
+        "verse": 20,
+        "startVerse": 20,
+        "endVerse": 20,
+        "verseRange": "20",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ الْمُزَّمِّلِ",
+          "english": "The Enshrouded One",
+          "revelation": "Mecca"
+        },
+        "text": "۞ إِنَّ رَبَّكَ یَعۡلَمُ أَنَّكَ تَقُومُ أَدۡنَىٰ مِن ثُلُثَیِ ٱلَّیۡلِ وَنِصۡفَهُۥ وَثُلُثَهُۥ وَطَاۤئِفَةࣱ مِّنَ ٱلَّذِینَ مَعَكَۚ وَٱللَّهُ یُقَدِّرُ ٱلَّیۡلَ وَٱلنَّهَارَۚ عَلِمَ أَن لَّن تُحۡصُوهُ فَتَابَ عَلَیۡكُمۡۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنَ ٱلۡقُرۡءَانِۚ عَلِمَ أَن سَیَكُونُ مِنكُم مَّرۡضَىٰ وَءَاخَرُونَ یَضۡرِبُونَ فِی ٱلۡأَرۡضِ یَبۡتَغُونَ مِن فَضۡلِ ٱللَّهِ وَءَاخَرُونَ یُقَـٰتِلُونَ فِی سَبِیلِ ٱللَّهِۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنۡهُۚ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَقۡرِضُوا۟ ٱللَّهَ قَرۡضًا حَسَنࣰاۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِ هُوَ خَیۡرࣰا وَأَعۡظَمَ أَجۡرࣰاۚ وَٱسۡتَغۡفِرُوا۟ ٱللَّهَۖ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمُۢ",
+        "translation": "Indeed, your Lord knows, [O Muhammad], that you stand [in prayer] almost two thirds of the night or half of it or a third of it, and [so do] a group of those with you. And Allah determines [the extent of] the night and the day. He has known that you [Muslims] will not be able to do it and has turned to you in forgiveness, so recite what is easy [for you] of the Qur'an. He has known that there will be among you those who are ill and others traveling throughout the land seeking [something] of the bounty of Allah and others fighting for the cause of Allah. So recite what is easy from it and establish prayer and give zakah and loan Allah a goodly loan. And whatever good you put forward for yourselves - you will find it with Allah. It is better and greater in reward. And seek forgiveness of Allah. Indeed, Allah is Forgiving and Merciful",
+        "confidence": 96,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.05,
+        "matchedSlice": "۞ إِنَّ رَبَّكَ یَعۡلَمُ أَنَّكَ تَقُومُ أَدۡنَىٰ مِن ثُلُثَیِ ٱلَّیۡلِ وَنِصۡفَهُۥ وَثُلُثَهُۥ وَطَاۤئِفَةࣱ مِّنَ ٱلَّذِینَ مَعَكَۚ وَٱللَّهُ یُقَدِّرُ ٱلَّیۡلَ وَٱلنَّهَارَۚ عَلِمَ أَن لَّن تُحۡصُوهُ فَتَابَ عَلَیۡكُمۡۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنَ ٱلۡقُرۡءَانِۚ عَلِمَ أَن سَیَكُونُ مِنكُم مَّرۡضَىٰ وَءَاخَرُونَ یَضۡرِبُونَ فِی ٱلۡأَرۡضِ یَبۡتَغُونَ مِن فَضۡلِ ٱللَّهِ وَءَاخَرُونَ یُقَـٰتِلُونَ فِی سَبِیلِ ٱللَّهِۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنۡهُۚ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَقۡرِضُوا۟ ٱللَّهَ قَرۡضًا حَسَنࣰاۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِ هُوَ خَیۡرࣰا وَأَعۡظَمَ أَجۡرࣰاۚ وَٱسۡتَغۡفِرُوا۟ ٱللَّهَۖ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمُۢ",
+        "matchedTokens": [
+          "مِنۡهُۚ",
+          "وَأَقِیمُوا۟",
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتُوا۟"
+        ],
+        "breakdown": [
+          {
+            "verse": 20,
+            "text": "۞ إِنَّ رَبَّكَ یَعۡلَمُ أَنَّكَ تَقُومُ أَدۡنَىٰ مِن ثُلُثَیِ ٱلَّیۡلِ وَنِصۡفَهُۥ وَثُلُثَهُۥ وَطَاۤئِفَةࣱ مِّنَ ٱلَّذِینَ مَعَكَۚ وَٱللَّهُ یُقَدِّرُ ٱلَّیۡلَ وَٱلنَّهَارَۚ عَلِمَ أَن لَّن تُحۡصُوهُ فَتَابَ عَلَیۡكُمۡۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنَ ٱلۡقُرۡءَانِۚ عَلِمَ أَن سَیَكُونُ مِنكُم مَّرۡضَىٰ وَءَاخَرُونَ یَضۡرِبُونَ فِی ٱلۡأَرۡضِ یَبۡتَغُونَ مِن فَضۡلِ ٱللَّهِ وَءَاخَرُونَ یُقَـٰتِلُونَ فِی سَبِیلِ ٱللَّهِۖ فَٱقۡرَءُوا۟ مَا تَیَسَّرَ مِنۡهُۚ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَقۡرِضُوا۟ ٱللَّهَ قَرۡضًا حَسَنࣰاۚ وَمَا تُقَدِّمُوا۟ لِأَنفُسِكُم مِّنۡ خَیۡرࣲ تَجِدُوهُ عِندَ ٱللَّهِ هُوَ خَیۡرࣰا وَأَعۡظَمَ أَجۡرࣰاۚ وَٱسۡتَغۡفِرُوا۟ ٱللَّهَۖ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمُۢ",
+            "translation": "Indeed, your Lord knows, [O Muhammad], that you stand [in prayer] almost two thirds of the night or half of it or a third of it, and [so do] a group of those with you. And Allah determines [the extent of] the night and the day. He has known that you [Muslims] will not be able to do it and has turned to you in forgiveness, so recite what is easy [for you] of the Qur'an. He has known that there will be among you those who are ill and others traveling throughout the land seeking [something] of the bounty of Allah and others fighting for the cause of Allah. So recite what is easy from it and establish prayer and give zakah and loan Allah a goodly loan. And whatever good you put forward for yourselves - you will find it with Allah. It is better and greater in reward. And seek forgiveness of Allah. Indeed, Allah is Forgiving and Merciful",
+            "confidence": 96,
+            "coverage": "fragment",
+            "coverageRatio": 0.05,
+            "matchedWordCount": 4,
+            "totalWordCount": 79,
+            "matchedSlice": "مِنۡهُۚ وَأَقِیمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 2,
+        "verse": 277,
+        "startVerse": 277,
+        "endVerse": 277,
+        "verseRange": "277",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "إِنَّ ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ لَهُمۡ أَجۡرُهُمۡ عِندَ رَبِّهِمۡ وَلَا خَوۡفٌ عَلَیۡهِمۡ وَلَا هُمۡ یَحۡزَنُونَ",
+        "translation": "Indeed, those who believe and do righteous deeds and establish prayer and give zakah will have their reward with their Lord, and there will be no fear concerning them, nor will they grieve",
+        "confidence": 93,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.21,
+        "matchedSlice": "إِنَّ ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ لَهُمۡ أَجۡرُهُمۡ عِندَ رَبِّهِمۡ وَلَا خَوۡفٌ عَلَیۡهِمۡ وَلَا هُمۡ یَحۡزَنُونَ",
+        "matchedTokens": [
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتَوُا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 277,
+            "text": "إِنَّ ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ لَهُمۡ أَجۡرُهُمۡ عِندَ رَبِّهِمۡ وَلَا خَوۡفٌ عَلَیۡهِمۡ وَلَا هُمۡ یَحۡزَنُونَ",
+            "translation": "Indeed, those who believe and do righteous deeds and establish prayer and give zakah will have their reward with their Lord, and there will be no fear concerning them, nor will they grieve",
+            "confidence": 93,
+            "coverage": "fragment",
+            "coverageRatio": 0.21,
+            "matchedWordCount": 4,
+            "totalWordCount": 19,
+            "matchedSlice": "وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 9,
+        "verse": 5,
+        "startVerse": 5,
+        "endVerse": 5,
+        "verseRange": "5",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّوْبَةِ",
+          "english": "The Repentance",
+          "revelation": "Madina"
+        },
+        "text": "فَإِذَا ٱنسَلَخَ ٱلۡأَشۡهُرُ ٱلۡحُرُمُ فَٱقۡتُلُوا۟ ٱلۡمُشۡرِكِینَ حَیۡثُ وَجَدتُّمُوهُمۡ وَخُذُوهُمۡ وَٱحۡصُرُوهُمۡ وَٱقۡعُدُوا۟ لَهُمۡ كُلَّ مَرۡصَدࣲۚ فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَخَلُّوا۟ سَبِیلَهُمۡۚ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمࣱ",
+        "translation": "And when the sacred months have passed, then kill the polytheists wherever you find them and capture them and besiege them and sit in wait for them at every place of ambush. But if they should repent, establish prayer, and give zakah, let them [go] on their way. Indeed, Allah is Forgiving and Merciful",
+        "confidence": 93,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.15,
+        "matchedSlice": "فَإِذَا ٱنسَلَخَ ٱلۡأَشۡهُرُ ٱلۡحُرُمُ فَٱقۡتُلُوا۟ ٱلۡمُشۡرِكِینَ حَیۡثُ وَجَدتُّمُوهُمۡ وَخُذُوهُمۡ وَٱحۡصُرُوهُمۡ وَٱقۡعُدُوا۟ لَهُمۡ كُلَّ مَرۡصَدࣲۚ فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَخَلُّوا۟ سَبِیلَهُمۡۚ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمࣱ",
+        "matchedTokens": [
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتَوُا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 5,
+            "text": "فَإِذَا ٱنسَلَخَ ٱلۡأَشۡهُرُ ٱلۡحُرُمُ فَٱقۡتُلُوا۟ ٱلۡمُشۡرِكِینَ حَیۡثُ وَجَدتُّمُوهُمۡ وَخُذُوهُمۡ وَٱحۡصُرُوهُمۡ وَٱقۡعُدُوا۟ لَهُمۡ كُلَّ مَرۡصَدࣲۚ فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَخَلُّوا۟ سَبِیلَهُمۡۚ إِنَّ ٱللَّهَ غَفُورࣱ رَّحِیمࣱ",
+            "translation": "And when the sacred months have passed, then kill the polytheists wherever you find them and capture them and besiege them and sit in wait for them at every place of ambush. But if they should repent, establish prayer, and give zakah, let them [go] on their way. Indeed, Allah is Forgiving and Merciful",
+            "confidence": 93,
+            "coverage": "fragment",
+            "coverageRatio": 0.15,
+            "matchedWordCount": 4,
+            "totalWordCount": 26,
+            "matchedSlice": "وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      },
+      {
+        "chapter": 9,
+        "verse": 11,
+        "startVerse": 11,
+        "endVerse": 11,
+        "verseRange": "11",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ التَّوْبَةِ",
+          "english": "The Repentance",
+          "revelation": "Madina"
+        },
+        "text": "فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَإِخۡوَٰنُكُمۡ فِی ٱلدِّینِۗ وَنُفَصِّلُ ٱلۡءَایَـٰتِ لِقَوۡمࣲ یَعۡلَمُونَ",
+        "translation": "But if they repent, establish prayer, and give zakah, then they are your brothers in religion; and We detail the verses for a people who know",
+        "confidence": 93,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.31,
+        "matchedSlice": "فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَإِخۡوَٰنُكُمۡ فِی ٱلدِّینِۗ وَنُفَصِّلُ ٱلۡءَایَـٰتِ لِقَوۡمࣲ یَعۡلَمُونَ",
+        "matchedTokens": [
+          "ٱلصَّلَوٰةَ",
+          "وَءَاتَوُا۟",
+          "ٱلزَّكَوٰةَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 11,
+            "text": "فَإِن تَابُوا۟ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ فَإِخۡوَٰنُكُمۡ فِی ٱلدِّینِۗ وَنُفَصِّلُ ٱلۡءَایَـٰتِ لِقَوۡمࣲ یَعۡلَمُونَ",
+            "translation": "But if they repent, establish prayer, and give zakah, then they are your brothers in religion; and We detail the verses for a people who know",
+            "confidence": 93,
+            "coverage": "fragment",
+            "coverageRatio": 0.31,
+            "matchedWordCount": 4,
+            "totalWordCount": 13,
+            "matchedSlice": "وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَءَاتَوُا۟ ٱلزَّكَوٰةَ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 1.24
+  },
+  "8b_wa_ahalla_allahu_al_bay_wa_harrama_al_riba": {
+    "query": "وأحل الله البيع وحرم الربا",
+    "normalizedQuery": "واحل الله البيع وحرم الربا",
+    "alefInvariantQuery": "وحل لله لبيع وحرم لرب",
+    "state": "close_match",
+    "topConfidence": 88,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 275,
+        "startVerse": 275,
+        "endVerse": 275,
+        "verseRange": "275",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ٱلَّذِینَ یَأۡكُلُونَ ٱلرِّبَوٰا۟ لَا یَقُومُونَ إِلَّا كَمَا یَقُومُ ٱلَّذِی یَتَخَبَّطُهُ ٱلشَّیۡطَـٰنُ مِنَ ٱلۡمَسِّۚ ذَٰلِكَ بِأَنَّهُمۡ قَالُوۤا۟ إِنَّمَا ٱلۡبَیۡعُ مِثۡلُ ٱلرِّبَوٰا۟ۗ وَأَحَلَّ ٱللَّهُ ٱلۡبَیۡعَ وَحَرَّمَ ٱلرِّبَوٰا۟ۚ فَمَن جَاۤءَهُۥ مَوۡعِظَةࣱ مِّن رَّبِّهِۦ فَٱنتَهَىٰ فَلَهُۥ مَا سَلَفَ وَأَمۡرُهُۥۤ إِلَى ٱللَّهِۖ وَمَنۡ عَادَ فَأُو۟لَـٰۤئِكَ أَصۡحَـٰبُ ٱلنَّارِۖ هُمۡ فِیهَا خَـٰلِدُونَ",
+        "translation": "Those who consume interest cannot stand [on the Day of Resurrection] except as one stands who is being beaten by Satan into insanity. That is because they say, \"Trade is [just] like interest.\" But Allah has permitted trade and has forbidden interest. So whoever has received an admonition from his Lord and desists may have what is past, and his affair rests with Allah. But whoever returns to [dealing in interest or usury] - those are the companions of the Fire; they will abide eternally therein",
+        "confidence": 88,
+        "state": "close_match",
+        "coverage": "fragment",
+        "coverageRatio": 0.11,
+        "matchedSlice": "ٱلَّذِینَ یَأۡكُلُونَ ٱلرِّبَوٰا۟ لَا یَقُومُونَ إِلَّا كَمَا یَقُومُ ٱلَّذِی یَتَخَبَّطُهُ ٱلشَّیۡطَـٰنُ مِنَ ٱلۡمَسِّۚ ذَٰلِكَ بِأَنَّهُمۡ قَالُوۤا۟ إِنَّمَا ٱلۡبَیۡعُ مِثۡلُ ٱلرِّبَوٰا۟ۗ وَأَحَلَّ ٱللَّهُ ٱلۡبَیۡعَ وَحَرَّمَ ٱلرِّبَوٰا۟ۚ فَمَن جَاۤءَهُۥ مَوۡعِظَةࣱ مِّن رَّبِّهِۦ فَٱنتَهَىٰ فَلَهُۥ مَا سَلَفَ وَأَمۡرُهُۥۤ إِلَى ٱللَّهِۖ وَمَنۡ عَادَ فَأُو۟لَـٰۤئِكَ أَصۡحَـٰبُ ٱلنَّارِۖ هُمۡ فِیهَا خَـٰلِدُونَ",
+        "matchedTokens": [
+          "وَأَحَلَّ",
+          "ٱللَّهُ",
+          "ٱلۡبَیۡعَ",
+          "وَحَرَّمَ"
+        ],
+        "breakdown": [
+          {
+            "verse": 275,
+            "text": "ٱلَّذِینَ یَأۡكُلُونَ ٱلرِّبَوٰا۟ لَا یَقُومُونَ إِلَّا كَمَا یَقُومُ ٱلَّذِی یَتَخَبَّطُهُ ٱلشَّیۡطَـٰنُ مِنَ ٱلۡمَسِّۚ ذَٰلِكَ بِأَنَّهُمۡ قَالُوۤا۟ إِنَّمَا ٱلۡبَیۡعُ مِثۡلُ ٱلرِّبَوٰا۟ۗ وَأَحَلَّ ٱللَّهُ ٱلۡبَیۡعَ وَحَرَّمَ ٱلرِّبَوٰا۟ۚ فَمَن جَاۤءَهُۥ مَوۡعِظَةࣱ مِّن رَّبِّهِۦ فَٱنتَهَىٰ فَلَهُۥ مَا سَلَفَ وَأَمۡرُهُۥۤ إِلَى ٱللَّهِۖ وَمَنۡ عَادَ فَأُو۟لَـٰۤئِكَ أَصۡحَـٰبُ ٱلنَّارِۖ هُمۡ فِیهَا خَـٰلِدُونَ",
+            "translation": "Those who consume interest cannot stand [on the Day of Resurrection] except as one stands who is being beaten by Satan into insanity. That is because they say, \"Trade is [just] like interest.\" But Allah has permitted trade and has forbidden interest. So whoever has received an admonition from his Lord and desists may have what is past, and his affair rests with Allah. But whoever returns to [dealing in interest or usury] - those are the companions of the Fire; they will abide eternally therein",
+            "confidence": 88,
+            "coverage": "fragment",
+            "coverageRatio": 0.11,
+            "matchedWordCount": 5,
+            "totalWordCount": 45,
+            "matchedSlice": "وَأَحَلَّ ٱللَّهُ ٱلۡبَیۡعَ وَحَرَّمَ ٱلرِّبَوٰا۟ۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 14.49
+  },
+  "8c_samawati_wal_ard_wa_la_yauduhu": {
+    "query": "السموات والارض ولا يئوده حفظهما",
+    "normalizedQuery": "السموات والارض ولا ييوده حفظهما",
+    "alefInvariantQuery": "لسموت ولرض ول ييوده حفظهم",
+    "state": "close_match",
+    "topConfidence": 84,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 255,
+        "startVerse": 255,
+        "endVerse": 255,
+        "verseRange": "255",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+        "confidence": 84,
+        "state": "close_match",
+        "coverage": "fragment",
+        "coverageRatio": 0.1,
+        "matchedSlice": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+        "matchedTokens": [
+          "وَٱلۡأَرۡضَۖ",
+          "وَلَا",
+          "یَءُودُهُۥ",
+          "حِفۡظُهُمَاۚ"
+        ],
+        "breakdown": [
+          {
+            "verse": 255,
+            "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
+            "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
+            "confidence": 84,
+            "coverage": "fragment",
+            "coverageRatio": 0.1,
+            "matchedWordCount": 5,
+            "totalWordCount": 50,
+            "matchedSlice": "ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 2.29
+  },
+  "8d_dhalika_al_kitab_la_rayba_fih": {
+    "query": "ذلك الكتاب لا ريب فيه",
+    "normalizedQuery": "ذلك الكتاب لا ريب فيه",
+    "alefInvariantQuery": "ذلك لكتب ل ريب فيه",
+    "state": "matched",
+    "topConfidence": 100,
+    "totalMatches": 1,
+    "results": [
+      {
+        "chapter": 2,
+        "verse": 2,
+        "startVerse": 2,
+        "endVerse": 2,
+        "verseRange": "2",
+        "isRange": false,
+        "surah": {
+          "arabic": "سُوْرَةُ البَقَرَةِ",
+          "english": "The Cow",
+          "revelation": "Madina"
+        },
+        "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+        "confidence": 100,
+        "state": "matched",
+        "coverage": "fragment",
+        "coverageRatio": 0.71,
+        "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+        "matchedTokens": [
+          "ذَٰلِكَ",
+          "ٱلۡكِتَـٰبُ",
+          "لَا",
+          "رَیۡبَۛ",
+          "فِیهِۛ"
+        ],
+        "breakdown": [
+          {
+            "verse": 2,
+            "text": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ هُدࣰى لِّلۡمُتَّقِینَ",
+            "translation": "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
+            "confidence": 100,
+            "coverage": "fragment",
+            "coverageRatio": 0.71,
+            "matchedWordCount": 5,
+            "totalWordCount": 7,
+            "matchedSlice": "ذَٰلِكَ ٱلۡكِتَـٰبُ لَا رَیۡبَۛ فِیهِۛ"
+          }
+        ],
+        "leadingBasmalaIgnored": false
+      }
+    ],
+    "referralRequired": false,
+    "executionTimeMs": 3.83
+  }
+}

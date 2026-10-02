@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import {
   normalizeArabic,
   toAlefInvariant,
-  levenshteinSimilarity,
-  slidingWindowSimilarity,
+  cleanWhitespaceBeforeCombiningMarks,
+  wordSimilarityCorpusDerived,
 } from './normalizer.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,18 +28,46 @@ export interface IndexedAyah {
   enText: string;
   normalizedText: string;
   alefInvariant: string;
-  tokens: string[];
-  alefInvariantTokens: string[];
-  alefTokenSet: Set<string>;
+  rawWords: string[];
+  normalizedWords: string[];
+  alefInvariantWords: string[];
   surah: SurahMeta;
+}
+
+export interface StreamWord {
+  chapter: number;
+  verse: number;
+  wordIndexInAyah: number;
+  globalWordIndex: number;
+  rawUthmani: string;
+  normalized: string;
+  alefInvariant: string;
 }
 
 export type AyahMatchState = 'matched' | 'close_match' | 'not_found' | 'too_short';
 export type CoverageType = 'full' | 'fragment';
 
+export interface AyahBreakdownItem {
+  verse: number;
+  text: string;
+  translation: string;
+  confidence: number;
+  coverage: CoverageType;
+  coverageRatio: number;
+  matchedWordCount: number;
+  totalWordCount: number;
+  matchedStartWordIndex: number;
+  matchedEndWordIndex: number;
+  matchedSlice?: string;
+}
+
 export interface AyahMatchResult {
   chapter: number;
   verse: number;
+  startVerse?: number;
+  endVerse?: number;
+  verseRange?: string;
+  isRange?: boolean;
   surah: {
     arabic: string;
     english: string;
@@ -51,8 +79,12 @@ export interface AyahMatchResult {
   state: 'matched' | 'close_match';
   coverage: CoverageType;
   coverageRatio: number;
+  matchedStartWordIndex: number;
+  matchedEndWordIndex: number;
   matchedSlice?: string;
   matchedTokens: string[];
+  breakdown?: AyahBreakdownItem[];
+  leadingBasmalaIgnored?: boolean;
 }
 
 export interface AyahSearchResponse {
@@ -73,10 +105,17 @@ const DATA_DIR = path.resolve(__dirname, '../corpus/data');
 
 let indexedAyat: IndexedAyah[] = [];
 let surahMetadata: Map<number, SurahMeta> = new Map();
-// Map exact alefInvariant string -> array of ayah indices (for O(1) exact matching & duplicates)
+let surahWordStreams: Map<number, StreamWord[]> = new Map();
+let surahAyatMap: Map<number, IndexedAyah[]> = new Map();
+
+// Map exact normalized string & alefInvariant string -> array of ayah indices
+const exactNormalizedMap: Map<string, number[]> = new Map();
 const exactAlefMap: Map<string, number[]> = new Map();
-// Inverted index for words
-const invertedIndex: Map<string, number[]> = new Map();
+
+// Inverted index for word tokens -> { chapter, globalIndex }
+const wordPositionIndex: Map<string, Array<{ chapter: number; globalIndex: number }>> = new Map();
+const twoGramIndex: Map<string, Array<{ chapter: number; globalIndex: number }>> = new Map();
+
 let isInitialized = false;
 
 export function initAyahEngine(): void {
@@ -112,11 +151,15 @@ export function initAyahEngine(): void {
   }
 
   indexedAyat = arVerses.map((v: { chapter: number; verse: number; text: string }, idx: number) => {
-    const norm = normalizeArabic(v.text);
+    let cleanDisplay = cleanWhitespaceBeforeCombiningMarks(v.text);
+    // Remove standalone decorative section markers from word tokenization
+    cleanDisplay = cleanDisplay.replace(/[\u06DE\u06E9\u06DD\uFD3E\uFD3F]/g, ' ').replace(/\s+/g, ' ').trim();
+    const norm = normalizeArabic(cleanDisplay);
     const alefInv = toAlefInvariant(norm);
-    const tokens = norm.split(' ').filter(Boolean);
-    const alefTokens = alefInv.split(' ').filter(Boolean);
-    const alefTokenSet = new Set(alefTokens);
+
+    const rawWords = cleanDisplay.split(' ').filter(Boolean);
+    const normWords = norm.split(' ').filter(Boolean);
+    const alefWords = alefInv.split(' ').filter(Boolean);
 
     const surah = surahMetadata.get(v.chapter) || {
       chapter: v.chapter,
@@ -127,6 +170,13 @@ export function initAyahEngine(): void {
       totalVerses: 0,
     };
 
+    let normList = exactNormalizedMap.get(norm);
+    if (!normList) {
+      normList = [];
+      exactNormalizedMap.set(norm, normList);
+    }
+    normList.push(idx);
+
     let exactList = exactAlefMap.get(alefInv);
     if (!exactList) {
       exactList = [];
@@ -134,32 +184,78 @@ export function initAyahEngine(): void {
     }
     exactList.push(idx);
 
-    for (const t of alefTokenSet) {
-      let list = invertedIndex.get(t);
-      if (!list) {
-        list = [];
-        invertedIndex.set(t, list);
-      }
-      list.push(idx);
-    }
-
     return {
       index: idx,
       chapter: v.chapter,
       verse: v.verse,
-      text: v.text,
+      text: cleanDisplay,
       enText: enMap.get(`${v.chapter}:${v.verse}`) || '',
       normalizedText: norm,
       alefInvariant: alefInv,
-      tokens,
-      alefInvariantTokens: alefTokens,
-      alefTokenSet,
+      rawWords,
+      normalizedWords: normWords,
+      alefInvariantWords: alefWords,
       surah,
     };
   });
 
+  // Build continuous word streams per Surah and position indices
+  for (let c = 1; c <= 114; c++) {
+    surahWordStreams.set(c, []);
+    surahAyatMap.set(c, []);
+  }
+
+  for (let i = 0; i < indexedAyat.length; i++) {
+    const ayah = indexedAyat[i];
+    const stream = surahWordStreams.get(ayah.chapter)!;
+    const surahAyat = surahAyatMap.get(ayah.chapter)!;
+    surahAyat.push(ayah);
+
+    for (let w = 0; w < ayah.normalizedWords.length; w++) {
+      const globalIndex = stream.length;
+      const rawUthmani = ayah.rawWords[w] || '';
+      const normalized = ayah.normalizedWords[w] || '';
+      const alefInvariant = ayah.alefInvariantWords[w] || '';
+
+      const wordObj: StreamWord = {
+        chapter: ayah.chapter,
+        verse: ayah.verse,
+        wordIndexInAyah: w,
+        globalWordIndex: globalIndex,
+        rawUthmani,
+        normalized,
+        alefInvariant,
+      };
+
+      stream.push(wordObj);
+
+      if (alefInvariant) {
+        let posList = wordPositionIndex.get(alefInvariant);
+        if (!posList) {
+          posList = [];
+          wordPositionIndex.set(alefInvariant, posList);
+        }
+        posList.push({ chapter: ayah.chapter, globalIndex });
+      }
+
+      if (w > 0 && ayah.alefInvariantWords[w - 1]) {
+        const prevAlef = ayah.alefInvariantWords[w - 1];
+        const twoGram = `${prevAlef}_${alefInvariant}`;
+        let twoList = twoGramIndex.get(twoGram);
+        if (!twoList) {
+          twoList = [];
+          twoGramIndex.set(twoGram, twoList);
+        }
+        twoList.push({ chapter: ayah.chapter, globalIndex: globalIndex - 1 });
+      }
+    }
+  }
+
   isInitialized = true;
 }
+
+const BASMALA_NORM = normalizeArabic('بسم الله الرحمن الرحيم');
+const BASMALA_ALEF = toAlefInvariant(BASMALA_NORM);
 
 export function searchAyah(rawQuery: string): AyahSearchResponse {
   if (!isInitialized) {
@@ -167,12 +263,13 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
   }
 
   const startTime = performance.now();
-  const normalizedQuery = normalizeArabic(rawQuery);
+  const trimmed = rawQuery.trim();
+  const normalizedQuery = normalizeArabic(trimmed);
   const alefInvariantQuery = toAlefInvariant(normalizedQuery);
 
-  const queryTokens = normalizedQuery.split(' ').filter(Boolean);
-  const queryAlefTokens = alefInvariantQuery.split(' ').filter(Boolean);
-  const qWordCount = queryTokens.length;
+  const queryWords = normalizedQuery.split(' ').filter(Boolean);
+  const queryAlefWords = alefInvariantQuery.split(' ').filter(Boolean);
+  const qWordCount = queryWords.length;
 
   if (qWordCount === 0 || alefInvariantQuery.length < 1) {
     return {
@@ -189,44 +286,35 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     };
   }
 
-  // --- RULE 4: Short-query guard (< 3 normalized words) ---
-  if (qWordCount < 3) {
-    const exactMatchIndices = exactAlefMap.get(alefInvariantQuery);
-    if (exactMatchIndices && exactMatchIndices.length > 0) {
-      const results: AyahMatchResult[] = exactMatchIndices.map((idx) => {
-        const a = indexedAyat[idx];
-        return {
-          chapter: a.chapter,
-          verse: a.verse,
-          surah: {
-            arabic: a.surah.arabicName,
-            english: a.surah.englishName,
-            revelation: a.surah.revelation,
-          },
-          text: a.text,
-          translation: a.enText,
-          confidence: 100,
-          state: 'matched',
-          coverage: 'full',
-          coverageRatio: 1.0,
-          matchedSlice: a.text,
-          matchedTokens: queryTokens,
-        };
-      });
+  // Check for whole ayah match candidates
+  const wholeAyahHits = new Set<number>();
+  const exactNorm = exactNormalizedMap.get(normalizedQuery);
+  if (exactNorm) exactNorm.forEach((idx) => wholeAyahHits.add(idx));
+  const exactAlef = exactAlefMap.get(alefInvariantQuery);
+  if (exactAlef) exactAlef.forEach((idx) => wholeAyahHits.add(idx));
 
-      return {
-        query: rawQuery,
-        normalizedQuery,
-        alefInvariantQuery,
-        state: 'matched',
-        topConfidence: 100,
-        totalMatches: results.length,
-        results,
-        referralRequired: false,
-        executionTimeMs: Math.round((performance.now() - startTime) * 100) / 100,
-      };
-    }
+  // Check for Leading Basmala
+  let hasLeadingBasmala = false;
+  if (
+    queryWords.length >= 5 &&
+    (normalizedQuery.startsWith(BASMALA_NORM) || alefInvariantQuery.startsWith(BASMALA_ALEF))
+  ) {
+    hasLeadingBasmala = true;
+  }
 
+  if (hasLeadingBasmala) {
+    const strippedQueryWords = queryWords.slice(4);
+    const strippedNorm = strippedQueryWords.join(' ');
+    const strippedAlef = toAlefInvariant(strippedNorm);
+
+    const sNorm = exactNormalizedMap.get(strippedNorm);
+    if (sNorm) sNorm.forEach((idx) => { if (indexedAyat[idx].chapter !== 1) wholeAyahHits.add(idx); });
+    const sAlef = exactAlefMap.get(strippedAlef);
+    if (sAlef) sAlef.forEach((idx) => { if (indexedAyat[idx].chapter !== 1) wholeAyahHits.add(idx); });
+  }
+
+  // Short-query guard (< 3 words) if no full ayah matches exist
+  if (qWordCount < 3 && wholeAyahHits.size === 0) {
     return {
       query: rawQuery,
       normalizedQuery,
@@ -241,180 +329,184 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     };
   }
 
-  // --- FAST PATH 1: O(1) Exact whole ayah match ---
-  const exactHits = exactAlefMap.get(alefInvariantQuery);
-  if (exactHits && exactHits.length > 0) {
-    const results: AyahMatchResult[] = exactHits.map((idx) => {
-      const a = indexedAyat[idx];
-      return {
-        chapter: a.chapter,
-        verse: a.verse,
-        surah: {
-          arabic: a.surah.arabicName,
-          english: a.surah.englishName,
-          revelation: a.surah.revelation,
-        },
-        text: a.text,
-        translation: a.enText,
-        confidence: 100,
-        state: 'matched',
-        coverage: 'full',
-        coverageRatio: 1.0,
-        matchedSlice: a.text,
-        matchedTokens: queryTokens,
-      };
-    });
+  // Query variants for stream scanning
+  const queryVariants = [
+    { words: queryWords, alefWords: queryAlefWords, isBasmalaStripped: false },
+  ];
 
+  if (hasLeadingBasmala) {
+    const strippedWords = queryWords.slice(4);
+    const strippedAlef = queryAlefWords.slice(4);
+    if (strippedWords.length >= 1) {
+      queryVariants.push({
+        words: strippedWords,
+        alefWords: strippedAlef,
+        isBasmalaStripped: true,
+      });
+    }
+  }
+
+  type CandidateMatch = {
+    chapter: number;
+    startVerse: number;
+    endVerse: number;
+    startGlobalWord: number;
+    endGlobalWord: number;
+    confidence: number;
+    wordScores: number[];
+    matchedTokens: string[];
+    isBasmalaStripped: boolean;
+  };
+
+  const rawCandidateMatches: CandidateMatch[] = [];
+
+  for (const variant of queryVariants) {
+    const vWords = variant.words;
+    const vAlef = variant.alefWords;
+    const vLen = vWords.length;
+    if (vLen === 0) continue;
+
+    const candidateStartsBySurah = new Map<number, Set<number>>();
+
+    // 1. Check 2-grams
+    for (let i = 0; i < Math.min(3, vLen - 1); i++) {
+      const twoGram = `${vAlef[i]}_${vAlef[i + 1]}`;
+      const hits = twoGramIndex.get(twoGram);
+      if (hits) {
+        for (const h of hits) {
+          if (variant.isBasmalaStripped && h.chapter === 1) continue;
+          let sSet = candidateStartsBySurah.get(h.chapter);
+          if (!sSet) {
+            sSet = new Set();
+            candidateStartsBySurah.set(h.chapter, sSet);
+          }
+          sSet.add(Math.max(0, h.globalIndex - i));
+        }
+      }
+    }
+
+    // 2. Check 1-grams
+    for (let i = 0; i < Math.min(2, vLen); i++) {
+      const hits = wordPositionIndex.get(vAlef[i]);
+      if (hits) {
+        for (const h of hits) {
+          if (variant.isBasmalaStripped && h.chapter === 1) continue;
+          let sSet = candidateStartsBySurah.get(h.chapter);
+          if (!sSet) {
+            sSet = new Set();
+            candidateStartsBySurah.set(h.chapter, sSet);
+          }
+          sSet.add(Math.max(0, h.globalIndex - i));
+        }
+      }
+    }
+
+    // Also include positions of any whole-ayah hits
+    for (const hIdx of wholeAyahHits) {
+      const ayah = indexedAyat[hIdx];
+      const stream = surahWordStreams.get(ayah.chapter);
+      if (stream) {
+        const firstW = stream.find((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
+        if (firstW) {
+          let sSet = candidateStartsBySurah.get(ayah.chapter);
+          if (!sSet) {
+            sSet = new Set();
+            candidateStartsBySurah.set(ayah.chapter, sSet);
+          }
+          sSet.add(firstW.globalWordIndex);
+        }
+      }
+    }
+
+    for (const [ch, startIndices] of candidateStartsBySurah.entries()) {
+      const stream = surahWordStreams.get(ch);
+      if (!stream || stream.length === 0) continue;
+
+      for (const startIdx of startIndices) {
+        if (startIdx >= stream.length) continue;
+        const availableWords = stream.length - startIdx;
+        const compareLen = Math.min(vLen, availableWords);
+        if (compareLen < Math.min(1, vLen)) continue;
+
+        let totalScore = 0;
+        const wordScores: number[] = [];
+        const matchedTokens: string[] = [];
+
+        for (let i = 0; i < vLen; i++) {
+          if (startIdx + i < stream.length) {
+            const streamWord = stream[startIdx + i];
+            const qWord = vWords[i];
+            const score = wordSimilarityCorpusDerived(
+              qWord,
+              streamWord.normalized,
+              streamWord.rawUthmani
+            );
+            wordScores.push(score);
+            totalScore += score;
+            if (score >= 0.75) {
+              matchedTokens.push(streamWord.rawUthmani);
+            }
+          } else {
+            wordScores.push(0);
+          }
+        }
+
+        const avgScore = totalScore / vLen;
+        const confidence = Math.round(avgScore * 100);
+
+        if (confidence >= 65) {
+          const startVerse = stream[startIdx].verse;
+          const endGlobal = Math.min(stream.length - 1, startIdx + vLen - 1);
+          const endVerse = stream[endGlobal].verse;
+
+          rawCandidateMatches.push({
+            chapter: ch,
+            startVerse,
+            endVerse,
+            startGlobalWord: startIdx,
+            endGlobalWord: endGlobal,
+            confidence,
+            wordScores,
+            matchedTokens,
+            isBasmalaStripped: variant.isBasmalaStripped,
+          });
+        }
+      }
+    }
+  }
+
+  // Deduplicate matches
+  const bestMatchMap = new Map<string, CandidateMatch>();
+  for (const m of rawCandidateMatches) {
+    const key = `${m.chapter}:${m.startVerse}-${m.endVerse}`;
+    const existing = bestMatchMap.get(key);
+    if (!existing || m.confidence > existing.confidence) {
+      bestMatchMap.set(key, m);
+    }
+  }
+
+  const candidateList = Array.from(bestMatchMap.values());
+
+  if (candidateList.length === 0) {
+    const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
     return {
       query: rawQuery,
       normalizedQuery,
       alefInvariantQuery,
-      state: 'matched',
-      topConfidence: 100,
-      totalMatches: results.length,
-      results,
-      referralRequired: false,
-      executionTimeMs: Math.round((performance.now() - startTime) * 100) / 100,
+      state: 'not_found',
+      topConfidence: 0,
+      totalMatches: 0,
+      results: [],
+      referralRequired: true,
+      referralMessage: 'لم يتم العثور على تطابق موثوق، راجع أهل العلم',
+      executionTimeMs: elapsed,
     };
   }
 
-  // --- NORMAL MATCHING FOR >= 3 WORDS ---
-  const candidateScores = new Map<number, number>();
-
-  for (let i = 0; i < queryAlefTokens.length; i++) {
-    const qt = queryAlefTokens[i];
-    const directHits = invertedIndex.get(qt);
-    if (directHits) {
-      const weight = qt.length <= 2 ? 0.3 : 1.0;
-      for (let j = 0; j < directHits.length; j++) {
-        const aIdx = directHits[j];
-        candidateScores.set(aIdx, (candidateScores.get(aIdx) || 0) + weight);
-      }
-    }
-  }
-
-  const topCandidates = Array.from(candidateScores.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 60);
-
-  type Evaluated = {
-    ayah: IndexedAyah;
-    confidence: number;
-    rawScore: number;
-    coverage: CoverageType;
-    coverageRatio: number;
-    matchedSlice: string;
-    matchedTokens: string[];
-  };
-
-  const evaluated: Evaluated[] = [];
-  const qLen = alefInvariantQuery.length;
-
-  for (let i = 0; i < topCandidates.length; i++) {
-    const [aIdx] = topCandidates[i];
-    const ayah = indexedAyat[aIdx];
-    const target = ayah.alefInvariant;
-    const tLen = target.length;
-
-    let matchingTokenCount = 0;
-    const matchedTokens: string[] = [];
-    for (let t = 0; t < queryAlefTokens.length; t++) {
-      if (ayah.alefTokenSet.has(queryAlefTokens[t])) {
-        matchingTokenCount++;
-        matchedTokens.push(queryTokens[t] || queryAlefTokens[t]);
-      }
-    }
-
-    const tokenOverlap =
-      queryAlefTokens.length > 0 ? matchingTokenCount / queryAlefTokens.length : 0;
-    const ayahWordCount = ayah.alefInvariantTokens.length;
-    const coverageRatio =
-      ayahWordCount > 0 ? Math.min(1, matchingTokenCount / ayahWordCount) : 0;
-    const coverage: CoverageType =
-      coverageRatio >= 0.85 || qWordCount >= ayahWordCount * 0.85
-        ? 'full'
-        : 'fragment';
-
-    // 1. Exact whole ayah match
-    if (target === alefInvariantQuery) {
-      evaluated.push({
-        ayah,
-        confidence: 100,
-        rawScore: 1.0,
-        coverage: 'full',
-        coverageRatio: 1.0,
-        matchedSlice: ayah.text,
-        matchedTokens: queryTokens,
-      });
-      continue;
-    }
-
-    // 2. Exact substring match
-    if (target.includes(alefInvariantQuery)) {
-      const isFull = qWordCount >= ayahWordCount * 0.85;
-      evaluated.push({
-        ayah,
-        confidence: 100,
-        rawScore: 1.0,
-        coverage: isFull ? 'full' : 'fragment',
-        coverageRatio: isFull ? 1.0 : coverageRatio,
-        matchedSlice: alefInvariantQuery,
-        matchedTokens,
-      });
-      continue;
-    }
-
-    // 3. Full sequence Levenshtein if lengths are close
-    let sFull = 0;
-    if (Math.abs(qLen - tLen) <= Math.max(8, Math.round(qLen * 0.15))) {
-      sFull = levenshteinSimilarity(alefInvariantQuery, target);
-      if (sFull >= 0.90) {
-        const conf = Math.round(sFull * 100);
-        evaluated.push({
-          ayah,
-          confidence: conf,
-          rawScore: sFull,
-          coverage: 'full',
-          coverageRatio: 1.0,
-          matchedSlice: ayah.text,
-          matchedTokens,
-        });
-        continue;
-      }
-    }
-
-    // 4. Sliding window Levenshtein on Alef-invariant string
-    let sw = { similarity: 0, bestSlice: '' };
-    if (tokenOverlap >= 0.20) {
-      sw = slidingWindowSimilarity(alefInvariantQuery, target);
-    }
-
-    const combined = Math.max(sFull, 0.70 * sw.similarity + 0.30 * tokenOverlap);
-    let finalScore = combined;
-
-    if (queryAlefTokens.length >= 3 && tokenOverlap < 0.30 && sw.similarity < 0.75) {
-      finalScore *= 0.3;
-    }
-
-    const confidence = Math.round(finalScore * 100);
-
-    if (confidence >= 65) {
-      evaluated.push({
-        ayah,
-        confidence,
-        rawScore: finalScore,
-        coverage,
-        coverageRatio,
-        matchedSlice: sw.bestSlice || ayah.text,
-        matchedTokens,
-      });
-    }
-  }
-
   let topConfidence = 0;
-  for (let i = 0; i < evaluated.length; i++) {
-    if (evaluated[i].confidence > topConfidence) {
-      topConfidence = evaluated[i].confidence;
+  for (const m of candidateList) {
+    if (m.confidence > topConfidence) {
+      topConfidence = m.confidence;
     }
   }
 
@@ -434,38 +526,129 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     };
   }
 
-  const threshold = Math.max(70, topConfidence - 2);
-  const filtered = evaluated.filter((e) => e.confidence >= threshold);
+  const threshold = Math.max(70, topConfidence - 3);
+  const filteredCandidates = candidateList.filter((m) => m.confidence >= threshold);
 
-  filtered.sort((a, b) => {
-    if (b.confidence !== a.confidence) {
-      return b.confidence - a.confidence;
+  const formattedResults: AyahMatchResult[] = filteredCandidates.map((m) => {
+    const surah = surahMetadata.get(m.chapter)!;
+    const surahAyat = surahAyatMap.get(m.chapter)!;
+    const stream = surahWordStreams.get(m.chapter)!;
+
+    const matchedAyat = surahAyat.filter(
+      (a) => a.verse >= m.startVerse && a.verse <= m.endVerse
+    );
+
+    const breakdown: AyahBreakdownItem[] = [];
+    let totalAyatWords = 0;
+    let totalMatchedWords = 0;
+
+    let overallStartWordIndex = 0;
+    let overallEndWordIndex = 0;
+
+    for (let aIdx = 0; aIdx < matchedAyat.length; aIdx++) {
+      const ayah = matchedAyat[aIdx];
+      const ayahWordsInMatch = stream.filter(
+        (w) =>
+          w.verse === ayah.verse &&
+          w.globalWordIndex >= m.startGlobalWord &&
+          w.globalWordIndex <= m.endGlobalWord
+      );
+
+      const matchedWordCount = ayahWordsInMatch.length;
+      const totalWordCount = ayah.rawWords.length;
+      const covRatio = totalWordCount > 0 ? matchedWordCount / totalWordCount : 0;
+      const cov: CoverageType = covRatio >= 0.85 ? 'full' : 'fragment';
+
+      totalAyatWords += totalWordCount;
+      totalMatchedWords += matchedWordCount;
+
+      const firstWord = ayahWordsInMatch[0];
+      const lastWord = ayahWordsInMatch[ayahWordsInMatch.length - 1];
+
+      const startWordIdx = firstWord ? firstWord.wordIndexInAyah : 0;
+      const endWordIdx = lastWord ? lastWord.wordIndexInAyah : totalWordCount - 1;
+
+      if (aIdx === 0) {
+        overallStartWordIndex = startWordIdx;
+      }
+      if (aIdx === matchedAyat.length - 1) {
+        overallEndWordIndex = endWordIdx;
+      }
+
+      breakdown.push({
+        verse: ayah.verse,
+        text: ayah.text,
+        translation: ayah.enText,
+        confidence: m.confidence,
+        coverage: cov,
+        coverageRatio: Math.round(covRatio * 100) / 100,
+        matchedWordCount,
+        totalWordCount,
+        matchedStartWordIndex: startWordIdx,
+        matchedEndWordIndex: endWordIdx,
+        matchedSlice: ayahWordsInMatch.map((w) => w.rawUthmani).join(' '),
+      });
     }
-    if (a.ayah.chapter !== b.ayah.chapter) {
-      return a.ayah.chapter - b.ayah.chapter;
-    }
-    return a.ayah.verse - b.ayah.verse;
+
+    const overallCoverageRatio =
+      totalAyatWords > 0 ? Math.min(1.0, totalMatchedWords / totalAyatWords) : 0;
+    const allAyatFull = breakdown.every((b) => b.coverage === 'full');
+    const isSingleAyah = m.startVerse === m.endVerse;
+
+    const coverage: CoverageType = isSingleAyah
+      ? overallCoverageRatio >= 0.85 || qWordCount >= totalAyatWords * 0.85
+        ? 'full'
+        : 'fragment'
+      : allAyatFull
+      ? 'full'
+      : 'fragment';
+
+    const fullRangeText = matchedAyat.map((a) => a.text).join(' ');
+    const fullRangeTranslation = matchedAyat.map((a) => a.enText).join(' ');
+    const verseRange = isSingleAyah ? `${m.startVerse}` : `${m.startVerse}–${m.endVerse}`;
+
+    return {
+      chapter: m.chapter,
+      verse: m.startVerse,
+      startVerse: m.startVerse,
+      endVerse: m.endVerse,
+      verseRange,
+      isRange: !isSingleAyah,
+      surah: {
+        arabic: surah.arabicName,
+        english: surah.englishName,
+        revelation: surah.revelation,
+      },
+      text: fullRangeText,
+      translation: fullRangeTranslation,
+      confidence: m.confidence,
+      state: m.confidence >= 90 ? 'matched' : 'close_match',
+      coverage,
+      coverageRatio: Math.round(overallCoverageRatio * 100) / 100,
+      matchedStartWordIndex: overallStartWordIndex,
+      matchedEndWordIndex: overallEndWordIndex,
+      matchedSlice: fullRangeText,
+      matchedTokens: m.matchedTokens,
+      breakdown,
+      leadingBasmalaIgnored: m.isBasmalaStripped,
+    };
+  });
+
+  formattedResults.sort((a, b) => {
+    if (a.coverage === 'full' && b.coverage !== 'full') return -1;
+    if (b.coverage === 'full' && a.coverage !== 'full') return 1;
+    if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+    if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+    return (a.startVerse || a.verse) - (b.startVerse || b.verse);
   });
 
   const overallState: AyahMatchState = topConfidence >= 90 ? 'matched' : 'close_match';
+  const hasLeadingBasmalaIgnored = formattedResults.some((r) => r.leadingBasmalaIgnored);
+  let notice: string | undefined = undefined;
 
-  const results: AyahMatchResult[] = filtered.map((c) => ({
-    chapter: c.ayah.chapter,
-    verse: c.ayah.verse,
-    surah: {
-      arabic: c.ayah.surah.arabicName,
-      english: c.ayah.surah.englishName,
-      revelation: c.ayah.surah.revelation,
-    },
-    text: c.ayah.text,
-    translation: c.ayah.enText,
-    confidence: c.confidence,
-    state: c.confidence >= 90 ? 'matched' : 'close_match',
-    coverage: c.coverage,
-    coverageRatio: Math.round(c.coverageRatio * 100) / 100,
-    matchedSlice: c.matchedSlice,
-    matchedTokens: c.matchedTokens,
-  }));
+  if (hasLeadingBasmalaIgnored) {
+    notice = 'تم تجاهل البسملة في بداية السورة أثناء المطابقة لأنها ليست جزءاً من الآية الأولى في هذه السورة';
+  }
 
   const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
 
@@ -475,9 +658,10 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     alefInvariantQuery,
     state: overallState,
     topConfidence,
-    totalMatches: results.length,
-    results,
+    totalMatches: formattedResults.length,
+    results: formattedResults,
     referralRequired: false,
+    notice,
     executionTimeMs: elapsed,
   };
 }

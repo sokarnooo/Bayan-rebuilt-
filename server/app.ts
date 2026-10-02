@@ -9,11 +9,29 @@ app.use(express.json({ limit: '10mb' }));
 // Warm up Ayah Engine
 initAyahEngine();
 
+export const REGISTERED_ROUTES = [
+  'GET /api/health',
+  'GET /api/corpus/stats',
+  'POST /api/ayah/search',
+  'POST /api/ayah/match',
+  'POST /api/hadith/match',
+  'POST /api/ask',
+  'POST /api/ocr',
+];
+
 app.get('/api/health', (req, res) => {
+  const { corpus, loadTimeMs } = loadCorpus();
   res.json({
     status: 'ok',
     app: 'Bayan',
     timestamp: new Date().toISOString(),
+    corpusLoaded: {
+      quranAyatCount: corpus.quran.ar.length,
+      quranEnglishAyatCount: corpus.quran.en.length,
+      hadithCollectionsCount: 7,
+      loadTimeMs,
+    },
+    registeredRoutes: REGISTERED_ROUTES,
   });
 });
 

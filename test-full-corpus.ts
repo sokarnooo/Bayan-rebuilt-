@@ -9,9 +9,9 @@ const rawQuran = JSON.parse(fs.readFileSync('server/corpus/data/quran_ar.json', 
 function generateTestQuery(text: string): string {
   // Step 1: Rule 2 - Remove whitespace only when it sits directly before a combining mark
   const cleaned = cleanWhitespaceBeforeCombiningMarks(text);
-  // Step 2: Strip diacritics and fold Farsi Yeh/Kaf to standard Arabic ي/ك
+  // Step 2: Strip diacritics (including extended Quranic tanween \u08D3-\u08FF) and fold Farsi Yeh/Kaf to standard Arabic ي/ك
   return cleaned
-    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8]/g, '')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF]/g, '')
     .replace(/\u0640/g, '')
     .replace(/\u06CC/g, 'ي')
     .replace(/\u06A9/g, 'ك')

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { InterfaceLanguage } from '../../types';
-import { OcrButton } from '../common/OcrButton';
 import {
   Search,
   BookOpen,
@@ -12,15 +11,33 @@ import {
   ChevronUp,
   Sparkles,
   ExternalLink,
+  RotateCcw,
+  Layers,
 } from 'lucide-react';
 
 interface AyahModeProps {
   language: InterfaceLanguage;
 }
 
+interface AyahBreakdownItem {
+  verse: number;
+  text: string;
+  translation: string;
+  confidence: number;
+  coverage: 'full' | 'fragment';
+  coverageRatio: number;
+  matchedWordCount: number;
+  totalWordCount: number;
+  matchedSlice?: string;
+}
+
 interface AyahResult {
   chapter: number;
   verse: number;
+  startVerse?: number;
+  endVerse?: number;
+  verseRange?: string;
+  isRange?: boolean;
   surah: {
     arabic: string;
     english: string;
@@ -34,6 +51,8 @@ interface AyahResult {
   coverageRatio: number;
   matchedSlice?: string;
   matchedTokens: string[];
+  breakdown?: AyahBreakdownItem[];
+  leadingBasmalaIgnored?: boolean;
 }
 
 interface SearchResponse {
@@ -57,7 +76,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
   const [expandedAll, setExpandedAll] = useState(false);
   const [tafsirLoading, setTafsirLoading] = useState<Record<string, boolean>>({});
   const [tafsirData, setTafsirData] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string | null>(null);
+  const [hasConnectionError, setHasConnectionError] = useState(false);
 
   const isAr = language === 'ar';
 
@@ -66,7 +85,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     if (!q) return;
 
     setLoading(true);
-    setError(null);
+    setHasConnectionError(false);
     setExpandedAll(false);
 
     try {
@@ -77,13 +96,16 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        console.error(`Verification API error: HTTP ${res.status} ${res.statusText}`);
+        setHasConnectionError(true);
+        return;
       }
 
       const data: SearchResponse = await res.json();
       setSearchResponse(data);
     } catch (err: any) {
-      setError(err.message || 'Error executing search');
+      console.error('Network/Server connection error during verification:', err);
+      setHasConnectionError(true);
     } finally {
       setLoading(false);
     }
@@ -112,27 +134,67 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
       } else {
         setTafsirData((prev) => ({
           ...prev,
-          [key]: isAr ? 'التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)' : 'Tafsir Al-Muyassar (King Fahd Complex)',
+          [key]: isAr
+            ? 'التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)'
+            : 'Tafsir Al-Muyassar (King Fahd Complex)',
         }));
       }
     } catch (e) {
+      console.error('Tafsir fetch error:', e);
       setTafsirData((prev) => ({
         ...prev,
-        [key]: isAr ? 'تعذر جلب التفسير من المصدر حالياً.' : 'Unable to fetch tafsir at this moment.',
+        [key]: isAr
+          ? 'تعذر جلب التفسير من المصدر حالياً.'
+          : 'Unable to fetch tafsir at this moment.',
       }));
     } finally {
       setTafsirLoading((prev) => ({ ...prev, [key]: false }));
     }
   };
 
+  // Matched word highlighter
+  const renderHighlightedWords = (text: string, matchedTokens: string[]) => {
+    if (!matchedTokens || matchedTokens.length === 0) {
+      return text;
+    }
+
+    const cleanTokenSet = new Set(
+      matchedTokens.map((t) =>
+        t.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF\s\u00A0.,«»ۖۗۚۛ]/g, '')
+      )
+    );
+
+    const words = text.split(' ');
+    return words.map((word, idx) => {
+      const cleanW = word.replace(
+        /[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF\s\u00A0.,«»ۖۗۚۛ]/g,
+        ''
+      );
+      const isMatched = cleanTokenSet.has(cleanW);
+
+      return (
+        <React.Fragment key={idx}>
+          {idx > 0 ? ' ' : ''}
+          {isMatched ? (
+            <span className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-bold inline-block">
+              {word}
+            </span>
+          ) : (
+            <span>{word}</span>
+          )}
+        </React.Fragment>
+      );
+    });
+  };
+
   const quickSamples = [
     'فبأي آلاء ربكما تكذبان',
     'الله لا اله الا هو الحي القيوم',
-    'وسع كرسيه السموات والارض',
+    'قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفوا أحد',
+    'وهو العلي العظيم لا اكراه في الدين',
     'ذلك الكتاب لا ريب فيه',
-    'إن الذين آمنوا وعملوا الصالحات',
     'الم',
-    'الله',
+    'طه',
     'من جد وجد ومن زرع حصد',
   ];
 
@@ -143,19 +205,12 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
 
   return (
     <div className="space-y-6">
-      {/* Search Input Box with embedded OCR */}
+      {/* Search Input Box */}
       <div className="rounded-xl bg-[#12183F] border border-[#6150EA]/30 p-4 shadow-xl focus-within:border-[#2EF2C2]/60 transition">
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-[#F2F4FF]/90">
-            {isAr ? 'نص الآية الكريمة أو جزء منها:' : 'Verse text or partial quote:'}
+            {isAr ? 'نص الآية الكريمة أو نطاق الآيات:' : 'Verse text or multi-ayah quote:'}
           </label>
-          <OcrButton
-            language={language}
-            onTextExtracted={(extractedText) => {
-              setQuery(extractedText);
-              handleSearch(extractedText);
-            }}
-          />
         </div>
 
         <div className="relative">
@@ -172,8 +227,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
             lang="ar"
             placeholder={
               isAr
-                ? 'اكتب أو الصق نص الآية هنا (يقبل الأخطاء الإملائية والاقتباسات الجزئية)...'
-                : 'Type or paste Quranic text here (tolerates typos and partial verses)...'
+                ? 'اكتب أو الصق نص الآية أو السورة كاملة هنا (يقبل الأخطاء الإملائية والاقتباسات المتصلة عبر الآيات)...'
+                : 'Type or paste Quranic text or contiguous ayah ranges here (tolerates typos and cross-ayah pastes)...'
             }
             className="w-full bg-[#12183F]/70 border border-[#6150EA]/20 rounded-lg p-3 text-[#F2F4FF] placeholder-[#F2F4FF]/30 focus:outline-none focus:border-[#2EF2C2]/70 font-quran text-2xl leading-relaxed resize-y"
           />
@@ -190,7 +245,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                 setQuery(sample);
                 handleSearch(sample);
               }}
-              className="text-xs px-2.5 py-1 rounded bg-[#6150EA]/15 hover:bg-[#6150EA]/30 text-[#F2F4FF]/80 hover:text-[#2EF2C2] border border-[#6150EA]/30 transition"
+              className="text-xs px-2.5 py-1 rounded bg-[#6150EA]/15 hover:bg-[#6150EA]/30 text-[#F2F4FF]/80 hover:text-[#2EF2C2] border border-[#6150EA]/30 transition cursor-pointer"
             >
               {sample}
             </button>
@@ -200,8 +255,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#6150EA]/15">
           <p className="text-xs text-[#F2F4FF]/50">
             {isAr
-              ? 'مطابقة حتمية عبر مصحف مجمع الملك فهد (عاصم - حفص) مع التفسير الميسر.'
-              : 'Deterministic matching against King Fahd Complex with Al-Muyassar tafsir.'}
+              ? 'مطابقة حتمية عبر نص Quran Academy (ara-quranacademy).'
+              : 'Deterministic matching against Quran Academy text source.'}
           </p>
           <button
             type="button"
@@ -219,16 +274,39 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-900/30 border border-red-500/50 text-red-200 text-sm flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-          <span>{error}</span>
+      {/* Connection error panel */}
+      {hasConnectionError && (
+        <div className="p-5 rounded-xl bg-red-950/30 border border-red-500/40 text-red-200 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+            <span className="font-medium">
+              {isAr
+                ? 'تعذر الاتصال بخدمة التحقق. حاول مرة أخرى بعد قليل.'
+                : 'Unable to connect to verification service. Please try again shortly.'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSearch()}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-red-600/30 hover:bg-red-600/50 border border-red-400/40 text-red-100 text-xs font-semibold transition cursor-pointer shrink-0"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>{isAr ? 'إعادة المحاولة' : 'Retry'}</span>
+          </button>
         </div>
       )}
 
       {/* Results Section */}
-      {searchResponse && (
+      {searchResponse && !hasConnectionError && (
         <div className="space-y-4">
+          {/* Notice banner if leading Basmalah was ignored */}
+          {searchResponse.notice && (
+            <div className="p-3.5 rounded-xl bg-blue-950/30 border border-blue-500/40 text-blue-200 text-xs flex items-center gap-2">
+              <Info className="w-4 h-4 text-blue-400 shrink-0" />
+              <span>{searchResponse.notice}</span>
+            </div>
+          )}
+
           {/* Header Summary Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-[#12183F] border border-[#6150EA]/20">
             <div className="flex items-center gap-3">
@@ -250,7 +328,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
               ) : (
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'غير موجود في القرآن' : 'Not Found in Quran'}</span>
+                  <span>{isAr ? 'لا يوجد تطابق موثوق' : 'No Reliable Match'}</span>
                 </div>
               )}
 
@@ -274,7 +352,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
             </div>
           </div>
 
-          {/* Short-Query Notice Panel (under 3 words when not a whole ayah) */}
+          {/* Short-Query Notice Panel */}
           {searchResponse.state === 'too_short' && (
             <div className="p-6 rounded-2xl bg-blue-950/25 border-2 border-blue-500/40 text-blue-100 flex flex-col sm:flex-row items-start gap-4">
               <div className="p-3 rounded-xl bg-blue-500/15 border border-blue-500/30 shrink-0 text-blue-400">
@@ -289,14 +367,14 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                 </h3>
                 <p className="text-sm text-blue-200/80 leading-relaxed">
                   {isAr
-                    ? 'الكلمات المفردة والعبارات القصيرة تتكرر في مواضع متعددة من القرآن الكريم أو تشكل أجزاءً من آيات طويلة. تفادياً لعرض مئات النتائج غير المقصودة، يُرجى كتابة ثلاث كلمات على الأقل لتحديد الآية المقصودة بدقة (إلا إذا كانت الكلمة تشكل آية مستقلة كاملة مثل «الم» أو «الرحمن»).'
-                    : 'Single words and short phrases occur across dozens of verses. To avoid flooding hundreds of partial results, please type at least 3 words to pinpoint the verse (unless the query is an entire standalone ayah like "Alif Lam Meem" or "Ar-Rahman").'}
+                    ? 'الكلمات المفردة والعبارات القصيرة تتكرر في مواضع متعددة من القرآن الكريم. تفادياً لعرض مئات النتائج غير المقصودة، يُرجى كتابة ثلاث كلمات على الأقل لتحديد الآية المقصودة بدقة (إلا إذا كانت الكلمة تشكل آية مستقلة كاملة مثل «الم» أو «الرحمن»).'
+                    : 'Single words and short phrases occur across dozens of verses. Please type at least 3 words to pinpoint the verse (unless the query is an entire standalone ayah like "Alif Lam Meem" or "Ar-Rahman").'}
                 </p>
               </div>
             </div>
           )}
 
-          {/* Scholar Referral Panel when not found (strictly confidence < 70) */}
+          {/* Scholar Referral Panel when not found */}
           {searchResponse.state === 'not_found' && (
             <div className="p-6 rounded-2xl bg-amber-950/25 border-2 border-amber-500/40 text-amber-100 flex flex-col sm:flex-row items-start gap-4">
               <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 shrink-0 text-amber-400">
@@ -318,9 +396,9 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
             </div>
           )}
 
-          {/* Matched Ayah Cards */}
+          {/* Matched Ayah / Range Cards */}
           {resultsToShow.map((item, idx) => {
-            const verseKey = `${item.chapter}:${item.verse}`;
+            const verseKey = `${item.chapter}:${item.verseRange || item.verse}`;
             const isTafsirOpen = !!tafsirData[verseKey];
             const isTafsirBusy = !!tafsirLoading[verseKey];
 
@@ -335,9 +413,13 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                     <span className="px-2.5 py-0.5 rounded bg-[#12183F] border border-[#6150EA]/30 text-[#2EF2C2] font-bold">
                       {item.surah.arabic}
                     </span>
-                    <span className="text-[#F2F4FF]/70">
+                    <span className="text-[#F2F4FF]/90 font-semibold">
                       {isAr
-                        ? `الآية ${item.verse}`
+                        ? item.isRange
+                          ? `الآيات ${item.verseRange}`
+                          : `الآية ${item.verse}`
+                        : item.isRange
+                        ? `${item.surah.english} — Verses ${item.verseRange}`
                         : `${item.surah.english} — Verse ${item.verse}`}
                     </span>
                     <span className="text-[11px] px-2 py-0.5 rounded bg-[#6150EA]/20 text-[#F2F4FF]/60">
@@ -348,7 +430,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {/* Coverage badge: full vs fragment */}
+                    {/* Coverage badge with strict language localization */}
                     <span
                       className={`text-[11px] px-2 py-0.5 rounded font-semibold ${
                         item.coverage === 'full'
@@ -356,9 +438,13 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                           : 'bg-[#6150EA]/30 text-[#F2F4FF]/80 border border-[#6150EA]/40'
                       }`}
                     >
-                      {item.coverage === 'full'
-                        ? isAr ? 'آية كاملة (Full Ayah)' : 'Full Ayah'
-                        : isAr ? 'مقطع من آية (Fragment)' : 'Fragment'}
+                      {item.isRange
+                        ? item.coverage === 'full'
+                          ? isAr ? 'نطاق آيات كامل' : 'Full Ayah Range'
+                          : isAr ? 'مقطع عبر آيات' : 'Cross-Ayah Fragment'
+                        : item.coverage === 'full'
+                        ? isAr ? 'آية كاملة' : 'Full Ayah'
+                        : isAr ? 'مقطع من آية' : 'Fragment'}
                     </span>
 
                     <span className="text-[11px] px-2 py-0.5 rounded bg-[#12183F] border border-[#2EF2C2]/30 text-[#2EF2C2] font-bold">
@@ -367,17 +453,17 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                   </div>
                 </div>
 
-                {/* Ayah Scripture Arabic Text with Amiri Font */}
+                {/* Ayah Scripture Arabic Text with Amiri Font & Highlighting */}
                 <div className="p-6 text-center space-y-4">
                   <p
                     dir="rtl"
                     lang="ar"
                     className="font-quran text-2xl sm:text-3xl leading-[2.3] text-[#F2F4FF] select-text"
                   >
-                    « {item.text} »
+                    « {renderHighlightedWords(item.text, item.matchedTokens)} »
                   </p>
 
-                  {/* English Translation (Saheeh International) */}
+                  {/* English Translation */}
                   {item.translation && (
                     <p
                       dir="ltr"
@@ -386,9 +472,47 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                       "{item.translation}"
                     </p>
                   )}
+
+                  {/* Per-Ayah Breakdown for Ranges */}
+                  {item.isRange && item.breakdown && item.breakdown.length > 1 && (
+                    <div className="pt-3 border-t border-[#6150EA]/15 text-start">
+                      <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-[#2EF2C2]">
+                        <Layers className="w-3.5 h-3.5" />
+                        <span>{isAr ? 'تفصيل الآيات المشمولة في النطاق:' : 'Breakdown of verses in range:'}</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {item.breakdown.map((b, bIdx) => (
+                          <div
+                            key={bIdx}
+                            className="p-2.5 rounded-lg bg-[#12183F]/70 border border-[#6150EA]/20 flex items-center justify-between text-xs"
+                          >
+                            <span className="text-[#F2F4FF]/80 font-medium">
+                              {isAr ? `الآية ${b.verse}` : `Verse ${b.verse}`}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                  b.coverage === 'full'
+                                    ? 'bg-[#2EF2C2]/15 text-[#2EF2C2]'
+                                    : 'bg-[#6150EA]/20 text-[#F2F4FF]/70'
+                                }`}
+                              >
+                                {b.coverage === 'full'
+                                  ? isAr ? 'كاملة' : 'Full'
+                                  : isAr ? `${Math.round(b.coverageRatio * 100)}% من الآية` : `${Math.round(b.coverageRatio * 100)}% coverage`}
+                              </span>
+                              <span className="text-[10px] text-[#F2F4FF]/50">
+                                {b.matchedWordCount}/{b.totalWordCount} {isAr ? 'كلمة' : 'words'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Ayah Card Footer Actions (Tafsir button) */}
+                {/* Ayah Card Footer Actions */}
                 <div className="px-5 py-3 bg-[#12183F]/80 border-t border-[#6150EA]/20 flex items-center justify-between">
                   <button
                     type="button"
@@ -400,7 +524,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                           return next;
                         });
                       } else {
-                        fetchTafsir(item.chapter, item.verse);
+                        fetchTafsir(item.chapter, item.startVerse || item.verse);
                       }
                     }}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2EF2C2] hover:text-[#2EF2C2]/80 transition cursor-pointer"
@@ -417,7 +541,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                   </button>
 
                   <a
-                    href={`https://quran.com/${item.chapter}/${item.verse}`}
+                    href={`https://quran.com/${item.chapter}/${item.startVerse || item.verse}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] text-[#F2F4FF]/50 hover:text-[#F2F4FF]/90 transition"
@@ -444,7 +568,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
             );
           })}
 
-          {/* Multi-occurrence expander for 6+ results (e.g. 31 occurrences of Ar-Rahman) */}
+          {/* Multi-occurrence expander */}
           {searchResponse.results.length > 5 && (
             <div className="text-center pt-2">
               <button
@@ -473,13 +597,13 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         </div>
       )}
 
-      {/* Standby view when no search executed */}
-      {!searchResponse && (
+      {/* Standby view */}
+      {!searchResponse && !hasConnectionError && (
         <div className="p-8 text-center rounded-xl border border-dashed border-[#6150EA]/20 bg-[#12183F]/40">
           <p className="text-sm text-[#F2F4FF]/60 max-w-md mx-auto leading-relaxed">
             {isAr
-              ? 'أدخل نص الآية أعلاه أو استخدم زر «استخراج من صورة» للبحث المباشر وعرض بيانات السورة والتفسير المعتمد.'
-              : 'Enter verse text above or use "OCR Image" to match and view authentic chapter details and tafsir.'}
+              ? 'أدخل نص الآية أو السورة أعلاه للمطابقة المباشرة مع النص القرآني المعتمد وعرض التفسير والمواضع.'
+              : 'Enter verse or surah text above to verify against primary Quranic source text.'}
           </p>
         </div>
       )}
