@@ -1,0 +1,818 @@
+[
+  {
+    "id": "ayah_exact_1",
+    "mode": "ayah",
+    "input": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "1:1"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_exact_2",
+    "mode": "ayah",
+    "input": "قُلۡ إِن كَانَتۡ لَكُمُ ٱلدَّارُ ٱلۡءَاخِرَةُ عِندَ ٱللَّهِ خَالِصَةࣰ مِّن دُونِ ٱلنَّاسِ فَتَمَنَّوُا۟ ٱلۡمَوۡتَ إِن كُنتُمۡ صَـٰدِقِینَ",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "2:94"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_exact_3",
+    "mode": "ayah",
+    "input": "وَإِذَا حَضَرَ ٱلۡقِسۡمَةَ أُو۟لُوا۟ ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینُ فَٱرۡزُقُوهُم مِّنۡهُ وَقُولُوا۟ لَهُمۡ قَوۡلࣰا مَّعۡرُوفࣰا",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "4:8"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_exact_4",
+    "mode": "ayah",
+    "input": "۞ وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "7:47"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_exact_5",
+    "mode": "ayah",
+    "input": "وَٱتۡلُ عَلَیۡهِمۡ نَبَأَ إِبۡرَ ٰهِیمَ",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "26:69"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_exact_6",
+    "mode": "ayah",
+    "input": "مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ",
+    "language": "ar",
+    "category": "exact",
+    "expected": {
+      "state": "matched",
+      "ref": "114:6"
+    },
+    "note": "Exact match"
+  },
+  {
+    "id": "ayah_nodiacritics_1",
+    "mode": "ayah",
+    "input": "۞ أتأۡمرون ٱلناس بٱلۡبر وتنسوۡن أنفسكمۡ وأنتمۡ تتۡلون ٱلۡكتـبۚ أفلا تعۡقلون",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "2:44"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_nodiacritics_2",
+    "mode": "ayah",
+    "input": "قدۡ نرى تقلب وجۡهك فی ٱلسماۤءۖ فلنولینك قبۡلةࣰ ترۡضىهاۚ فول وجۡهك شطۡر ٱلۡمسۡجد ٱلۡحرامۚ وحیۡث ما كنتمۡ فولوا۟ وجوهكمۡ شطۡرهۥۗ وإن ٱلذین أوتوا۟ ٱلۡكتـب لیعۡلمون أنه ٱلۡحق من ربهمۡۗ وما ٱلله بغـفل عما یعۡملون",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "2:144"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_nodiacritics_3",
+    "mode": "ayah",
+    "input": "یسۡتخۡفون من ٱلناس ولا یسۡتخۡفون من ٱلله وهو معهمۡ إذۡ یبیتون ما لا یرۡضى من ٱلۡقوۡلۚ وكان ٱلله بما یعۡملون محیطا",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "4:108"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_nodiacritics_4",
+    "mode": "ayah",
+    "input": "وٱلذین كذبوا۟ بءایـتنا ولقاۤء ٱلۡءاخرة حبطتۡ أعۡمـلهمۡۚ هلۡ یجۡزوۡن إلا ما كانوا۟ یعۡملون",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "7:147"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_nodiacritics_5",
+    "mode": "ayah",
+    "input": "رب نجنی وأهۡلی مما یعۡملون",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "26:169"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_nodiacritics_6",
+    "mode": "ayah",
+    "input": "وحور عینࣱ",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "56:22"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "ayah_typo_1",
+    "mode": "ayah",
+    "input": "قَالُ ۟ ٱدۡعُ لَنَا رَبَّكَ یُبَیِّن لَّنَا مَا لَوۡنُهَاۚ قَالَ إِنَّهُۥ یَقُولُ إِنَّهَا بَقَرَةࣱ صَفۡرَاۤءُ فَاقِعࣱ لَّوۡنُهَا تَسُرُّ ٱلنَّـٰظِرِینَ",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:69"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_typo_2",
+    "mode": "ayah",
+    "input": "إِنَّ ا یَأۡمُرُكُم بِٱلسُّوۤءِ وَٱلۡفَحۡشَاۤءِ وَأَن تَقُولُوا۟ عَلَى ٱللَّهِ مَا لَا تَعۡلَمُونَ",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:169"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_typo_3",
+    "mode": "ayah",
+    "input": "بَل ر فَعَهُ ٱللَّهُ إِلَیۡهِۚ وَكَانَ ٱللَّهُ عَزِیزًا حَكِیمࣰا",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "4:158"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_typo_4",
+    "mode": "ayah",
+    "input": "وَٱلّ ِینَ تَدۡعُونَ مِن دُونِهِۦ لَا یَسۡتَطِیعُونَ نَصۡرَكُمۡ وَلَاۤ أَنفُسَهُمۡ یَنصُرُونَ",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "7:197"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_typo_5",
+    "mode": "ayah",
+    "input": "وَتَق ُّبَكَ فِی ٱلسَّـٰجِدِینَ",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "26:219"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_typo_6",
+    "mode": "ayah",
+    "input": "ءَأَن مۡ أَنشَأۡتُمۡ شَجَرَتَهَاۤ أَمۡ نَحۡنُ ٱلۡمُنشِءُونَ",
+    "language": "ar",
+    "category": "typos",
+    "expected": {
+      "state": "close_match",
+      "ref": "56:72"
+    },
+    "note": "With typos"
+  },
+  {
+    "id": "ayah_slice_1",
+    "mode": "ayah",
+    "input": "إِلَیۡكَ وَمَاۤ أُنزِلَ مِن",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:4"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_slice_2",
+    "mode": "ayah",
+    "input": "ٱعۡتَدَىٰ عَلَیۡكُمۡ فَٱعۡتَدُوا۟ عَلَیۡهِ",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:194"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_slice_3",
+    "mode": "ayah",
+    "input": "أَوۡ فَسَادࣲ فِی ٱلۡأَرۡضِ",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "5:32"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_slice_4",
+    "mode": "ayah",
+    "input": "وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَٱبۡنِ ٱلسَّبِیلِ",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "8:41"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_slice_5",
+    "mode": "ayah",
+    "input": "عَرۡشُكِۖ قَالَتۡ كَأَنَّهُۥ هُوَۚ",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "27:42"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_slice_6",
+    "mode": "ayah",
+    "input": "وَجَعَلۡنَا فِی ذُرِّیَّتِهِمَا ٱلنُّبُوَّةَ",
+    "language": "ar",
+    "category": "partial_slice",
+    "expected": {
+      "state": "close_match",
+      "ref": "57:26"
+    },
+    "note": "Partial slice"
+  },
+  {
+    "id": "ayah_range_1",
+    "mode": "ayah",
+    "input": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
+    "language": "ar",
+    "category": "multi_ayah_range",
+    "expected": {
+      "state": "matched",
+      "ref": "1:1-2"
+    },
+    "note": "Multi-ayah range"
+  },
+  {
+    "id": "ayah_range_2",
+    "mode": "ayah",
+    "input": "۞ وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ وَنَادَىٰۤ أَصۡحَـٰبُ ٱلۡأَعۡرَافِ رِجَالࣰا یَعۡرِفُونَهُم بِسِیمَىٰهُمۡ قَالُوا۟ مَاۤ أَغۡنَىٰ عَنكُمۡ جَمۡعُكُمۡ وَمَا كُنتُمۡ تَسۡتَكۡبِرُونَ",
+    "language": "ar",
+    "category": "multi_ayah_range",
+    "expected": {
+      "state": "matched",
+      "ref": "7:47-48"
+    },
+    "note": "Multi-ayah range"
+  },
+  {
+    "id": "ayah_range_3",
+    "mode": "ayah",
+    "input": "وَحُورٌ عِینࣱ كَأَمۡثَـٰلِ ٱللُّؤۡلُؤِ ٱلۡمَكۡنُونِ",
+    "language": "ar",
+    "category": "multi_ayah_range",
+    "expected": {
+      "state": "matched",
+      "ref": "56:22-23"
+    },
+    "note": "Multi-ayah range"
+  },
+  {
+    "id": "ayah_rahman_refrain",
+    "mode": "ayah",
+    "input": "فبأي آلاء ربكما تكذبان",
+    "language": "ar",
+    "category": "refrain",
+    "expected": {
+      "state": "matched",
+      "ref": "55:13"
+    },
+    "note": "Ar-Rahman refrain (31 occurrences)"
+  },
+  {
+    "id": "ayah_replaced_1",
+    "mode": "ayah",
+    "input": "وَإِذَا لَقُوا۟ ٱلَّذِینَ ءَامَنُوا۟ قَالُوۤا۟ ءَامَنَّا وَإِذَا خَلَوۡا۟ كلمة_مختلفة شَیَـٰطِینِهِمۡ قَالُوۤا۟ إِنَّا مَعَكُمۡ إِنَّمَا نَحۡنُ مُسۡتَهۡزِءُونَ",
+    "language": "ar",
+    "category": "one_word_replaced",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:14"
+    },
+    "note": "One word replaced"
+  },
+  {
+    "id": "ayah_replaced_2",
+    "mode": "ayah",
+    "input": "وَقَـٰتِلُوا۟ فِی سَبِیلِ ٱللَّهِ كلمة_مختلفة أَنَّ ٱللَّهَ سَمِیعٌ عَلِیمࣱ",
+    "language": "ar",
+    "category": "one_word_replaced",
+    "expected": {
+      "state": "close_match",
+      "ref": "2:244"
+    },
+    "note": "One word replaced"
+  },
+  {
+    "id": "ayah_replaced_3",
+    "mode": "ayah",
+    "input": "قُل لِّمَن مَّا فِی ٱلسَّمَـٰوَ ٰتِ وَٱلۡأَرۡضِۖ قُل لِّلَّهِۚ كَتَبَ عَلَىٰ نَفۡسِهِ ٱلرَّحۡمَةَۚ كلمة_مختلفة إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۚ ٱلَّذِینَ خَسِرُوۤا۟ أَنفُسَهُمۡ فَهُمۡ لَا یُؤۡمِنُونَ",
+    "language": "ar",
+    "category": "one_word_replaced",
+    "expected": {
+      "state": "close_match",
+      "ref": "6:12"
+    },
+    "note": "One word replaced"
+  },
+  {
+    "id": "ayah_nonquran_1",
+    "mode": "ayah",
+    "input": "هذا كلام ليس من القرآن الكريم",
+    "language": "ar",
+    "category": "non_quran",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-Quran input"
+  },
+  {
+    "id": "ayah_nonquran_2",
+    "mode": "ayah",
+    "input": "الذهب والفضة والبر والشعير",
+    "language": "ar",
+    "category": "non_quran",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-Quran input"
+  },
+  {
+    "id": "ayah_nonquran_3",
+    "mode": "ayah",
+    "input": "إنما العلم بالتعلم والحلم بالتحلم",
+    "language": "ar",
+    "category": "non_quran",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-Quran input"
+  },
+  {
+    "id": "hadith_exact_1",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا الْحُمَيْدِيُّ عَبْدُ اللَّهِ بْنُ الزُّبَيْرِ ، قَالَ : حَدَّثَنَا سُفْيَانُ ، قَالَ : حَدَّثَنَا يَحْيَى بْنُ سَعِيدٍ الْأَنْصَارِيُّ ، قَالَ : أَخْبَرَنِي مُحَمَّدُ بْنُ إِبْرَاهِيمَ التَّيْمِيُّ ، أَنَّهُ سَمِعَ عَلْقَمَةَ بْنَ وَقَّاصٍ اللَّيْثِيَّ ، يَقُولُ : سَمِعْتُ عُمَرَ بْنَ الْخَطَّابِ رَضِيَ اللَّهُ عَنْهُ عَلَى الْمِنْبَرِ، قَالَ : سَمِعْتُ رَسُولَ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، يَقُولُ : \" إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى دُنْيَا يُصِيبُهَا أَوْ إِلَى امْرَأَةٍ يَنْكِحُهَا، فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_exact_2",
+    "mode": "hadith",
+    "input": "",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "muslim_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_exact_3",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ بْنِ قَعْنَبٍ الْقَعْنَبِيُّ، حَدَّثَنَا عَبْدُ الْعَزِيزِ، - يَعْنِي ابْنَ مُحَمَّدٍ - عَنْ مُحَمَّدٍ، - يَعْنِي ابْنَ عَمْرٍو - عَنْ أَبِي سَلَمَةَ، عَنِ الْمُغِيرَةِ بْنِ شُعْبَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا ذَهَبَ الْمَذْهَبَ أَبْعَدَ ‏.‏",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "abudawud_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_exact_4",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، حَدَّثَنَا أَبُو عَوَانَةَ، عَنْ سِمَاكِ بْنِ حَرْبٍ، ح وَحَدَّثَنَا هَنَّادٌ، حَدَّثَنَا وَكِيعٌ، عَنْ إِسْرَائِيلَ، عَنْ سِمَاكٍ، عَنْ مُصْعَبِ بْنِ سَعْدٍ، عَنِ ابْنِ عُمَرَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ لاَ تُقْبَلُ صَلاَةٌ بِغَيْرِ طُهُورٍ وَلاَ صَدَقَةٌ مِنْ غُلُولٍ ‏\"‏ ‏.‏ قَالَ هَنَّادٌ فِي حَدِيثِهِ ‏\"‏ إِلاَّ بِطُهُورٍ ‏\"‏ ‏.‏ قَالَ أَبُو عِيسَى هَذَا الْحَدِيثُ أَصَحُّ شَيْءٍ فِي هَذَا الْبَابِ وَأَحْسَنُ ‏.‏ وَفِي الْبَابِ عَنْ أَبِي الْمَلِيحِ عَنْ أَبِيهِ وَأَبِي هُرَيْرَةَ وَأَنَسٍ ‏.‏ وَأَبُو الْمَلِيحِ بْنُ أُسَامَةَ اسْمُهُ عَامِرٌ وَيُقَالُ زَيْدُ بْنُ أُسَامَةَ بْنِ عُمَيْرٍ الْهُذَلِيُّ ‏.‏",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "tirmidhi_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_exact_5",
+    "mode": "hadith",
+    "input": "أَخْبَرَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، قَالَ حَدَّثَنَا سُفْيَانُ، عَنِ الزُّهْرِيِّ، عَنْ أَبِي سَلَمَةَ، عَنْ أَبِي هُرَيْرَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم قَالَ ‏ \"‏ إِذَا اسْتَيْقَظَ أَحَدُكُمْ مِنْ نَوْمِهِ فَلاَ يَغْمِسْ يَدَهُ فِي وَضُوئِهِ حَتَّى يَغْسِلَهَا ثَلاَثًا فَإِنَّ أَحَدَكُمْ لاَ يَدْرِي أَيْنَ بَاتَتْ يَدُهُ ‏\"‏ ‏.‏",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "nasai_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_exact_6",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا أَبُو بَكْرِ بْنُ أَبِي شَيْبَةَ قَالَ: حَدَّثَنَا شَرِيكٌ عَنِ الأَعْمَشِ عَنْ أَبِي صَالِحٍ عَنْ أَبِي هُرَيْرَةَ قَالَ: قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: «مَا أَمَرْتُكُمْ بِهِ فَخُذُوهُ وَمَا نَهَيْتُكُمْ عَنْهُ فَانْتَهُوا»",
+    "language": "ar",
+    "category": "exact_matn",
+    "expected": {
+      "state": "matched",
+      "ref": "ibnmajah_1"
+    },
+    "note": "Exact matn"
+  },
+  {
+    "id": "hadith_isnad_1",
+    "mode": "hadith",
+    "input": "حدثنا عبد الله بن يوسف قال أخبرنا مالك عن نافع عن ابن عمر أن رسول الله صلى الله عليه وسلم قال: حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ هِشَامِ بْنِ عُرْوَةَ، عَنْ أَبِيهِ، عَنْ عَائِشَةَ أُمِّ الْمُؤْمِنِينَ ـ رضى الله عنها ـ أَنَّ الْحَارِثَ بْنَ هِشَامٍ ـ رضى الله عنه ـ سَأَلَ رَسُولَ اللَّهِ صلى الله عليه وسلم فَقَالَ يَا رَسُولَ اللَّهِ كَيْفَ يَأْتِيكَ الْوَحْىُ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أَحْيَانًا يَأْتِينِي مِثْلَ صَلْصَلَةِ الْجَرَسِ ـ وَهُوَ أَشَدُّهُ عَلَىَّ ـ فَيُفْصَمُ عَنِّي وَقَدْ وَعَيْتُ عَنْهُ مَا قَالَ، وَأَحْيَانًا يَتَمَثَّلُ لِيَ الْمَلَكُ رَجُلاً فَيُكَلِّمُنِي فَأَعِي مَا يَقُولُ ‏\"‏‏.‏ قَالَتْ عَائِشَةُ رضى الله عنها وَلَقَدْ رَأَيْتُهُ يَنْزِلُ عَلَيْهِ الْوَحْىُ فِي الْيَوْمِ الشَّدِيدِ الْبَرْدِ، فَيَفْصِمُ عَنْهُ وَإِنَّ جَبِينَهُ لَيَتَفَصَّدُ عَرَقًا‏.‏",
+    "language": "ar",
+    "category": "isnad_takhrij",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_2"
+    },
+    "note": "With isnad and takhrij"
+  },
+  {
+    "id": "hadith_isnad_2",
+    "mode": "hadith",
+    "input": "وحدثني محمد بن رافع حدثنا عبد الرزاق أخبرنا معمر عن همام بن منبه قال هذا ما حدثنا أبو هريرة عن رسول الله صلى الله عليه وسلم فذكر أحاديث منها وقال رسول الله صلى الله عليه وسلم: ",
+    "language": "ar",
+    "category": "isnad_takhrij",
+    "expected": {
+      "state": "matched",
+      "ref": "muslim_2"
+    },
+    "note": "With isnad and takhrij"
+  },
+  {
+    "id": "hadith_isnad_3",
+    "mode": "hadith",
+    "input": "حدثنا مسدد حدثنا عيسى بن يونس حدثنا الأعمش عن أبي وائل عن حذيفة قال: حَدَّثَنَا مُسَدَّدُ بْنُ مُسَرْهَدٍ، حَدَّثَنَا عِيسَى بْنُ يُونُسَ، أَخْبَرَنَا إِسْمَاعِيلُ بْنُ عَبْدِ الْمَلِكِ، عَنْ أَبِي الزُّبَيْرِ، عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا أَرَادَ الْبَرَازَ انْطَلَقَ حَتَّى لاَ يَرَاهُ أَحَدٌ ‏.‏",
+    "language": "ar",
+    "category": "isnad_takhrij",
+    "expected": {
+      "state": "matched",
+      "ref": "abudawud_2"
+    },
+    "note": "With isnad and takhrij"
+  },
+  {
+    "id": "hadith_isnad_4",
+    "mode": "hadith",
+    "input": "حدثنا قتيبة حدثنا الليث عن نافع عن ابن عمر أن رسول الله صلى الله عليه وسلم قال: حَدَّثَنَا إِسْحَاقُ بْنُ مُوسَى الأَنْصَارِيُّ، حَدَّثَنَا مَعْنُ بْنُ عِيسَى الْقَزَّازُ، حَدَّثَنَا مَالِكُ بْنُ أَنَسٍ، ح وَحَدَّثَنَا قُتَيْبَةُ، عَنْ مَالِكٍ، عَنْ سُهَيْلِ بْنِ أَبِي صَالِحٍ، عَنْ أَبِيهِ، عَنْ أَبِي هُرَيْرَةَ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ إِذَا تَوَضَّأَ الْعَبْدُ الْمُسْلِمُ أَوِ الْمُؤْمِنُ فَغَسَلَ وَجْهَهُ خَرَجَتْ مِنْ وَجْهِهِ كُلُّ خَطِيئَةٍ نَظَرَ إِلَيْهَا بِعَيْنَيْهِ مَعَ الْمَاءِ أَوْ مَعَ آخِرِ قَطْرِ الْمَاءِ أَوْ نَحْوِ هَذَا وَإِذَا غَسَلَ يَدَيْهِ خَرَجَتْ مِنْ يَدَيْهِ كُلُّ خَطِيئَةٍ بَطَشَتْهَا يَدَاهُ مَعَ الْمَاءِ أَوْ مَعَ آخِرِ قَطْرِ الْمَاءِ حَتَّى يَخْرُجَ نَقِيًّا مِنَ الذُّنُوبِ ‏\"‏ ‏.‏ قَالَ أَبُو عِيسَى هَذَا حَدِيثٌ حَسَنٌ صَحِيحٌ وَهُوَ حَدِيثُ مَالِكٍ عَنْ سُهَيْلٍ عَنْ أَبِيهِ عَنْ أَبِي هُرَيْرَةَ ‏.‏ وَأَبُو صَالِحٍ وَالِدُ سُهَيْلٍ هُوَ أَبُو صَالِحٍ السَّمَّانُ وَاسْمُهُ ذَكْوَانُ ‏.‏ وَأَبُو هُرَيْرَةَ اخْتُلِفَ فِي اسْمِهِ فَقَالُوا عَبْدُ شَمْسٍ وَقَالُوا عَبْدُ اللَّهِ بْنُ عَمْرٍو وَهَكَذَا قَالَ مُحَمَّدُ بْنُ إِسْمَاعِيلَ وَهُوَ الأَصَحُّ ‏.‏ قَالَ أَبُو عِيسَى وَفِي الْبَابِ عَنْ عُثْمَانَ بْنِ عَفَّانَ وَثَوْبَانَ وَالصُّنَابِحِيِّ وَعَمْرِو بْنِ عَبَسَةَ وَسَلْمَانَ وَعَبْدِ اللَّهِ بْنِ عَمْرٍو ‏.‏ وَالصُّنَابِحِيُّ الَّذِي رَوَى عَنْ أَبِي بَكْرٍ الصِّدِّيقِ لَيْسَ لَهُ سَمَاعٌ مِنْ رَسُولِ اللَّهِ صلى الله عليه وسلم وَاسْمُهُ عَبْدُ الرَّحْمَنِ بْنُ عُسَيْلَةَ وَيُكْنَى أَبَا عَبْدِ اللَّهِ رَحَلَ إِلَى النَّبِيِّ صلى الله عليه وسلم فَقُبِضَ النَّبِيُّ صلى الله عليه وسلم وَهُوَ فِي الطَّرِيقِ وَقَدْ رَوَى عَنِ النَّبِيِّ صلى الله عليه وسلم أَحَادِيثَ ‏.‏ وَالصُّنَابِحُ بْنُ الأَعْسَرِ الأَحْمَسِيُّ صَاحِبُ النَّبِيِّ صلى الله عليه وسلم يُقَالُ لَهُ الصُّنَابِحِيُّ أَيْضًا وَإِنَّمَا حَدِيثُهُ قَالَ سَمِعْتُ النَّبِيَّ صلى الله عليه وسلم يَقُولُ ‏\"‏ إِنِّي مُكَاثِرٌ بِكُمُ الأُمَمَ فَلاَ تَقْتَتِلُنَّ بَعْدِي ‏\"‏ ‏.‏",
+    "language": "ar",
+    "category": "isnad_takhrij",
+    "expected": {
+      "state": "matched",
+      "ref": "tirmidhi_2"
+    },
+    "note": "With isnad and takhrij"
+  },
+  {
+    "id": "hadith_nodiacritics_1",
+    "mode": "hadith",
+    "input": "حدثنا آدم بن أبي إياس، قال حدثنا شعبة، عن عبد الله بن أبي السفر، وإسماعيل، عن الشعبي، عن عبد الله بن عمرو ـ رضى الله عنهما ـ عن النبي صلى الله عليه وسلم قال ‏ \"‏ المسلم من سلم المسلمون من لسانه ويده، والمهاجر من هجر ما نهى الله عنه ‏\"‏‏.‏ قال أبو عبد الله وقال أبو معاوية حدثنا داود عن عامر قال سمعت عبد الله عن النبي صلى الله عليه وسلم‏.‏ وقال عبد الأعلى عن داود عن عامر عن عبد الله عن النبي صلى الله عليه وسلم‏.‏",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_10"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "hadith_nodiacritics_2",
+    "mode": "hadith",
+    "input": "",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "muslim_10"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "hadith_nodiacritics_3",
+    "mode": "hadith",
+    "input": "حدثنا موسى بن إسماعيل، حدثنا وهيب، حدثنا عمرو بن يحيى، عن أبي زيد، عن معقل بن أبي معقل الأسدي، قال نهى رسول الله صلى الله عليه وسلم أن نستقبل القبلتين ببول أو غائط ‏.‏ قال أبو داود وأبو زيد هو مولى بني ثعلبة ‏.‏",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "abudawud_10"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "hadith_nodiacritics_4",
+    "mode": "hadith",
+    "input": "وقد روى هذا الحديث ابن لهيعة، عن أبي الزبير، عن جابر، عن أبي قتادة، أنه رأى النبي صلى الله عليه وسلم يبول مستقبل القبلة ‏.‏ حدثنا بذلك قتيبة حدثنا ابن لهيعة ‏.‏ وحديث جابر عن النبي صلى الله عليه وسلم أصح من حديث ابن لهيعة ‏.‏ وابن لهيعة ضعيف عند أهل الحديث ضعفه يحيى بن سعيد القطان وغيره من قبل حفظه ‏.‏",
+    "language": "ar",
+    "category": "no_diacritics",
+    "expected": {
+      "state": "matched",
+      "ref": "tirmidhi_10"
+    },
+    "note": "No diacritics"
+  },
+  {
+    "id": "hadith_changed_1",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا مُحَمَّدُ بْنُ سَلاَمٍ، قَالَ أَخْبَرَنَا عَبْدَةُ، عَنْ هِشَامٍ، عَنْ أَبِيهِ، عَنْ عَائِشَةَ، قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَمَرَهُمْ أَمَرَهُمْ مِنَ الأَعْمَالِ بِمَا يُطِيقُونَ قَالُوا إِنَّا لَسْنَا كلمة_مختلفة يَا رَسُولَ اللَّهِ، إِنَّ اللَّهَ قَدْ غَفَرَ لَكَ مَا تَقَدَّمَ مِنْ ذَنْبِكَ وَمَا تَأَخَّرَ‏.‏ فَيَغْضَبُ حَتَّى يُعْرَفَ الْغَضَبُ فِي وَجْهِهِ ثُمَّ يَقُولُ ‏ \"‏ إِنَّ أَتْقَاكُمْ وَأَعْلَمَكُمْ بِاللَّهِ أَنَا ‏\"‏‏.‏",
+    "language": "ar",
+    "category": "one_word_changed",
+    "expected": {
+      "state": "close_match",
+      "ref": "bukhari_20"
+    },
+    "note": "One word changed"
+  },
+  {
+    "id": "hadith_changed_2",
+    "mode": "hadith",
+    "input": "كلمة_مختلفة",
+    "language": "ar",
+    "category": "one_word_changed",
+    "expected": {
+      "state": "close_match",
+      "ref": "muslim_20"
+    },
+    "note": "One word changed"
+  },
+  {
+    "id": "hadith_changed_3",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا زُهَيْرُ بْنُ حَرْبٍ، وَهَنَّادُ بْنُ السَّرِيِّ، قَالاَ حَدَّثَنَا وَكِيعٌ، حَدَّثَنَا الأَعْمَشُ، قَالَ سَمِعْتُ مُجَاهِدًا، يُحَدِّثُ عَنْ طَاوُسٍ، عَنِ ابْنِ عَبَّاسٍ، قَالَ مَرَّ رَسُولُ اللَّهِ صلى الله عليه وسلم عَلَى قَبْرَيْنِ فَقَالَ ‏\"‏ إِنَّهُمَا يُعَذَّبَانِ وَمَا يُعَذَّبَانِ فِي كَبِيرٍ أَمَّا هَذَا فَكَانَ لاَ يَسْتَنْزِهُ كلمة_مختلفة الْبَوْلِ وَأَمَّا هَذَا فَكَانَ يَمْشِي بِالنَّمِيمَةِ ‏\"‏ ‏.‏ ثُمَّ دَعَا بِعَسِيبٍ رَطْبٍ فَشَقَّهُ بِاثْنَيْنِ ثُمَّ غَرَسَ عَلَى هَذَا وَاحِدًا وَعَلَى هَذَا وَاحِدًا وَقَالَ ‏\"‏ لَعَلَّهُ يُخَفَّفُ عَنْهُمَا مَا لَمْ يَيْبَسَا ‏\"‏ ‏.‏ قَالَ هَنَّادٌ ‏\"‏ يَسْتَتِرُ ‏\"‏ ‏.‏ مَكَانَ ‏\"‏ يَسْتَنْزِهُ ‏\"‏ ‏.‏",
+    "language": "ar",
+    "category": "one_word_changed",
+    "expected": {
+      "state": "close_match",
+      "ref": "abudawud_20"
+    },
+    "note": "One word changed"
+  },
+  {
+    "id": "hadith_changed_4",
+    "mode": "hadith",
+    "input": "حَدَّثَنَا مُحَمَّدُ بْنُ بَشَّارٍ، حَدَّثَنَا عَبْدُ الْوَهَّابِ الثَّقَفِيُّ، عَنْ مُحَمَّدِ بْنِ عَمْرٍو، عَنْ أَبِي سَلَمَةَ، عَنِ الْمُغِيرَةِ بْنِ شُعْبَةَ، قَالَ كُنْتُ مَعَ النَّبِيِّ صلى الله عليه وسلم فِي سَفَرٍ فَأَتَى النَّبِيُّ صلى الله عليه وسلم حَاجَتَهُ فَأَبْعَدَ فِي الْمَذْهَبِ ‏.‏ قَالَ وَفِي الْبَابِ عَنْ عَبْدِ الرَّحْمَنِ بْنِ أَبِي قُرَادٍ وَأَبِي كلمة_مختلفة وَجَابِرٍ وَيَحْيَى بْنِ عُبَيْدٍ عَنْ أَبِيهِ وَأَبِي مُوسَى وَابْنِ عَبَّاسٍ وَبِلاَلِ بْنِ الْحَارِثِ ‏.‏ قَالَ أَبُو عِيسَى هَذَا حَدِيثٌ حَسَنٌ صَحِيحٌ ‏.‏ وَيُرْوَى عَنِ النَّبِيِّ صلى الله عليه وسلم أَنَّهُ كَانَ يَرْتَادُ لِبَوْلِهِ مَكَانًا كَمَا يَرْتَادُ مَنْزِلاً ‏.‏ وَأَبُو سَلَمَةَ اسْمُهُ عَبْدُ اللَّهِ بْنُ عَبْدِ الرَّحْمَنِ بْنِ عَوْفٍ الزُّهْرِيُّ ‏.‏",
+    "language": "ar",
+    "category": "one_word_changed",
+    "expected": {
+      "state": "close_match",
+      "ref": "tirmidhi_20"
+    },
+    "note": "One word changed"
+  },
+  {
+    "id": "hadith_attestation_1",
+    "mode": "hadith",
+    "input": "إنما الأعمال بالنيات",
+    "language": "ar",
+    "category": "attestation",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_1"
+    },
+    "note": "Should show attestations in other collections"
+  },
+  {
+    "id": "hadith_attestation_2",
+    "mode": "hadith",
+    "input": "المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف",
+    "language": "ar",
+    "category": "attestation",
+    "expected": {
+      "state": "matched",
+      "ref": "muslim_2664"
+    },
+    "note": "Attestation check"
+  },
+  {
+    "id": "hadith_disagreement_1",
+    "mode": "hadith",
+    "input": "الماء طهور لا ينجسه شيء",
+    "language": "ar",
+    "category": "grader_disagreement",
+    "expected": {
+      "state": "matched",
+      "ref": "abudawud_66"
+    },
+    "note": "Grader disagreement check"
+  },
+  {
+    "id": "hadith_disagreement_2",
+    "mode": "hadith",
+    "input": "صلاة في مسجدي هذا أفضل من ألف صلاة فيما سواه",
+    "language": "ar",
+    "category": "grader_disagreement",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_1190"
+    },
+    "note": "Grader disagreement check"
+  },
+  {
+    "id": "hadith_nograde_1",
+    "mode": "hadith",
+    "input": "بني الإسلام على خمس",
+    "language": "ar",
+    "category": "no_grade_collections",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_8"
+    },
+    "note": "Bukhari case (implied Sahih)"
+  },
+  {
+    "id": "hadith_nograde_2",
+    "mode": "hadith",
+    "input": "المرء مع من أحب",
+    "language": "ar",
+    "category": "no_grade_collections",
+    "expected": {
+      "state": "matched",
+      "ref": "muslim_2640"
+    },
+    "note": "Muslim case (implied Sahih)"
+  },
+  {
+    "id": "hadith_fabricated_1",
+    "mode": "hadith",
+    "input": "اطلبوا العلم ولو في الصين",
+    "language": "ar",
+    "category": "curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Known fabricated saying"
+  },
+  {
+    "id": "hadith_fabricated_2",
+    "mode": "hadith",
+    "input": "من عرف نفسه فقد عرف ربه",
+    "language": "ar",
+    "category": "curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Known fabricated saying"
+  },
+  {
+    "id": "hadith_fabricated_3",
+    "mode": "hadith",
+    "input": "اختلاف أمتي رحمة",
+    "language": "ar",
+    "category": "curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Known fabricated saying"
+  },
+  {
+    "id": "hadith_invented_1",
+    "mode": "hadith",
+    "input": "قال رسول الله صلى الله عليه وسلم عليكم بأكل الباذنجان فإنه شفاء",
+    "language": "ar",
+    "category": "invented",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Invented claim"
+  },
+  {
+    "id": "hadith_invented_2",
+    "mode": "hadith",
+    "input": "إن الله يحب اللاعبين بالكرة إذا أخلصوا النية",
+    "language": "ar",
+    "category": "invented",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Invented claim"
+  },
+  {
+    "id": "hadith_invented_3",
+    "mode": "hadith",
+    "input": "من نام بعد العصر فلا يلومن إلا نفسه",
+    "language": "ar",
+    "category": "invented",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Invented claim"
+  },
+  {
+    "id": "hadith_en_verbatim_1",
+    "mode": "hadith",
+    "input": "Actions are but by intentions",
+    "language": "en",
+    "category": "english_verbatim",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_1"
+    },
+    "note": "English verbatim"
+  },
+  {
+    "id": "hadith_en_verbatim_2",
+    "mode": "hadith",
+    "input": "The best among you are those who learn the Quran and teach it",
+    "language": "en",
+    "category": "english_verbatim",
+    "expected": {
+      "state": "matched",
+      "ref": "bukhari_5027"
+    },
+    "note": "English verbatim"
+  },
+  {
+    "id": "hadith_en_paraphrase_1",
+    "mode": "hadith",
+    "input": "Deeds depend on what you intend",
+    "language": "en",
+    "category": "english_paraphrase",
+    "expected": {
+      "state": "close_match",
+      "ref": "bukhari_1"
+    },
+    "note": "English paraphrase"
+  },
+  {
+    "id": "hadith_en_paraphrase_2",
+    "mode": "hadith",
+    "input": "The religion is sincerity",
+    "language": "en",
+    "category": "english_paraphrase",
+    "expected": {
+      "state": "close_match",
+      "ref": "muslim_55"
+    },
+    "note": "English paraphrase"
+  }
+]

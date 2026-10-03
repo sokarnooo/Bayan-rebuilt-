@@ -47,18 +47,18 @@ async function runPrebuild() {
       const enPath = path.join(DATA_DIR, `hadith_${col}_en.json`);
       
       if (!fs.existsSync(arPath)) {
-        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col}.json`, arPath);
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/ara-${col}.json`, arPath);
       }
       if (!fs.existsSync(enPath)) {
-        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col}.json`, enPath);
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/eng-${col}.json`, enPath);
       }
     }
 
     if (!fs.existsSync(path.join(DATA_DIR, 'quran_ar.json'))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
     }
     if (!fs.existsSync(path.join(DATA_DIR, 'quran_en.json'))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/eng-abdullahyusufal.json`, path.join(DATA_DIR, 'quran_en.json'));
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-abdullahyusufal.json`, path.join(DATA_DIR, 'quran_en.json'));
     }
   } catch (err) {
     console.error('CRITICAL: Download failed. Prebuild aborted.');
