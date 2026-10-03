@@ -152,25 +152,24 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     }
   };
 
-  // Matched word highlighter
-  const renderHighlightedWords = (text: string, matchedTokens: string[]) => {
-    if (!matchedTokens || matchedTokens.length === 0) {
+  // Matched word highlighter by positional slice
+  const renderHighlightedWords = (
+    text: string,
+    startWordIndex?: number,
+    endWordIndex?: number
+  ) => {
+    if (
+      startWordIndex === undefined ||
+      endWordIndex === undefined ||
+      startWordIndex < 0 ||
+      endWordIndex < startWordIndex
+    ) {
       return text;
     }
 
-    const cleanTokenSet = new Set(
-      matchedTokens.map((t) =>
-        t.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF\s\u00A0.,«»ۖۗۚۛ]/g, '')
-      )
-    );
-
     const words = text.split(' ');
     return words.map((word, idx) => {
-      const cleanW = word.replace(
-        /[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF\s\u00A0.,«»ۖۗۚۛ]/g,
-        ''
-      );
-      const isMatched = cleanTokenSet.has(cleanW);
+      const isMatched = idx >= startWordIndex && idx <= endWordIndex;
 
       return (
         <React.Fragment key={idx}>
@@ -255,8 +254,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#6150EA]/15">
           <p className="text-xs text-[#F2F4FF]/50">
             {isAr
-              ? 'مطابقة حتمية عبر نص Quran Academy (ara-quranacademy).'
-              : 'Deterministic matching against Quran Academy text source.'}
+              ? 'مطابقة نصية آلية عبر نص Quran Academy (ara-quranacademy).'
+              : 'Automated text matching against Quran Academy text source.'}
           </p>
           <button
             type="button"
@@ -460,7 +459,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                     lang="ar"
                     className="font-quran text-2xl sm:text-3xl leading-[2.3] text-[#F2F4FF] select-text"
                   >
-                    « {renderHighlightedWords(item.text, item.matchedTokens)} »
+                    « {renderHighlightedWords(item.text, item.matchedStartWordIndex, item.matchedEndWordIndex)} »
                   </p>
 
                   {/* English Translation */}

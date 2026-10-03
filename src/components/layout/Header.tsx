@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) =>
               </span>
             </div>
             <p className="text-[11px] text-[#F2F4FF]/60 font-sans">
-              {isAr ? 'التحقق الشرعي القطعي بالدليل والدرجة' : 'Authoritative Islamic Text Verification'}
+              {isAr ? 'التحقق الشرعي بالدليل والدرجة' : 'Authoritative Islamic Text Verification'}
             </p>
           </div>
         </div>
