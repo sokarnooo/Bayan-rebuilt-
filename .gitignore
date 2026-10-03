@@ -1,3 +1,5 @@
 node_modules
 dist
 .env
+# Corpus data and generated index
+server/corpus/data/

@@ -77,6 +77,13 @@ interface HadithSearchResponse {
   referralRequired: boolean;
   notice?: string;
   executionTimeMs: number;
+  isCuratedMatched?: boolean;
+  curatedMatchedEntry?: {
+    saying: string;
+    ruling: string;
+    url: string;
+    source: string;
+  };
 }
 
 interface HadithModeProps {
@@ -86,6 +93,7 @@ interface HadithModeProps {
 export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isNotReadyRetry, setIsNotReadyRetry] = useState(false);
   const [result, setResult] = useState<HadithSearchResponse | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -96,12 +104,22 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
     if (!textToSearch) return;
 
     setIsLoading(true);
+    setIsNotReadyRetry(false);
     try {
       const res = await fetch('/api/hadith/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: textToSearch }),
       });
+
+      if (res.status === 503) {
+        setIsNotReadyRetry(true);
+        setTimeout(() => {
+          handleSearch(textToSearch);
+        }, 2000);
+        return;
+      }
+
       const data: HadithSearchResponse = await res.json();
       setResult(data);
     } catch (err) {
@@ -226,7 +244,7 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#6150EA]/15">
           <p className="text-xs text-[#F2F4FF]/50">
             {isAr
-              ? 'تخريج دقيق من الكتب السبعة مع بيان درجة كل مخرج دون افتئات.'
+              ? 'تخريج دقيق من المجموعات السبع المفهرسة مع بيان درجة كل مخرج دون افتئات.'
               : 'Precise takhrij across the 7 canonical collections with named grader judgments.'}
           </p>
           <button
@@ -244,6 +262,16 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
           </button>
         </div>
       </div>
+
+      {/* Retry loading banner */}
+      {isNotReadyRetry && (
+        <div className="p-4 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-300 flex items-center justify-center gap-3 shadow-lg animate-pulse" dir="rtl">
+          <RotateCcw className="w-5 h-5 animate-spin text-amber-400" />
+          <span className="font-semibold text-sm">
+            الخدمة قيد التحميل، تُعاد المحاولة تلقائياً
+          </span>
+        </div>
+      )}
 
       {/* Results Area */}
       {result && (
@@ -288,8 +316,47 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
             </div>
           </div>
 
+          {/* Curated matched Fabricated-saying card */}
+          {result.isCuratedMatched && result.curatedMatchedEntry && (
+            <div className="p-5 rounded-xl border-2 border-red-500/40 bg-red-500/10 text-red-100 space-y-4 shadow-lg select-text text-right" dir="rtl">
+              <div className="flex items-center gap-2 text-red-400 font-bold border-b border-red-500/20 pb-2">
+                <AlertTriangle className="w-5 h-5 text-red-400 animate-pulse" />
+                <span className="text-lg">حديث منتشر لا يصح</span>
+              </div>
+              
+              <div className="space-y-3">
+                <p className="font-quran text-xl sm:text-2xl leading-relaxed text-[#F2F4FF]">
+                  النص: « {result.curatedMatchedEntry.saying} »
+                </p>
+                
+                <div className="text-sm space-y-2 pt-1">
+                  <p>
+                    <span className="font-bold text-red-300">الحكم في الدرر السنية: </span>
+                    <span className="font-semibold bg-red-500/20 px-2 py-0.5 rounded text-red-200">
+                      {result.curatedMatchedEntry.ruling}
+                    </span>
+                  </p>
+                  
+                  <p className="flex items-center flex-wrap gap-1.5">
+                    <span className="font-bold text-red-300">المصدر: </span>
+                    <span>الدرر السنية — أحاديث منتشرة لا تصح</span>
+                    <span>•</span>
+                    <a
+                      href={result.curatedMatchedEntry.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-400 hover:underline inline-flex items-center gap-1 font-mono text-xs"
+                    >
+                      رابط التحقق <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Notice Banner */}
-          {result.notice && (
+          {result.notice && !result.isCuratedMatched && (
             <div className={`p-4 rounded-xl border text-sm ${
               result.notice.startsWith('تحذير')
                 ? 'bg-red-500/10 border-red-500/40 text-red-200 space-y-2'
@@ -324,21 +391,27 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
 
           {/* Scholar Referral Mandatory Panel */}
           {(result.referralRequired || result.state === 'not_found') && (
-            <div className="p-6 rounded-xl bg-gradient-to-r from-red-950/40 via-[#12183F] to-[#12183F] border-2 border-red-500/40 text-center space-y-3 shadow-lg">
-              <div className="w-12 h-12 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto text-red-300">
-                <HelpCircle className="w-6 h-6" />
+            result.isCuratedMatched ? (
+              <div className="p-4 text-center text-red-300 font-semibold text-sm">
+                «لم يُعثر على هذا النص في المجموعات المفهرسة»
               </div>
-              <h3 className="text-lg font-bold text-red-300">
-                {isAr
-                  ? 'لم يتم العثور على تطابق موثوق، راجع أهل العلم'
-                  : 'No reliable match found; refer to qualified scholars'}
-              </h3>
-              <p className="text-sm text-[#F2F4FF]/80 max-w-xl mx-auto leading-relaxed">
-                {isAr
-                  ? 'النص المدخل لم يُطابق حديثاً موثقاً في كتب السنة السبعة المعتمدة بنسبة تحقق كافية. يُرجى مراجعة كتب الحديث المتخصصة أو استشارة أهل العلم قبل تداوله أو البناء عليه.'
-                  : 'The query text did not match any verified hadith across the 7 canonical collections with sufficient confidence. Please consult verified references or Islamic scholars.'}
-              </p>
-            </div>
+            ) : (
+              <div className="p-6 rounded-xl bg-gradient-to-r from-red-950/40 via-[#12183F] to-[#12183F] border-2 border-red-500/40 text-center space-y-3 shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto text-red-300">
+                  <HelpCircle className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-red-300">
+                  {isAr
+                    ? 'لم يتم العثور على تطابق موثوق، راجع أهل العلم'
+                    : 'No reliable match found; refer to qualified scholars'}
+                </h3>
+                <p className="text-sm text-[#F2F4FF]/80 max-w-xl mx-auto leading-relaxed">
+                  {isAr
+                    ? 'النص المدخل لم يُطابق حديثاً موثقاً في المجموعات السبع المفهرسة المعتمدة بنسبة تحقق كافية. يُرجى مراجعة كتب الحديث المتخصصة أو استشارة أهل العلم قبل تداوله أو البناء عليه.'
+                    : 'The query text did not match any verified hadith across the 7 indexed collections with sufficient confidence. Please consult verified references or Islamic scholars.'}
+                </p>
+              </div>
+            )
           )}
 
           {/* Result Cards */}

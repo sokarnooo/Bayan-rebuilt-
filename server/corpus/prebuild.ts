@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import zlib from 'zlib';
 import { fileURLToPath } from 'url';
 import { preprocessAllRawHadiths } from '../matching/hadithMatcher.ts';
 
@@ -7,19 +8,106 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, './data');
 
+const EXPECTED_COUNTS: Record<string, number> = {
+  bukhari: 7580,
+  muslim: 7360,
+  abudawud: 5272,
+  tirmidhi: 3924,
+  nasai: 5679,
+  ibnmajah: 4338,
+  nawawi: 42,
+};
+
+const QURAN_EXPECTED = 6236;
+
+const COLLECTIONS = Object.keys(EXPECTED_COUNTS);
+const QURAN_EDITIONS = ['ara-quranacademy', 'eng-abdullahyusufal'];
+
+async function downloadFile(url: string, dest: string) {
+  console.log(`Downloading ${url} ...`);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
+  const text = await res.text();
+  fs.writeFileSync(dest, text);
+}
+
 async function runPrebuild() {
   console.log('====================================================');
-  console.log('Prebuilding Hadith records index to save cold-start time...');
+  console.log('Starting Prebuild: Data Acquisition & Index Generation');
   const startTime = performance.now();
 
-  const { records, emptyCount } = preprocessAllRawHadiths();
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
 
-  const outPath = path.join(DATA_DIR, 'prebuilt_hadiths.json');
-  fs.writeFileSync(outPath, JSON.stringify(records));
+  // 1. Download Corpus if missing
+  try {
+    for (const col of COLLECTIONS) {
+      const arPath = path.join(DATA_DIR, `hadith_${col}_ar.json`);
+      const enPath = path.join(DATA_DIR, `hadith_${col}_en.json`);
+      
+      if (!fs.existsSync(arPath)) {
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col}.json`, arPath);
+      }
+      if (!fs.existsSync(enPath)) {
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col}.json`, enPath);
+      }
+    }
+
+    if (!fs.existsSync(path.join(DATA_DIR, 'quran_ar.json'))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
+    }
+    if (!fs.existsSync(path.join(DATA_DIR, 'quran_en.json'))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/eng-abdullahyusufal.json`, path.join(DATA_DIR, 'quran_en.json'));
+    }
+  } catch (err) {
+    console.error('CRITICAL: Download failed. Prebuild aborted.');
+    console.error(err);
+    process.exit(1); // Fail build
+  }
+
+  // 2. Preprocess & Verify Counts
+  console.log('Preprocessing records and verifying counts...');
+  const { records, vocab, sections, emptyCount } = preprocessAllRawHadiths();
+
+  // Verification
+  const actualCounts: Record<string, number> = {};
+  for (const r of records) {
+    actualCounts[r.c] = (actualCounts[r.c] || 0) + 1;
+  }
+
+  let mismatch = false;
+  for (const col of COLLECTIONS) {
+    if (actualCounts[col] !== EXPECTED_COUNTS[col]) {
+      console.error(`ERROR: ${col} count mismatch! Expected ${EXPECTED_COUNTS[col]}, got ${actualCounts[col]}`);
+      mismatch = true;
+    }
+  }
+
+  // Check Quran (simple read check)
+  const quranAr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'quran_ar.json'), 'utf8'));
+  const quranList = quranAr.quran || quranAr[Object.keys(quranAr)[0]];
+  if (quranList.length !== QURAN_EXPECTED) {
+    console.error(`ERROR: Quran count mismatch! Expected ${QURAN_EXPECTED}, got ${quranList.length}`);
+    mismatch = true;
+  }
+
+  if (mismatch) {
+    console.error('CRITICAL: Data verification failed. Build aborted.');
+    process.exit(1);
+  }
+
+  console.log('Verification PASSED.');
+
+  // 3. Save Gzipped Index
+  const outPathGz = path.join(DATA_DIR, 'prebuilt_hadiths.json.gz');
+  const jsonStr = JSON.stringify({ v: vocab, r: records, s: sections });
+  const compressed = zlib.gzipSync(Buffer.from(jsonStr, 'utf8'));
+  fs.writeFileSync(outPathGz, compressed);
 
   const elapsed = Math.round(performance.now() - startTime);
   console.log(`Prebuild Completed successfully in ${elapsed}ms!`);
-  console.log(`Saved ${records.length} records to ${outPath} (${emptyCount} empty records excluded).`);
+  console.log(`Saved ${records.length} records to ${outPathGz} (${compressed.length} bytes).`);
   console.log('====================================================');
 }
 

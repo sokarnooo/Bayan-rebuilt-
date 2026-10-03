@@ -7,27 +7,23 @@ export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
-// Warm up Engines asynchronously to ensure instant startup
+// Warm up Engines synchronously on startup before server starts listening to avoid Cloud Run CPU throttling
 let isAyahReady = false;
 let isHadithReady = false;
 
-Promise.resolve().then(() => {
-  try {
-    initAyahEngine();
-    isAyahReady = true;
-  } catch (err) {
-    console.error('Failed to init Ayah Engine:', err);
-  }
-});
+try {
+  initAyahEngine();
+  isAyahReady = true;
+} catch (err) {
+  console.error('Failed to init Ayah Engine:', err);
+}
 
-Promise.resolve().then(() => {
-  try {
-    initHadithEngine();
-    isHadithReady = true;
-  } catch (err) {
-    console.error('Failed to init Hadith Engine:', err);
-  }
-});
+try {
+  initHadithEngine();
+  isHadithReady = true;
+} catch (err) {
+  console.error('Failed to init Hadith Engine:', err);
+}
 
 export const REGISTERED_ROUTES = [
   'GET /api/health',
@@ -100,12 +96,18 @@ app.post('/api/ayah/match', (req, res) => {
 });
 
 app.post('/api/hadith/search', (req, res) => {
+  if (!isHadithReady) {
+    return res.status(503).json({ ready: false });
+  }
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
   res.json(result);
 });
 
 app.post('/api/hadith/match', (req, res) => {
+  if (!isHadithReady) {
+    return res.status(503).json({ ready: false });
+  }
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
   res.json(result);

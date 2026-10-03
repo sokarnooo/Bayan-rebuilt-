@@ -133,7 +133,7 @@ export default function App() {
             <span>•</span>
             <span>التفسير الميسر: مجمع الملك فهد</span>
             <span>•</span>
-            <span>مجموعات الحديث السبعة المعتمدة</span>
+            <span>مجموعات الحديث السبع المفهرسة</span>
           </div>
         </div>
       </footer>
