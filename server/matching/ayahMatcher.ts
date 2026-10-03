@@ -122,8 +122,10 @@ const twoGramIndex: Map<string, Array<{ chapter: number; globalIndex: number }>>
 
 let isInitialized = false;
 
-export function initAyahEngine(): void {
-  if (isInitialized) return;
+export function initAyahEngine(): { totalIndexed: number } {
+  if (isInitialized) {
+    return { totalIndexed: indexedAyat.length };
+  }
 
   const infoRaw = JSON.parse(
     fs.readFileSync(path.join(DATA_DIR, 'quran_info.json'), 'utf8')
@@ -256,6 +258,7 @@ export function initAyahEngine(): void {
   }
 
   isInitialized = true;
+  return { totalIndexed: indexedAyat.length };
 }
 
 const BASMALA_NORM = normalizeArabic('بسم الله الرحمن الرحيم');

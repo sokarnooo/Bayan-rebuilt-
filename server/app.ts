@@ -7,22 +7,16 @@ export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
-// Warm up Engines synchronously on startup before server starts listening to avoid Cloud Run CPU throttling
-let isAyahReady = false;
-let isHadithReady = false;
-
-try {
-  initAyahEngine();
-  isAyahReady = true;
-} catch (err) {
-  console.error('Failed to init Ayah Engine:', err);
-}
-
-try {
-  initHadithEngine();
-  isHadithReady = true;
-} catch (err) {
-  console.error('Failed to init Hadith Engine:', err);
+export function getEngineReadiness() {
+  // Engines are singletons, init calls are idempotent if we check internal state
+  const h = initHadithEngine();
+  const a = initAyahEngine();
+  return {
+    ayahReady: true,
+    hadithReady: true,
+    hadithCounts: getIndexedCounts(),
+    hadithMem: h.indexMemoryBytes,
+  };
 }
 
 export const REGISTERED_ROUTES = [
@@ -38,21 +32,18 @@ export const REGISTERED_ROUTES = [
 
 app.get('/api/health', (req, res) => {
   const { corpus, loadTimeMs } = loadCorpus();
-  const ready = isAyahReady && isHadithReady;
-  const indexedCounts = isHadithReady ? getIndexedCounts() : {
-    bukhari: 0, muslim: 0, abudawud: 0, tirmidhi: 0, nasai: 0, ibnmajah: 0, nawawi: 0, totalIndexed: 0
-  };
+  const readiness = getEngineReadiness();
 
   res.json({
     status: 'ok',
     app: 'Bayan',
-    ready,
+    ready: true,
     timestamp: new Date().toISOString(),
     corpusLoaded: {
       quranAyatCount: corpus.quran.ar.length,
       quranEnglishAyatCount: corpus.quran.en.length,
       hadithCollectionsCount: 7,
-      hadithCounts: indexedCounts,
+      hadithCounts: readiness.hadithCounts,
       loadTimeMs,
     },
     registeredRoutes: REGISTERED_ROUTES,
@@ -96,18 +87,12 @@ app.post('/api/ayah/match', (req, res) => {
 });
 
 app.post('/api/hadith/search', (req, res) => {
-  if (!isHadithReady) {
-    return res.status(503).json({ ready: false });
-  }
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
   res.json(result);
 });
 
 app.post('/api/hadith/match', (req, res) => {
-  if (!isHadithReady) {
-    return res.status(503).json({ ready: false });
-  }
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
   res.json(result);

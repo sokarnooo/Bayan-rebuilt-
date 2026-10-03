@@ -5,10 +5,12 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { app, REGISTERED_ROUTES } from './app.ts';
 import { loadCorpus } from './corpus/loader.ts';
+import { initHadithEngine, getIndexedCounts } from './matching/hadithMatcher.ts';
+import { initAyahEngine } from './matching/ayahMatcher.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PORT = parseInt(process.env.PORT || '3000', 10);
+const PORT = 3000;
 
 async function startServer() {
   const distPath = path.resolve(__dirname, '../dist');
@@ -29,16 +31,20 @@ async function startServer() {
     });
   }
 
-  const { corpus, loadTimeMs } = loadCorpus();
+  // Initialize Engines
+  console.log('Initializing Search Engines...');
+  const { corpus, loadTimeMs: corpusTime } = loadCorpus();
+  const { totalIndexed: hadithCount, indexMemoryBytes: hadithMem } = initHadithEngine();
+  const { totalIndexed: ayahCount } = initAyahEngine();
+  const counts = getIndexedCounts();
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(`Bayan Server listening on http://0.0.0.0:${PORT}`);
-    console.log(`Environment: ${isProd ? 'PRODUCTION (Static + API)' : 'DEVELOPMENT (Vite Middleware + API)'}`);
-    console.log(`Corpus Loaded in ${loadTimeMs}ms:`);
-    console.log(`  - Quran Arabic Ayat: ${corpus.quran.ar.length}`);
-    console.log(`  - Quran English Ayat: ${corpus.quran.en.length}`);
-    console.log(`  - Hadith Bukhari (AR/EN): ${corpus.hadith.ar.bukhari.length} / ${corpus.hadith.en.bukhari.length}`);
+    console.log(`Environment: ${isProd ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+    console.log(`Corpus Loaded in ${corpusTime}ms`);
+    console.log(`Hadith Engine: ${hadithCount} records indexed (${Math.round(hadithMem/1024)}KB memory map)`);
+    console.log(`Ayah Engine: ${ayahCount} records indexed`);
     console.log(`Registered API Routes:`);
     REGISTERED_ROUTES.forEach((r) => console.log(`  [x] ${r}`));
     console.log(`====================================================`);
