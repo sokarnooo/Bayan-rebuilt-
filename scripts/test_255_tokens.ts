@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { normalizeArabic, cleanWhitespaceBeforeCombiningMarks, toAlefInvariant, wordSimilarityWithPenalty } from '../server/matching/normalizer.ts';
+import { normalizeArabic, cleanWhitespaceBeforeCombiningMarks, toAlefInvariant, wordSimilarityCorpusDerived } from '../server/matching/normalizer.ts';
 
 const arRaw = JSON.parse(fs.readFileSync('server/corpus/data/quran_ar.json', 'utf8'));
 const verses = arRaw.quran || arRaw[Object.keys(arRaw)[0]];
@@ -19,7 +19,7 @@ for (let i = 0; i < corpusWords.length; i++) {
   const qw = queryWords[i];
   const normCW = normalizeArabic(cw);
   const normQW = normalizeArabic(qw);
-  const sim = wordSimilarityWithPenalty(normQW, normCW);
+  const sim = wordSimilarityCorpusDerived(normQW, normCW).score;
   if (sim < 1.0 || normCW !== normQW) {
     console.log(`\nMismatch at word index ${i}:`);
     console.log(`Corpus raw: "${cw}" -> norm: "${normCW}"`);

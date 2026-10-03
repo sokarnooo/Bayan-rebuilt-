@@ -1,19 +1,40 @@
 import express from 'express';
 import { loadCorpus } from './corpus/loader.ts';
 import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
+import { initHadithEngine, searchHadith, getIndexedCounts } from './matching/hadithMatcher.ts';
 
 export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
-// Warm up Ayah Engine
-initAyahEngine();
+// Warm up Engines asynchronously to ensure instant startup
+let isAyahReady = false;
+let isHadithReady = false;
+
+Promise.resolve().then(() => {
+  try {
+    initAyahEngine();
+    isAyahReady = true;
+  } catch (err) {
+    console.error('Failed to init Ayah Engine:', err);
+  }
+});
+
+Promise.resolve().then(() => {
+  try {
+    initHadithEngine();
+    isHadithReady = true;
+  } catch (err) {
+    console.error('Failed to init Hadith Engine:', err);
+  }
+});
 
 export const REGISTERED_ROUTES = [
   'GET /api/health',
   'GET /api/corpus/stats',
   'POST /api/ayah/search',
   'POST /api/ayah/match',
+  'POST /api/hadith/search',
   'POST /api/hadith/match',
   'POST /api/ask',
   'POST /api/ocr',
@@ -21,14 +42,21 @@ export const REGISTERED_ROUTES = [
 
 app.get('/api/health', (req, res) => {
   const { corpus, loadTimeMs } = loadCorpus();
+  const ready = isAyahReady && isHadithReady;
+  const indexedCounts = isHadithReady ? getIndexedCounts() : {
+    bukhari: 0, muslim: 0, abudawud: 0, tirmidhi: 0, nasai: 0, ibnmajah: 0, nawawi: 0, totalIndexed: 0
+  };
+
   res.json({
     status: 'ok',
     app: 'Bayan',
+    ready,
     timestamp: new Date().toISOString(),
     corpusLoaded: {
       quranAyatCount: corpus.quran.ar.length,
       quranEnglishAyatCount: corpus.quran.en.length,
       hadithCollectionsCount: 7,
+      hadithCounts: indexedCounts,
       loadTimeMs,
     },
     registeredRoutes: REGISTERED_ROUTES,
@@ -71,8 +99,16 @@ app.post('/api/ayah/match', (req, res) => {
   res.json(result);
 });
 
+app.post('/api/hadith/search', (req, res) => {
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchHadith(query);
+  res.json(result);
+});
+
 app.post('/api/hadith/match', (req, res) => {
-  res.json({ status: 'scaffold_ready', mode: 'hadith', results: [] });
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchHadith(query);
+  res.json(result);
 });
 
 app.post('/api/ask', (req, res) => {

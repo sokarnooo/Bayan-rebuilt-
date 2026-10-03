@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server/server.ts",
-    "build": "vite build",
+    "build": "tsx server/corpus/prebuild.ts && vite build",
     "start": "tsx server/server.ts",
     "lint": "tsc --noEmit"
   },

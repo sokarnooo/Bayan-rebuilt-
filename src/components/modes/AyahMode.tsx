@@ -51,6 +51,10 @@ interface AyahResult {
   coverageRatio: number;
   matchedSlice?: string;
   matchedTokens: string[];
+  wordMatchStatus?: ('exact' | 'approx' | 'none')[];
+  matchedStartWordIndex?: number;
+  matchedEndWordIndex?: number;
+  hasApproximateMatch?: boolean;
   breakdown?: AyahBreakdownItem[];
   leadingBasmalaIgnored?: boolean;
 }
@@ -482,13 +486,29 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                   )}
 
                   {/* English Translation */}
-                  {item.translation && (
-                    <p
+                  {item.isRange && item.breakdown && item.breakdown.length > 1 ? (
+                    <div
                       dir="ltr"
-                      className="text-sm text-[#F2F4FF]/75 italic leading-relaxed pt-2 border-t border-[#6150EA]/15"
+                      className="text-sm text-[#F2F4FF]/75 italic leading-relaxed pt-2 border-t border-[#6150EA]/15 space-y-1.5"
                     >
-                      "{item.translation}"
-                    </p>
+                      {item.breakdown.map((b) => (
+                        <p key={b.verse} className="flex items-start gap-1.5">
+                          <span className="font-mono text-xs font-semibold text-[#2EF2C2] not-italic shrink-0 pt-0.5">
+                            [{b.verse}]
+                          </span>
+                          <span>{b.translation}</span>
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    item.translation && (
+                      <p
+                        dir="ltr"
+                        className="text-sm text-[#F2F4FF]/75 italic leading-relaxed pt-2 border-t border-[#6150EA]/15"
+                      >
+                        {item.translation}
+                      </p>
+                    )
                   )}
 
                   {/* Per-Ayah Breakdown for Ranges */}

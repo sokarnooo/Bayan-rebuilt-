@@ -53,6 +53,13 @@ export function normalizeArabic(text: string): string {
 
   s = foldSilentCarrierWaw(s);
 
+  // Generic: Split connected Uthmani vocative Ya (یَـٰ / يـٰ) into separate "يا " token
+  // (e.g. یَـٰمُوسَىٰ -> يا موسى, یَـٰقَوۡمِ -> يا قوم, یَـٰۤـَٔادَمُ -> يا ءادم, یَـٰۤأَیُّهَا -> يا ايها)
+  s = s.replace(
+    /(^|[\s])([ىي\u06CC])[\u064B-\u065F\u06D6-\u06ED\u0640\u06E4]*\u0670[\u064B-\u065F\u06D6-\u06ED\u0640\u06E4]*(?=[ء-ي\u0671-\u06D3])/gu,
+    '$1يا '
+  );
+
   // Fold alef maqsura / ya followed by dagger alef:
   // 1. Connected/medial followed by letters/suffixes -> standard Alef 'ا'
   s = s.replace(
@@ -112,6 +119,14 @@ export function normalizeArabic(text: string): string {
   s = s.replace(/(^|[\s])فاليل(?=[\s]|$)/g, '$1فالليل');
   s = s.replace(/(^|[\s])باليل(?=[\s]|$)/g, '$1بالليل');
   s = s.replace(/(^|[\s])كاليل(?=[\s]|$)/g, '$1كالليل');
+
+  // Generic Uthmani separated compound particles -> unified modern standard
+  s = s.replace(/(^|[\s])بعد\s+ما(?=[\s]|$)/g, '$1بعدما');
+  s = s.replace(/(^|[\s])او\s+لم(?=[\s]|$)/g, '$1اولم');
+  s = s.replace(/(^|[\s])اف\s+لم(?=[\s]|$)/g, '$1افلم');
+  s = s.replace(/(^|[\s])كل\s+ما(?=[\s]|$)/g, '$1كلما');
+  s = s.replace(/(^|[\s])بءس\s+ما(?=[\s]|$)/g, '$1بءسما');
+  s = s.replace(/(^|[\s])ابن\s+ام(?=[\s]|$)/g, '$1ابن ام');
 
   return s.replace(/\s+/g, ' ').trim();
 }

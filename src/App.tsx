@@ -104,23 +104,36 @@ export default function App() {
         </section>
       </main>
 
-      {/* Footer with accurate dataset attributions */}
-      <footer className="border-t border-[#6150EA]/20 bg-[#12183F]/90 py-6 text-center text-xs text-[#F2F4FF]/60">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#2EF2C2]" />
+      {/* Footer with accurate dataset attributions & required scholar statement */}
+      <footer className="border-t border-[#6150EA]/20 bg-[#12183F]/90 py-6 text-center text-xs text-[#F2F4FF]/70">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col items-center justify-center gap-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-[#2EF2C2]">
+            <ShieldCheck className="w-4 h-4" />
+            <span>
+              {isAr
+                ? 'أداة آلية للمطابقة والتحقق، وليست بديلاً عن أهل العلم'
+                : 'Automated tool for text matching and verification; not a substitute for qualified scholars'}
+            </span>
+          </div>
+
+          <p className="text-[11px] text-[#F2F4FF]/50 max-w-2xl leading-relaxed">
+            {isAr
+              ? 'الخصوصية: لا يحفظ التطبيق الاستعلامات في أي قاعدة بيانات. قد تقوم منصة الاستضافة بتسجيل بيانات طلبات HTTP وعناوين IP القياسية. صور OCR وأسئلة قسم "اسأل" تُرسل إلى نماذج Google Gemini للمعالجة.'
+              : 'Privacy: The application does not store queries in a database. The hosting platform may log standard HTTP request metadata and IP addresses. OCR images and Ask questions are transmitted to Google Gemini models for processing.'}
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 text-[#F2F4FF]/40 text-[10px] pt-1 border-t border-[#6150EA]/10 w-full">
             <span>
               {isAr
                 ? 'مشروع بيان — تحدي الذكاء الاصطناعي في خدمة المحتوى الإسلامي'
                 : 'Bayan Project — AI in Service of Islamic Content Challenge'}
             </span>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-[#F2F4FF]/50 text-[11px]">
+            <span>•</span>
             <span>نص Quran Academy (ara-quranacademy)</span>
             <span>•</span>
-            <span>التفسير الميسر: مجمع الملك فهد لطباعة المصحف الشريف</span>
+            <span>التفسير الميسر: مجمع الملك فهد</span>
             <span>•</span>
-            <span>كتب الحديث السبعة المعتمدة</span>
+            <span>مجموعات الحديث السبعة المعتمدة</span>
           </div>
         </div>
       </footer>

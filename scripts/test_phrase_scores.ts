@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { normalizeArabic, cleanWhitespaceBeforeCombiningMarks, toAlefInvariant, wordSimilarityWithPenalty } from '../server/matching/normalizer.ts';
+import { normalizeArabic, cleanWhitespaceBeforeCombiningMarks, toAlefInvariant, wordSimilarityCorpusDerived } from '../server/matching/normalizer.ts';
 
 const query = 'السموات والارض ولا يئوده حفظهما';
 const qWords = query.split(' ');
@@ -27,7 +27,7 @@ for (let i = 0; i < qWords.length; i++) {
   const cw = targetSlice[i];
   const normQW = normalizeArabic(qw);
   const normCW = normalizeArabic(cw);
-  const sim = wordSimilarityWithPenalty(normQW, normCW);
+  const sim = wordSimilarityCorpusDerived(normQW, normCW).score;
   totalScore += sim;
   console.log(`\nWord ${i}:`);
   console.log(`  Query:  "${qw}" -> norm: "${normQW}"`);
