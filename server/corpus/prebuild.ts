@@ -54,6 +54,9 @@ async function runPrebuild() {
       }
     }
 
+    if (!fs.existsSync(path.join(DATA_DIR, 'quran_info.json'))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path.join(DATA_DIR, 'quran_info.json'));
+    }
     if (!fs.existsSync(path.join(DATA_DIR, 'quran_ar.json'))) {
       await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
     }

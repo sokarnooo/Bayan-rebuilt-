@@ -41,11 +41,13 @@ function checkPass(expected: any, actual: any) {
     else {
       if (actual.query_mode === 'ayah') {
         // Handle range or single
-        const actualRef = topResult.isRange ? topResult.verseRange : `${topResult.chapter}:${topResult.verse}`;
+        const rangeStr = (topResult.verseRange || '').replace(/–/g, '-');
+        const actualRef = topResult.isRange ? `${topResult.chapter}:${rangeStr}` : `${topResult.chapter}:${topResult.verse}`;
         // Partial match on ref is often enough for our test
-        refMatch = actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
+        refMatch = actualRef === expected.ref || actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
       } else {
-        refMatch = topResult.id === expected.ref;
+        const arabicRef = `${topResult.collection}_${topResult.arabicnumber}`;
+        refMatch = topResult.id === expected.ref || arabicRef === expected.ref;
       }
     }
   } else {

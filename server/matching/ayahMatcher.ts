@@ -95,6 +95,7 @@ export interface AyahSearchResponse {
   query: string;
   normalizedQuery: string;
   alefInvariantQuery: string;
+  query_mode: 'ayah';
   state: AyahMatchState;
   topConfidence: number;
   totalMatches: number;
@@ -283,6 +284,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       query: rawQuery,
       normalizedQuery,
       alefInvariantQuery,
+      query_mode: 'ayah',
       state: 'not_found',
       topConfidence: 0,
       totalMatches: 0,
@@ -567,7 +569,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
           const score = m.wordScores[matchOffset] ?? 1.0;
           const isExact = m.wordExactList[matchOffset] ?? true;
 
-          if (isExact && score >= 0.99) {
+          if (isExact && score >= 0.95) {
             status = 'exact';
           } else if (score >= 0.40) {
             status = 'approx';
@@ -664,8 +666,8 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       },
       text: fullRangeText,
       translation: fullRangeTranslation,
-      confidence: hasApproximateMatch ? Math.min(89, m.confidence) : m.confidence,
-      state: hasApproximateMatch ? 'close_match' : (m.confidence >= 90 ? 'matched' : 'close_match'),
+      confidence: (hasApproximateMatch || coverage !== 'full') ? Math.min(89, m.confidence) : m.confidence,
+      state: (hasApproximateMatch || coverage !== 'full' || m.confidence < 90) ? 'close_match' : 'matched',
       coverage,
       coverageRatio: Math.round(overallCoverageRatio * 100) / 100,
       matchedStartWordIndex: overallStartWordIndex,
@@ -695,6 +697,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
         query: rawQuery,
         normalizedQuery,
         alefInvariantQuery,
+        query_mode: 'ayah',
         state: 'too_short',
         topConfidence: 0,
         totalMatches: 0,
@@ -723,6 +726,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     query: rawQuery,
     normalizedQuery,
     alefInvariantQuery,
+    query_mode: 'ayah',
     state: overallState,
     topConfidence: overallTopConfidence,
     totalMatches: formattedResults.length,

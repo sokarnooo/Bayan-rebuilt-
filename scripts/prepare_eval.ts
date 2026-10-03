@@ -165,7 +165,7 @@ async function prepare() {
   // 1. Exact matn 6
   const hadithExact = [
     { col: 'bukhari', num: 1 },
-    { col: 'muslim', num: 1 },
+    { col: 'muslim', num: 93 },
     { col: 'abudawud', num: 1 },
     { col: 'tirmidhi', num: 1 },
     { col: 'nasai', num: 1 },

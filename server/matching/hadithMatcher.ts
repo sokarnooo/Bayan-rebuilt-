@@ -75,6 +75,7 @@ export interface HadithAttestationItem {
 export interface HadithSearchResponse {
   query: string;
   normalizedQuery: string;
+  query_mode: 'hadith';
   language: 'ar' | 'en';
   state: 'matched' | 'close_match' | 'not_found' | 'too_short';
   topConfidence: number;
@@ -358,6 +359,16 @@ function parseGrade(g: { name?: string; grade?: string }): HadithGradeItem {
     isIsnadJudgment: false,
     isCitation: false,
   };
+}
+
+export function normalizeEnglish(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/['"’`\-–]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export function stripHonorificsAndFormulas(text: string): string {
@@ -794,71 +805,89 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
   const isEnglish = /[a-zA-Z]/.test(trimmed) && !/[\u0600-\u06FF]/.test(trimmed);
 
   if (isEnglish) {
-    // English query: strict keyword and phrase containment matching against hadith_*_en.json
-    const qLower = trimmed.toLowerCase();
-    const qTokens = qLower.split(/\s+/).filter(Boolean);
-
+    const normQ = normalizeEnglish(trimmed);
+    const qTokens = normQ.split(/\s+/).filter(Boolean);
     const stopWords = new Set(['are', 'to', 'be', 'only', 'by', 'the', 'a', 'of', 'and', 'in', 'for', 'that']);
     const qContent = qTokens.filter((t) => !stopWords.has(t));
 
     const matches: HadithMatchResult[] = [];
+    const { corpus } = loadCorpus();
+    const cols = ['bukhari', 'muslim', 'abudawud', 'tirmidhi', 'nasai', 'ibnmajah', 'nawawi'] as const;
 
-    for (const h of corpusHadiths) {
-      if (!h.rawEnglishText) continue;
-      const enLower = h.rawEnglishText.toLowerCase();
+    for (const col of cols) {
+      const enList = corpus.hadith.en[col] || [];
+      const arList = corpus.hadith.ar[col] || [];
+      const colMeta = COLLECTION_METADATA[col] || { arName: col, enName: col };
 
-      let score = 0;
-      if (enLower.includes(qLower)) {
-        score = 100;
-      } else {
-        // Find fraction of content query words found in relative sequence order
-        let lastIndex = -1;
-        let matchCount = 0;
-        for (const t of qContent) {
-          const foundIndex = enLower.indexOf(t, lastIndex + 1);
-          if (foundIndex !== -1 && foundIndex > lastIndex) {
-            matchCount++;
-            lastIndex = foundIndex;
+      for (const enH of enList) {
+        if (!enH.text) continue;
+        const normEn = normalizeEnglish(enH.text);
+
+        let score = 0;
+        if (normEn.includes(normQ)) {
+          score = 100;
+        } else if (qContent.length > 0) {
+          let lastIndex = -1;
+          let matchCount = 0;
+          for (const t of qContent) {
+            const foundIndex = normEn.indexOf(t, lastIndex + 1);
+            if (foundIndex !== -1) {
+              matchCount++;
+              lastIndex = foundIndex;
+            }
+          }
+          if (matchCount >= 2 && matchCount / qContent.length >= 0.5) {
+            score = Math.round((matchCount / qContent.length) * 100);
+            score = Math.min(89, score);
           }
         }
-        
-        // Require at least 3 matched content words in the right order
-        if (matchCount >= 3) {
-          score = Math.round((matchCount / qContent.length) * 100);
-          score = Math.min(89, score);
-        } else {
-          score = 0;
-        }
-      }
 
-      if (score >= 70) {
-        matches.push({
-          id: h.id,
-          collection: h.collection,
-          collectionArabic: h.collectionArabic,
-          hadithnumber: h.hadithnumber,
-          arabicnumber: h.arabicnumber,
-          book: h.book,
-          hadithInBook: h.hadithInBook,
-          sectionName: h.sectionName,
-          text: h.rawArabicText,
-          translation: h.rawEnglishText,
-          confidence: score,
-          state: score >= 90 ? 'matched' : 'close_match',
-          coverage: score === 100 ? 'full' : 'fragment',
-          matchedStartWordIndex: 0,
-          matchedEndWordIndex: Math.min(h.fullWordTokens.length - 1, 15),
-          matchedTokens: qTokens,
-          wordMatchStatus: qTokens.map(() => 'exact'),
-          hasApproximateMatch: false,
-          grades: h.grades,
-          hasNoGrading: h.hasNoGrading,
-          isnadStripped: false,
-        });
+        if (score >= 70) {
+          const rawAr = arList.find((x) => x.hadithnumber === enH.hadithnumber);
+          const grades: HadithGradeItem[] = (rawAr?.grades || []).map(parseGrade);
+          const bookNum = rawAr?.reference?.book ?? 0;
+          const hadithInBook = rawAr?.reference?.hadith ?? 0;
+          const sections = sectionsCache.get(col) || {};
+          const sectionName = sections[String(bookNum)] || (bookNum > 0 ? `Book ${bookNum}` : '');
+
+          matches.push({
+            id: `${col}_${enH.hadithnumber}`,
+            collection: col,
+            collectionArabic: colMeta.arName,
+            hadithnumber: enH.hadithnumber,
+            arabicnumber: rawAr?.arabicnumber ?? enH.hadithnumber,
+            book: bookNum,
+            hadithInBook,
+            sectionName,
+            text: rawAr?.text || '',
+            translation: enH.text,
+            confidence: score,
+            state: score >= 90 ? 'matched' : 'close_match',
+            coverage: score === 100 ? 'full' : 'fragment',
+            matchedStartWordIndex: 0,
+            matchedEndWordIndex: Math.min(15, qTokens.length),
+            matchedTokens: qTokens,
+            wordMatchStatus: qTokens.map(() => 'exact'),
+            hasApproximateMatch: score < 90,
+            grades,
+            hasNoGrading: grades.length === 0,
+            isnadStripped: false,
+          });
+        }
       }
     }
 
-    matches.sort((a, b) => b.confidence - a.confidence);
+    const authorityMap: Record<string, number> = {
+      bukhari: 1, muslim: 2, abudawud: 3, tirmidhi: 4, nasai: 5, ibnmajah: 6, nawawi: 7
+    };
+    matches.sort((a, b) => {
+      if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+      const orderA = authorityMap[a.collection] || 99;
+      const orderB = authorityMap[b.collection] || 99;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.hadithnumber - b.hadithnumber;
+    });
+
     const topConf = matches.length > 0 ? matches[0].confidence : 0;
     const state = topConf >= 90 ? 'matched' : (topConf >= 70 ? 'close_match' : 'not_found');
     const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
@@ -866,6 +895,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     return {
       query: rawQuery,
       normalizedQuery: trimmed,
+      query_mode: 'hadith',
       language: 'en',
       state,
       topConfidence: topConf,
@@ -964,8 +994,8 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     }
   }
 
-  // Candidate generation via 2-grams
-  const candidateIndices = new Set<number>();
+  // Candidate generation via 2-grams with frequency ranking
+  const candidateScores = new Map<number, number>();
   const qIds = qTokens.map(t => getWordId(t));
 
   for (let i = 0; i < qTokens.length - 1; i++) {
@@ -974,15 +1004,22 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     if (id1 === -1 || id2 === -1) continue;
     
     const hits = getIndexHits(id1, id2);
-    for (const h of hits) candidateIndices.add(h);
+    for (const h of hits) {
+      candidateScores.set(h, (candidateScores.get(h) || 0) + 1);
+    }
   }
 
-  // If no 2-gram matches, check 1-gram for first 50 candidates
-  if (candidateIndices.size === 0 && qIds[0] !== -1) {
+  let candidateIndices: number[] = [];
+  if (candidateScores.size > 0) {
+    candidateIndices = Array.from(candidateScores.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 200)
+      .map((entry) => entry[0]);
+  } else if (qIds[0] !== -1) {
     for (let c = 0; c < corpusHadiths.length; c++) {
       if (corpusHadiths[c].m.includes(qIds[0])) {
-        candidateIndices.add(c);
-        if (candidateIndices.size >= 50) break;
+        candidateIndices.push(c);
+        if (candidateIndices.length >= 50) break;
       }
     }
   }
@@ -1079,10 +1116,17 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     }
   }
 
+  const authorityMap: Record<string, number> = {
+    bukhari: 1, muslim: 2, abudawud: 3, tirmidhi: 4, nasai: 5, ibnmajah: 6, nawawi: 7
+  };
+
   results.sort((a, b) => {
     if (a.state === 'matched' && b.state !== 'matched') return -1;
     if (b.state === 'matched' && a.state !== 'matched') return 1;
     if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+    const orderA = authorityMap[a.collection] || 99;
+    const orderB = authorityMap[b.collection] || 99;
+    if (orderA !== orderB) return orderA - orderB;
     return a.hadithnumber - b.hadithnumber;
   });
 
@@ -1104,6 +1148,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
   return {
     query: rawQuery,
     normalizedQuery: cleanQuery,
+    query_mode: 'hadith',
     language: 'ar',
     state: overallState,
     topConfidence,
