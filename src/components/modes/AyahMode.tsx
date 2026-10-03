@@ -152,30 +152,41 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     }
   };
 
-  // Matched word highlighter by positional slice
+  // Matched word highlighter by word status or positional slice
   const renderHighlightedWords = (
     text: string,
+    wordMatchStatus?: Array<'exact' | 'approx' | 'none'>,
     startWordIndex?: number,
     endWordIndex?: number
   ) => {
-    if (
-      startWordIndex === undefined ||
-      endWordIndex === undefined ||
-      startWordIndex < 0 ||
-      endWordIndex < startWordIndex
-    ) {
-      return text;
-    }
-
     const words = text.split(' ');
     return words.map((word, idx) => {
-      const isMatched = idx >= startWordIndex && idx <= endWordIndex;
+      let status: 'exact' | 'approx' | 'none' = 'none';
+
+      if (wordMatchStatus && wordMatchStatus.length === words.length) {
+        status = wordMatchStatus[idx];
+      } else if (
+        startWordIndex !== undefined &&
+        endWordIndex !== undefined &&
+        startWordIndex >= 0 &&
+        idx >= startWordIndex &&
+        idx <= endWordIndex
+      ) {
+        status = 'exact';
+      }
 
       return (
         <React.Fragment key={idx}>
           {idx > 0 ? ' ' : ''}
-          {isMatched ? (
+          {status === 'exact' ? (
             <span className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-bold inline-block">
+              {word}
+            </span>
+          ) : status === 'approx' ? (
+            <span
+              title={isAr ? 'تطابق تقريبي / رسم عثماني' : 'Approximate / script variant match'}
+              className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded font-bold inline-block"
+            >
               {word}
             </span>
           ) : (
@@ -459,8 +470,16 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                     lang="ar"
                     className="font-quran text-2xl sm:text-3xl leading-[2.3] text-[#F2F4FF] select-text"
                   >
-                    « {renderHighlightedWords(item.text, item.matchedStartWordIndex, item.matchedEndWordIndex)} »
+                    « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex)} »
                   </p>
+
+                  {/* Approximate match legend if any word was approximate */}
+                  {item.hasApproximateMatch && (
+                    <div className="flex items-center justify-center gap-2 pt-1 text-xs text-amber-300 font-medium">
+                      <span className="inline-block w-4 border-b-2 border-dashed border-amber-400" />
+                      <span>{isAr ? 'تطابق تقريبي' : 'Approximate match'}</span>
+                    </div>
+                  )}
 
                   {/* English Translation */}
                   {item.translation && (

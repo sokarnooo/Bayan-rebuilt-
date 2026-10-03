@@ -28,19 +28,20 @@ export function foldSilentCarrierWaw(text: string): string {
 }
 
 /**
- * Arabic normalization with full Hamza seat folding:
- * - Folds Farsi Kaf (ک \u06A9) -> ك \u0643
- * - Folds Farsi Yeh (ی \u06CC) -> ي \u064A
- * - Cleans whitespace before combining marks
+ * Arabic normalization with generic Uthmani dagger alef, Hamza, and demonstrative rules:
+ * - Folds Farsi keyboard variants
  * - Folds silent carrier Waw before ة / ا
- * - Converts dagger alefs (\u0670) to standard alef 'ا'
- * - Preserves standard defective demonstratives (ذلك، هذا، هذه، هؤلاء، لكن، الرحمن، إله)
- * - Folds ALL Hamza forms and seats (ء, أ, إ, آ, ٱ, ؤ, ئ, \u0654, \u0655, \u0674):
- *   - Initial hamzas (أ, إ, آ, ٱ) -> ا
- *   - Medial/final hamza seats (ؤ, ئ, ء, \u0654, \u0655, \u0674) -> ء (standard hamza representation)
+ * - Folds alef maqsura / ya followed by dagger alef:
+ *   - Medial / connected (e.g. أَرۡسَىٰهَا -> ارساها) -> 'ا'
+ *   - Final (e.g. عَلَىٰ -> علي, مُوسَىٰ -> موسي) -> 'ي'
+ * - Folds standalone hamza + alef (ءا -> ا) (alef madda in standard modern Arabic)
+ * - Converts remaining dagger alefs (\u0670) to standard alef 'ا'
  * - Strips Tashkeel, Tatweel, Quranic symbols, punctuation
+ * - Folds Alef variants (آ, أ, إ, ٱ) -> ا
  * - Folds Ta Marbuta (ة) -> ه
- * - Folds Alef Maqsura (ى) -> ي
+ * - Folds Yeh variants (ى, ی) -> ي
+ * - Folds Hamza seats uniformly (ؤ, ئ, ء) -> ء
+ * - Normalizes demonstratives and classical single-lam spellings (اليل -> الليل)
  */
 export function normalizeArabic(text: string): string {
   if (!text) return '';
@@ -52,32 +53,31 @@ export function normalizeArabic(text: string): string {
 
   s = foldSilentCarrierWaw(s);
 
-  // Common standard modern Arabic defective nouns
-  s = s.replace(/ذَٰلِك/g, 'ذلك');
-  s = s.replace(/هَـٰذَا/g, 'هذا');
-  s = s.replace(/هَـٰذِهِ/g, 'هذه');
-  s = s.replace(/هَـٰؤُلَا/g, 'هؤلاء');
-  s = s.replace(/لَـٰكِن/g, 'لكن');
-  s = s.replace(/ٱلرَّحۡمَـٰن/g, 'الرحمن');
-  s = s.replace(/إِلَـٰه/g, 'إله');
+  // Fold alef maqsura / ya followed by dagger alef:
+  // 1. Connected/medial followed by letters/suffixes -> standard Alef 'ا'
+  s = s.replace(
+    /([ىي\u0649\u06CC\u064A])[\u064B-\u065F\u06E1\u06D6-\u06ED\u08D3-\u08FF]*\u0670(?=[\u064B-\u065F\u06D6-\u06ED\u08D3-\u08FF]*[\u0621-\u064A\u0671-\u06D3\u06E5\u06E6])/gu,
+    'ا'
+  );
 
-  s = s.replace(/(^|[\s])الرحمان(?=[\s]|$)/g, '$1الرحمن');
-  s = s.replace(/(^|[\s])هاذا(?=[\s]|$)/g, '$1هذا');
-  s = s.replace(/(^|[\s])هاذه(?=[\s]|$)/g, '$1هذه');
-  s = s.replace(/(^|[\s])ذالك(?=[\s]|$)/g, '$1ذلك');
-  s = s.replace(/(^|[\s])الاه(?=[\s]|$)/g, '$1اله');
-  s = s.replace(/(^|[\s])إلاه(?=[\s]|$)/g, '$1اله');
-  s = s.replace(/(^|[\s])لاكن(?=[\s]|$)/g, '$1لكن');
+  // 2. Final alef maqsura followed by dagger alef at word end -> 'ي'
+  s = s.replace(
+    /([ىي\u0649\u06CC\u064A])[\u064B-\u065F\u06E1\u06D6-\u06ED\u08D3-\u08FF]*\u0670/gu,
+    'ي'
+  );
 
   // Convert all remaining dagger alefs to standard alef 'ا'
   s = s.replace(/\u0670/g, 'ا');
 
-  // Strip invisible format characters (Zero-width space, word joiner, etc.)
+  // Strip invisible format characters
   s = s.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, '');
 
   // Strip Tashkeel, Tatweel, Quranic pause marks, and Extended annotations
   s = s.replace(/[\u064B-\u065F\u06D6-\u06ED\u06DF-\u06E8\u08D3-\u08FF]/g, '');
   s = s.replace(/\u0640/g, '');
+
+  // Fold standalone hamza + alef to alef (e.g. ءَامَنُوا -> امنوا, ءَالَاۤءِ -> الاء)
+  s = s.replace(/ءا/g, 'ا');
 
   // Fold Alef variants
   s = s.replace(/[\u0622\u0623\u0625\u0671]/g, 'ا');
@@ -88,12 +88,30 @@ export function normalizeArabic(text: string): string {
   // Fold Yeh variants
   s = s.replace(/[\u0649\u06CC]/g, 'ي');
 
-  // Fold Hamza seats uniformly:
-  // Standalone hamza, Hamza on Waw (ؤ), Hamza on Ya (ئ), combining hamzas -> standard Hamza 'ء'
+  // Fold Hamza seats uniformly
   s = s.replace(/[\u0624\u0626\u0654\u0655\u0674]/g, 'ء');
 
   // Clean punctuation and non-letters
   s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ]/g, ' ');
+
+  // Defective nouns and demonstratives normalization (words whose spoken alef is omitted in rasm)
+  s = s.replace(/(^|[\s])الرحمان(?=[\s]|$)/g, '$1الرحمن');
+  s = s.replace(/(^|[\s])هاذا(?=[\s]|$)/g, '$1هذا');
+  s = s.replace(/(^|[\s])هاذه(?=[\s]|$)/g, '$1هذه');
+  s = s.replace(/(^|[\s])هاؤلاء(?=[\s]|$)/g, '$1هؤلاء');
+  s = s.replace(/(^|[\s])لاكن(?=[\s]|$)/g, '$1لكن');
+  s = s.replace(/(^|[\s])ولاكن(?=[\s]|$)/g, '$1ولكن');
+  s = s.replace(/(^|[\s])فلاكن(?=[\s]|$)/g, '$1فلكن');
+  s = s.replace(/(^|[\s])ذالك(?=[\s]|$)/g, '$1ذلك');
+  s = s.replace(/(^|[\s])كذالك(?=[\s]|$)/g, '$1كذلك');
+  s = s.replace(/(^|[\s])الاه(?=[\s]|$)/g, '$1اله');
+  s = s.replace(/(^|[\s])والاه(?=[\s]|$)/g, '$1واله');
+  s = s.replace(/(^|[\s])فالاه(?=[\s]|$)/g, '$1فاله');
+  s = s.replace(/(^|[\s])اليل(?=[\s]|$)/g, '$1الليل');
+  s = s.replace(/(^|[\s])واليل(?=[\s]|$)/g, '$1والليل');
+  s = s.replace(/(^|[\s])فاليل(?=[\s]|$)/g, '$1فالليل');
+  s = s.replace(/(^|[\s])باليل(?=[\s]|$)/g, '$1بالليل');
+  s = s.replace(/(^|[\s])كاليل(?=[\s]|$)/g, '$1كالليل');
 
   return s.replace(/\s+/g, ' ').trim();
 }
@@ -140,42 +158,36 @@ export function levenshteinSimilarity(s1: string, s2: string): number {
 
 /**
  * Corpus-derived Word Matching Rule:
- * Compares normalized query word with normalized corpus word.
- * If normalized words match: 1.0.
- * If their alef-invariant forms match:
- * - Check if the difference is an attested dagger-alef / spelling expansion of this specific corpus word
- *   (e.g. السماوات vs السموات, صلواتك vs صلوتك, الرحمن vs الرحمان).
- * - If the word in standard Arabic is a distinct lexical word (e.g. الكتب vs الكتاب, ل vs لا), applies penalty 0.40.
+ * Returns { score: number, isExact: boolean }
  */
 export function wordSimilarityCorpusDerived(
   qNorm: string,
   cNorm: string,
   cRawUthmani?: string
-): number {
-  if (!qNorm || !cNorm) return 0;
-  if (qNorm === cNorm) return 1.0;
+): { score: number; isExact: boolean } {
+  if (!qNorm || !cNorm) return { score: 0, isExact: false };
+  if (qNorm === cNorm) return { score: 1.0, isExact: true };
+
+  // If the only difference is hamza/alef representation (e.g. ء vs ا, ءامنوا vs امنوا)
+  if (qNorm.replace(/ء/g, 'ا') === cNorm.replace(/ء/g, 'ا')) {
+    return { score: 1.0, isExact: true };
+  }
 
   const qAlef = toAlefInvariant(qNorm);
   const cAlef = toAlefInvariant(cNorm);
 
   if (qAlef === cAlef) {
-    // Check if the corpus raw Uthmani word contains dagger alef \u0670 or silent carrier waw
-    // which justifies an orthographic variant spelling (e.g. السموات vs السماوات, صلوتك vs صلواتك)
     if (cRawUthmani && (cRawUthmani.includes('\u0670') || cRawUthmani.includes('وٰ') || cRawUthmani.includes('و\u0670'))) {
-      // If the query word is simply the bare consonant rasm without one or more of the dagger alefs:
-      // e.g. السموات (1 alef) vs السماوات (2 dagger alefs in Uthmani ٱلسَّمَـٰوَٰتِ)
-      // or صلواتك vs صَلَوَٰتِكَ
-      // Note: for standard lexical words where the singular has an alef and the plural does NOT (الكتاب vs الكتب):
-      // in standard Arabic, 'الكتاب' is singular, 'الكتب' is plural.
       if (qNorm === 'الكتب' && cNorm === 'الكتاب') {
-        return 0.40; // Lexical collision penalty
+        return { score: 0.40, isExact: false }; // Lexical collision penalty
       }
-      return 0.96;
+      return { score: 0.96, isExact: false };
     }
 
-    // Default alef collision penalty for distinct lexical words
-    return 0.40;
+    return { score: 0.40, isExact: false };
   }
 
-  return levenshteinSimilarity(qNorm, cNorm);
+  // Check Levenshtein similarity for typos
+  const sim = levenshteinSimilarity(qNorm, cNorm);
+  return { score: sim, isExact: sim === 1.0 };
 }

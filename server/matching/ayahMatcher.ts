@@ -46,6 +46,7 @@ export interface StreamWord {
 
 export type AyahMatchState = 'matched' | 'close_match' | 'not_found' | 'too_short';
 export type CoverageType = 'full' | 'fragment';
+export type WordMatchState = 'exact' | 'approx' | 'none';
 
 export interface AyahBreakdownItem {
   verse: number;
@@ -59,6 +60,7 @@ export interface AyahBreakdownItem {
   matchedStartWordIndex: number;
   matchedEndWordIndex: number;
   matchedSlice?: string;
+  wordMatchStatus?: WordMatchState[];
 }
 
 export interface AyahMatchResult {
@@ -83,6 +85,8 @@ export interface AyahMatchResult {
   matchedEndWordIndex: number;
   matchedSlice?: string;
   matchedTokens: string[];
+  wordMatchStatus?: WordMatchState[];
+  hasApproximateMatch?: boolean;
   breakdown?: AyahBreakdownItem[];
   leadingBasmalaIgnored?: boolean;
 }
@@ -313,21 +317,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     if (sAlef) sAlef.forEach((idx) => { if (indexedAyat[idx].chapter !== 1) wholeAyahHits.add(idx); });
   }
 
-  // Short-query guard (< 3 words) if no full ayah matches exist
-  if (qWordCount < 3 && wholeAyahHits.size === 0) {
-    return {
-      query: rawQuery,
-      normalizedQuery,
-      alefInvariantQuery,
-      state: 'too_short',
-      topConfidence: 0,
-      totalMatches: 0,
-      results: [],
-      referralRequired: false,
-      notice: 'المدخل قصير جداً للتحقق، يرجى كتابة 3 كلمات أو أكثر',
-      executionTimeMs: Math.round((performance.now() - startTime) * 100) / 100,
-    };
-  }
+  // Proceed to candidate search for whole ayah matching even for short queries
 
   // Query variants for stream scanning
   const queryVariants = [
@@ -354,6 +344,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     endGlobalWord: number;
     confidence: number;
     wordScores: number[];
+    wordExactList: boolean[];
     matchedTokens: string[];
     isBasmalaStripped: boolean;
   };
@@ -430,24 +421,27 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
 
         let totalScore = 0;
         const wordScores: number[] = [];
+        const wordExactList: boolean[] = [];
         const matchedTokens: string[] = [];
 
         for (let i = 0; i < vLen; i++) {
           if (startIdx + i < stream.length) {
             const streamWord = stream[startIdx + i];
             const qWord = vWords[i];
-            const score = wordSimilarityCorpusDerived(
+            const { score, isExact } = wordSimilarityCorpusDerived(
               qWord,
               streamWord.normalized,
               streamWord.rawUthmani
             );
             wordScores.push(score);
+            wordExactList.push(isExact);
             totalScore += score;
-            if (score >= 0.75) {
+            if (score >= 0.40) {
               matchedTokens.push(streamWord.rawUthmani);
             }
           } else {
             wordScores.push(0);
+            wordExactList.push(false);
           }
         }
 
@@ -467,6 +461,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
             endGlobalWord: endGlobal,
             confidence,
             wordScores,
+            wordExactList,
             matchedTokens,
             isBasmalaStripped: variant.isBasmalaStripped,
           });
@@ -545,35 +540,59 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     let overallStartWordIndex = 0;
     let overallEndWordIndex = 0;
 
+    const fullResultWordStatus: WordMatchState[] = [];
+    let hasApproximateMatch = false;
+
     for (let aIdx = 0; aIdx < matchedAyat.length; aIdx++) {
       const ayah = matchedAyat[aIdx];
-      const ayahWordsInMatch = stream.filter(
-        (w) =>
-          w.verse === ayah.verse &&
-          w.globalWordIndex >= m.startGlobalWord &&
-          w.globalWordIndex <= m.endGlobalWord
-      );
+      const ayahWords = ayah.rawWords;
+      const ayahWordStatus: WordMatchState[] = [];
 
-      const matchedWordCount = ayahWordsInMatch.length;
-      const totalWordCount = ayah.rawWords.length;
-      const covRatio = totalWordCount > 0 ? matchedWordCount / totalWordCount : 0;
+      let ayahMatchedCount = 0;
+      let ayahStartIdx = -1;
+      let ayahEndIdx = -1;
+
+      for (let w = 0; w < ayahWords.length; w++) {
+        const globalIdx = stream.findIndex(
+          (sw) => sw.chapter === ayah.chapter && sw.verse === ayah.verse && sw.wordIndexInAyah === w
+        );
+
+        let status: WordMatchState = 'none';
+
+        if (globalIdx >= m.startGlobalWord && globalIdx <= m.endGlobalWord) {
+          const matchOffset = globalIdx - m.startGlobalWord;
+          const score = m.wordScores[matchOffset] ?? 1.0;
+          const isExact = m.wordExactList[matchOffset] ?? true;
+
+          if (isExact && score >= 0.99) {
+            status = 'exact';
+          } else if (score >= 0.40) {
+            status = 'approx';
+            hasApproximateMatch = true;
+          }
+
+          if (status !== 'none') {
+            ayahMatchedCount++;
+            if (ayahStartIdx === -1) ayahStartIdx = w;
+            ayahEndIdx = w;
+          }
+        }
+
+        ayahWordStatus.push(status);
+        fullResultWordStatus.push(status);
+      }
+
+      if (ayahStartIdx === -1) ayahStartIdx = 0;
+      if (ayahEndIdx === -1) ayahEndIdx = ayahWords.length - 1;
+
+      if (aIdx === 0) overallStartWordIndex = ayahStartIdx;
+      if (aIdx === matchedAyat.length - 1) overallEndWordIndex = ayahEndIdx;
+
+      totalAyatWords += ayahWords.length;
+      totalMatchedWords += ayahMatchedCount;
+
+      const covRatio = ayahWords.length > 0 ? ayahMatchedCount / ayahWords.length : 0;
       const cov: CoverageType = covRatio >= 0.85 ? 'full' : 'fragment';
-
-      totalAyatWords += totalWordCount;
-      totalMatchedWords += matchedWordCount;
-
-      const firstWord = ayahWordsInMatch[0];
-      const lastWord = ayahWordsInMatch[ayahWordsInMatch.length - 1];
-
-      const startWordIdx = firstWord ? firstWord.wordIndexInAyah : 0;
-      const endWordIdx = lastWord ? lastWord.wordIndexInAyah : totalWordCount - 1;
-
-      if (aIdx === 0) {
-        overallStartWordIndex = startWordIdx;
-      }
-      if (aIdx === matchedAyat.length - 1) {
-        overallEndWordIndex = endWordIdx;
-      }
 
       breakdown.push({
         verse: ayah.verse,
@@ -582,11 +601,12 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
         confidence: m.confidence,
         coverage: cov,
         coverageRatio: Math.round(covRatio * 100) / 100,
-        matchedWordCount,
-        totalWordCount,
-        matchedStartWordIndex: startWordIdx,
-        matchedEndWordIndex: endWordIdx,
-        matchedSlice: ayahWordsInMatch.map((w) => w.rawUthmani).join(' '),
+        matchedWordCount: ayahMatchedCount,
+        totalWordCount: ayahWords.length,
+        matchedStartWordIndex: ayahStartIdx,
+        matchedEndWordIndex: ayahEndIdx,
+        matchedSlice: ayahWords.slice(ayahStartIdx, ayahEndIdx + 1).join(' '),
+        wordMatchStatus: ayahWordStatus,
       });
     }
 
@@ -604,7 +624,27 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       : 'fragment';
 
     const fullRangeText = matchedAyat.map((a) => a.text).join(' ');
-    const fullRangeTranslation = matchedAyat.map((a) => a.enText).join(' ');
+    // Join per-ayah translations with punctuation in display code
+    let fullRangeTranslation = matchedAyat
+      .map((a, idx) => {
+        let t = a.enText.trim();
+        if (!t) return '';
+        if (matchedAyat.length > 1) {
+          if (idx < matchedAyat.length - 1 && !/[.!?,:;\-—"'\)\]]$/.test(t)) {
+            t += ',';
+          } else if (idx === matchedAyat.length - 1 && !/[.!?,:;\-—"'\)\]]$/.test(t)) {
+            t += '.';
+          }
+        }
+        return t;
+      })
+      .filter(Boolean)
+      .join(' ');
+
+    if (fullRangeTranslation.includes('"') && (fullRangeTranslation.match(/"/g) || []).length % 2 !== 0) {
+      fullRangeTranslation += '"';
+    }
+
     const verseRange = isSingleAyah ? `${m.startVerse}` : `${m.startVerse}–${m.endVerse}`;
 
     return {
@@ -621,14 +661,16 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       },
       text: fullRangeText,
       translation: fullRangeTranslation,
-      confidence: m.confidence,
-      state: m.confidence >= 90 ? 'matched' : 'close_match',
+      confidence: hasApproximateMatch ? Math.min(89, m.confidence) : m.confidence,
+      state: hasApproximateMatch ? 'close_match' : (m.confidence >= 90 ? 'matched' : 'close_match'),
       coverage,
       coverageRatio: Math.round(overallCoverageRatio * 100) / 100,
       matchedStartWordIndex: overallStartWordIndex,
       matchedEndWordIndex: overallEndWordIndex,
       matchedSlice: fullRangeText,
       matchedTokens: m.matchedTokens,
+      wordMatchStatus: fullResultWordStatus,
+      hasApproximateMatch,
       breakdown,
       leadingBasmalaIgnored: m.isBasmalaStripped,
     };
@@ -642,7 +684,29 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     return (a.startVerse || a.verse) - (b.startVerse || b.verse);
   });
 
-  const overallState: AyahMatchState = topConfidence >= 90 ? 'matched' : 'close_match';
+  if (qWordCount < 3) {
+    const fullMatches = formattedResults.filter((r) => r.coverage === 'full');
+    if (fullMatches.length === 0) {
+      const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
+      return {
+        query: rawQuery,
+        normalizedQuery,
+        alefInvariantQuery,
+        state: 'too_short',
+        topConfidence: 0,
+        totalMatches: 0,
+        results: [],
+        referralRequired: false,
+        notice: 'المدخل قصير جداً للتحقق، يرجى كتابة 3 كلمات أو أكثر',
+        executionTimeMs: elapsed,
+      };
+    }
+  }
+
+  const overallTopConfidence =
+    formattedResults.length > 0 ? formattedResults[0].confidence : topConfidence;
+  const overallState: AyahMatchState =
+    formattedResults.some((r) => r.state === 'matched') ? 'matched' : 'close_match';
   const hasLeadingBasmalaIgnored = formattedResults.some((r) => r.leadingBasmalaIgnored);
   let notice: string | undefined = undefined;
 
@@ -657,7 +721,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     normalizedQuery,
     alefInvariantQuery,
     state: overallState,
-    topConfidence,
+    topConfidence: overallTopConfidence,
     totalMatches: formattedResults.length,
     results: formattedResults,
     referralRequired: false,
