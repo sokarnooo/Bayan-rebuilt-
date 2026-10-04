@@ -48,6 +48,12 @@ export type AyahMatchState = 'matched' | 'close_match' | 'not_found' | 'too_shor
 export type CoverageType = 'full' | 'fragment';
 export type WordMatchState = 'exact' | 'approx' | 'none';
 
+export interface ChangedWordItem {
+  queryWord: string;
+  sourceWord: string | null;
+  position: number;
+}
+
 export interface AyahBreakdownItem {
   verse: number;
   text: string;
@@ -87,6 +93,7 @@ export interface AyahMatchResult {
   matchedTokens: string[];
   wordMatchStatus?: WordMatchState[];
   hasApproximateMatch?: boolean;
+  changedWords?: ChangedWordItem[];
   breakdown?: AyahBreakdownItem[];
   leadingBasmalaIgnored?: boolean;
 }
@@ -351,6 +358,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     wordScores: number[];
     wordExactList: boolean[];
     matchedTokens: string[];
+    changedWords: ChangedWordItem[];
     isBasmalaStripped: boolean;
   };
 
@@ -428,6 +436,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
         const wordScores: number[] = [];
         const wordExactList: boolean[] = [];
         const matchedTokens: string[] = [];
+        const changedWords: ChangedWordItem[] = [];
 
         for (let i = 0; i < vLen; i++) {
           if (startIdx + i < stream.length) {
@@ -443,10 +452,21 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
             totalScore += score;
             if (score >= 0.40) {
               matchedTokens.push(streamWord.rawUthmani);
+            } else {
+              changedWords.push({
+                queryWord: qWord,
+                sourceWord: streamWord.rawUthmani,
+                position: i,
+              });
             }
           } else {
             wordScores.push(0);
             wordExactList.push(false);
+            changedWords.push({
+              queryWord: vWords[i],
+              sourceWord: null,
+              position: i,
+            });
           }
         }
 
@@ -468,6 +488,7 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
             wordScores,
             wordExactList,
             matchedTokens,
+            changedWords,
             isBasmalaStripped: variant.isBasmalaStripped,
           });
         }
@@ -652,6 +673,35 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
 
     const verseRange = isSingleAyah ? `${m.startVerse}` : `${m.startVerse}–${m.endVerse}`;
 
+    const hasUnmatchedWord = m.changedWords && m.changedWords.length > 0;
+    const isFullyMatched = !hasUnmatchedWord && !hasApproximateMatch && coverage === 'full' && m.confidence >= 90;
+
+    const displayWords: string[] = [];
+    const wordGlobalToFullRangeIndex = new Map<number, number>();
+    let fullRangeIdx = 0;
+    for (const ayah of matchedAyat) {
+      for (let w = 0; w < ayah.rawWords.length; w++) {
+        const swIdx = stream.findIndex(
+          (sw) => sw.chapter === ayah.chapter && sw.verse === ayah.verse && sw.wordIndexInAyah === w
+        );
+        if (swIdx !== -1) {
+          wordGlobalToFullRangeIndex.set(swIdx, fullRangeIdx);
+        }
+        displayWords.push(ayah.rawWords[w]);
+        fullRangeIdx++;
+      }
+    }
+
+    const matchedOriginalIndices: number[] = [];
+    const matchedWords: string[] = [];
+    for (let swIdx = m.startGlobalWord; swIdx <= m.endGlobalWord; swIdx++) {
+      const frIdx = wordGlobalToFullRangeIndex.get(swIdx);
+      if (frIdx !== undefined) {
+        matchedOriginalIndices.push(frIdx);
+        matchedWords.push(displayWords[frIdx]);
+      }
+    }
+
     return {
       chapter: m.chapter,
       verse: m.startVerse,
@@ -666,14 +716,17 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       },
       text: fullRangeText,
       translation: fullRangeTranslation,
-      confidence: (hasApproximateMatch || coverage !== 'full') ? Math.min(89, m.confidence) : m.confidence,
-      state: (hasApproximateMatch || coverage !== 'full' || m.confidence < 90) ? 'close_match' : 'matched',
+      confidence: isFullyMatched ? m.confidence : Math.min(89, m.confidence),
+      state: isFullyMatched ? 'matched' : 'close_match',
+      changedWords: m.changedWords || [],
       coverage,
       coverageRatio: Math.round(overallCoverageRatio * 100) / 100,
-      matchedStartWordIndex: overallStartWordIndex,
-      matchedEndWordIndex: overallEndWordIndex,
+      matchedStartWordIndex: matchedOriginalIndices[0] ?? 0,
+      matchedEndWordIndex: matchedOriginalIndices[matchedOriginalIndices.length - 1] ?? 0,
       matchedSlice: fullRangeText,
       matchedTokens: m.matchedTokens,
+      matchedWords,
+      matchedOriginalIndices,
       wordMatchStatus: fullResultWordStatus,
       hasApproximateMatch,
       breakdown,

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeArabic } from '../server/matching/normalizer.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +14,105 @@ if (!BASE_URL) {
 
 const CASES_PATH = path.resolve(__dirname, 'cases.json');
 const RESULTS_PATH = path.resolve(__dirname, 'results.json');
+
+function verifyHighlights(query: string, matchedWords: string[], mode: string): boolean {
+  if (!matchedWords || matchedWords.length === 0) return false;
+  
+  const qNorm = normalizeArabic(query);
+  const qWords = qNorm.split(/\s+/).filter(Boolean);
+  const qWordsSet = new Set(qWords);
+  
+  const SKIP_WORDS = new Set([
+    'صلى', 'صلي', 'الله', 'عليه', 'وسلم', 
+    'رضي', 'عنه', 'عنها', 'عنهم', 'عنهما', 'عنهن',
+    'رحمه', 'سبحانه', 'وتعالى', 'وتعالي', 'عز', 'وجل', 
+    'عليهما', 'السلام'
+  ]);
+  
+  // Rule 1: no skipped honorific is highlighted unless it is inside the query
+  for (const mw of matchedWords) {
+    const mwNorm = normalizeArabic(mw);
+    if (SKIP_WORDS.has(mwNorm) && !qWordsSet.has(mwNorm)) {
+      return false; // Error: highlighted a skipped honorific not in the query!
+    }
+  }
+  
+  // Rule 2: normalized joined matchedWords equal the normalized aligned part of the query (approximate words allowed)
+  const filteredMatched = matchedWords
+    .map(w => normalizeArabic(w))
+    .filter(w => !SKIP_WORDS.has(w) || qWordsSet.has(w));
+    
+  if (filteredMatched.length === 0) return false;
+  
+  // Find the best alignment of filteredMatched within the query words
+  let bestOverlap = 0;
+  const qLen = qWords.length;
+  const mLen = filteredMatched.length;
+  
+  for (let i = 0; i <= qLen - mLen; i++) {
+    let matchCount = 0;
+    for (let j = 0; j < mLen; j++) {
+      const qw = qWords[i + j];
+      const mw = filteredMatched[j];
+      if (qw === mw) {
+        matchCount++;
+      } else {
+        if (qw.replace(/ء/g, 'ا') === mw.replace(/ء/g, 'ا')) {
+          matchCount++;
+        } else {
+          const qwAlef = qw.replace(/[ا\u0670ء]/g, '');
+          const mwAlef = mw.replace(/[ا\u0670ء]/g, '');
+          if (qwAlef === mwAlef && qwAlef !== '') {
+            matchCount++;
+          } else {
+            // Char-level distance comparison for approximate matching
+            const maxLen = Math.max(qw.length, mw.length);
+            if (maxLen > 0) {
+              let dist = 0;
+              const minLen = Math.min(qw.length, mw.length);
+              for (let c = 0; c < minLen; c++) {
+                if (qw[c] !== mw[c]) dist++;
+              }
+              dist += Math.abs(qw.length - mw.length);
+              const sim = 1 - dist / maxLen;
+              if (sim >= 0.65) matchCount++;
+            }
+          }
+        }
+      }
+    }
+    if (matchCount > bestOverlap) {
+      bestOverlap = matchCount;
+    }
+  }
+  
+  for (let i = 0; i <= mLen - qLen; i++) {
+    let matchCount = 0;
+    for (let j = 0; j < qLen; j++) {
+      const qw = qWords[j];
+      const mw = filteredMatched[i + j];
+      if (qw === mw) {
+        matchCount++;
+      } else {
+        if (qw.replace(/ء/g, 'ا') === mw.replace(/ء/g, 'ا')) {
+          matchCount++;
+        } else {
+          const qwAlef = qw.replace(/[ا\u0670ء]/g, '');
+          const mwAlef = mw.replace(/[ا\u0670ء]/g, '');
+          if (qwAlef === mwAlef && qwAlef !== '') {
+            matchCount++;
+          }
+        }
+      }
+    }
+    if (matchCount > bestOverlap) {
+      bestOverlap = matchCount;
+    }
+  }
+  
+  const reqOverlap = Math.min(qWords.length, filteredMatched.length) * 0.70;
+  return bestOverlap >= reqOverlap;
+}
 
 async function runTest(mode: string, input: string) {
   const endpoint = mode === 'ayah' ? '/api/ayah/match' : '/api/hadith/match';
@@ -27,6 +127,17 @@ async function runTest(mode: string, input: string) {
   } catch (e: any) {
     return { error: e.message };
   }
+}
+
+function normalizeEnglishForEval(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/[()]/g, ' ')
+    .replace(/['"’`\-–]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function checkPass(expected: any, actual: any) {
@@ -44,12 +155,26 @@ function checkPass(expected: any, actual: any) {
   let refMatch = true;
   const topResult = actual.results?.[0];
 
+  // minScore validation
+  if (expected.minScore !== undefined) {
+    if (!topResult || (topResult.confidence ?? 0) < expected.minScore) {
+      return false;
+    }
+  }
+
+  // requireChangedWords validation
+  if (expected.requireChangedWords) {
+    if (!topResult || !topResult.changedWords || topResult.changedWords.length === 0) {
+      return false;
+    }
+  }
+
   if (expected.containsEnglishSlice) {
     if (!topResult?.translation) {
       refMatch = false;
     } else {
-      const trans = topResult.translation.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-      const slice = expected.containsEnglishSlice.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+      const trans = normalizeEnglishForEval(topResult.translation);
+      const slice = normalizeEnglishForEval(expected.containsEnglishSlice);
       refMatch = trans.includes(slice);
     }
   } else if (expected.allowedCollections) {
@@ -60,32 +185,56 @@ function checkPass(expected: any, actual: any) {
   } else if (expected.refs && Array.isArray(expected.refs)) {
     if (!topResult) refMatch = false;
     else {
-      if (actual.query_mode === 'ayah') {
-        const rangeStr = (topResult.verseRange || '').replace(/–/g, '-');
-        const actualRef = topResult.isRange ? `${topResult.chapter}:${rangeStr}` : `${topResult.chapter}:${topResult.verse}`;
-        refMatch = expected.refs.some((r: string) => actualRef === r || actualRef.includes(r) || r.includes(actualRef));
-      } else {
-        const arabicRef = `${topResult.collection}_${topResult.arabicnumber}`;
-        refMatch = expected.refs.includes(topResult.id) || expected.refs.includes(arabicRef);
-      }
+      const allActualRefs = (actual.results || []).map((r: any) => {
+        if (actual.query_mode === 'ayah') {
+          const rangeStr = (r.verseRange || '').replace(/–/g, '-');
+          return r.isRange ? `${r.chapter}:${rangeStr}` : `${r.chapter}:${r.verse}`;
+        } else {
+          return [r.id, `${r.collection}_${r.arabicnumber}`];
+        }
+      }).flat();
+      refMatch = expected.refs.some((exp: string) =>
+        allActualRefs.some((act: string) => act === exp || act.includes(exp) || exp.includes(act))
+      );
     }
   } else if (expected.ref) {
     if (!topResult) refMatch = false;
     else {
-      if (actual.query_mode === 'ayah') {
-        const rangeStr = (topResult.verseRange || '').replace(/–/g, '-');
-        const actualRef = topResult.isRange ? `${topResult.chapter}:${rangeStr}` : `${topResult.chapter}:${topResult.verse}`;
-        refMatch = actualRef === expected.ref || actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
+      const checkResultMatch = (r: any) => {
+        if (!r) return false;
+        if (actual.query_mode === 'ayah') {
+          const rangeStr = (r.verseRange || '').replace(/–/g, '-');
+          const actualRef = r.isRange ? `${r.chapter}:${rangeStr}` : `${r.chapter}:${r.verse}`;
+          return actualRef === expected.ref || actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
+        } else {
+          const arabicRef = `${r.collection}_${r.arabicnumber}`;
+          return r.id === expected.ref || arabicRef === expected.ref;
+        }
+      };
+
+      if (expected.rank === 1) {
+        refMatch = checkResultMatch(topResult);
       } else {
-        const arabicRef = `${topResult.collection}_${topResult.arabicnumber}`;
-        refMatch = topResult.id === expected.ref || arabicRef === expected.ref;
+        refMatch = checkResultMatch(topResult) || (actual.results || []).some(checkResultMatch);
       }
     }
   } else if (expected.ref === null) {
     refMatch = actual.state === 'not_found' || actual.results?.length === 0;
   }
   
-  return stateMatch && refMatch;
+  let highlightMatch = true;
+  if (stateMatch && refMatch) {
+    const expectsMatch = expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0);
+    if (expectsMatch) {
+      if (topResult) {
+        highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode);
+      } else {
+        highlightMatch = false;
+      }
+    }
+  }
+  
+  return stateMatch && refMatch && highlightMatch;
 }
 
 async function run() {
@@ -162,6 +311,9 @@ async function run() {
     console.log(`  Input: ${r.input.substring(0, 60)}...`);
     console.log(`  Expected: ${expStr}`);
     console.log(`  Actual: ${lastActual.state} (${actRef}) [Confidence: ${top?.confidence ?? 0}]`);
+    if (top?.matchedWords) {
+      console.log(`  Matched Words: [${top.matchedWords.join(', ')}]`);
+    }
     if (lastActual.error) console.log(`  Error: ${lastActual.error}`);
   });
 

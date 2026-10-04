@@ -139,23 +139,41 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
     fullText: string,
     wordStatus: ('exact' | 'approximate' | 'none')[],
     startIdx: number,
-    endIdx: number
+    endIdx: number,
+    changedWords?: Array<{ queryWord: string; sourceWord: string | null; position: number }>
   ) => {
     const words = fullText.split(/\s+/).filter(Boolean);
     if (!wordStatus || wordStatus.length === 0 || startIdx < 0) {
       return fullText;
     }
 
+    const changedSourceSet = new Set(
+      (changedWords || [])
+        .map((c) => c.sourceWord)
+        .filter(Boolean) as string[]
+    );
+
     return words.map((w, idx) => {
       if (idx >= startIdx && idx <= endIdx) {
         const statusIdx = idx - startIdx;
         const status = wordStatus[statusIdx] || 'exact';
 
+        if (status === 'none' || (changedWords && changedWords.length > 0 && changedSourceSet.has(w))) {
+          return (
+            <span
+              key={idx}
+              title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
+              className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-semibold transition inline-block"
+            >
+              {w}{' '}
+            </span>
+          );
+        }
         if (status === 'exact') {
           return (
             <span
               key={idx}
-              className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-semibold transition"
+              className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-semibold transition inline-block"
             >
               {w}{' '}
             </span>
@@ -165,7 +183,8 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
           return (
             <span
               key={idx}
-              className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded transition"
+              title={isAr ? 'تطابق تقريبي' : 'Approximate match'}
+              className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded transition inline-block"
             >
               {w}{' '}
             </span>
@@ -459,8 +478,25 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
                   lang="ar"
                   className="font-quran text-xl sm:text-2xl leading-[2.3] text-[#F2F4FF] select-text"
                 >
-                  « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex)} »
+                  « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex, item.changedWords)} »
                 </p>
+
+                {/* Changed / unmatched words legend */}
+                {item.changedWords && item.changedWords.length > 0 && (
+                  <div className="flex flex-col items-center justify-center gap-1 pt-1 text-xs text-red-400 font-medium">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-4 border-b-2 border-dashed border-red-500" />
+                      <span>{isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-red-300/80">
+                      {item.changedWords.map((cw, cwIdx) => (
+                        <span key={cwIdx} className="bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
+                          «{cw.queryWord}» {cw.sourceWord ? (isAr ? `(في الأصل: «${cw.sourceWord}»)` : `(Original: "${cw.sourceWord}")`) : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Approximate match legend if any word was approximate */}
                 {item.hasApproximateMatch && (

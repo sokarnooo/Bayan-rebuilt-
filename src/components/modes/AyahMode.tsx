@@ -161,9 +161,16 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     text: string,
     wordMatchStatus?: Array<'exact' | 'approx' | 'none'>,
     startWordIndex?: number,
-    endWordIndex?: number
+    endWordIndex?: number,
+    changedWords?: Array<{ queryWord: string; sourceWord: string | null; position: number }>
   ) => {
-    const words = text.split(' ');
+    const words = text.split(/\s+/).filter(Boolean);
+    const changedSourceSet = new Set(
+      (changedWords || [])
+        .map((c) => c.sourceWord)
+        .filter(Boolean) as string[]
+    );
+
     return words.map((word, idx) => {
       let status: 'exact' | 'approx' | 'none' = 'none';
 
@@ -179,10 +186,25 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         status = 'exact';
       }
 
+      const isChanged =
+        (status === 'none' &&
+          startWordIndex !== undefined &&
+          endWordIndex !== undefined &&
+          idx >= startWordIndex &&
+          idx <= endWordIndex) ||
+        (changedWords && changedWords.length > 0 && changedSourceSet.has(word));
+
       return (
         <React.Fragment key={idx}>
           {idx > 0 ? ' ' : ''}
-          {status === 'exact' ? (
+          {isChanged && changedWords && changedWords.length > 0 ? (
+            <span
+              title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
+              className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-bold inline-block"
+            >
+              {word}
+            </span>
+          ) : status === 'exact' ? (
             <span className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-bold inline-block">
               {word}
             </span>
@@ -474,8 +496,25 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                     lang="ar"
                     className="font-quran text-2xl sm:text-3xl leading-[2.3] text-[#F2F4FF] select-text"
                   >
-                    « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex)} »
+                    « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex, item.changedWords)} »
                   </p>
+
+                  {/* Changed / unmatched words legend */}
+                  {item.changedWords && item.changedWords.length > 0 && (
+                    <div className="flex flex-col items-center justify-center gap-1 pt-1 text-xs text-red-400 font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-4 border-b-2 border-dashed border-red-500" />
+                        <span>{isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-red-300/80">
+                        {item.changedWords.map((cw, cwIdx) => (
+                          <span key={cwIdx} className="bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
+                            «{cw.queryWord}» {cw.sourceWord ? (isAr ? `(في الأصل: «${cw.sourceWord}»)` : `(Original: "${cw.sourceWord}")`) : ''}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Approximate match legend if any word was approximate */}
                   {item.hasApproximateMatch && (
