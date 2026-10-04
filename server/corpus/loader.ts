@@ -5,7 +5,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = path.resolve(__dirname, './data');
+const DATA_DIR = fs.existsSync(path.resolve(__dirname, './data'))
+  ? path.resolve(__dirname, './data')
+  : path.resolve(process.cwd(), 'server/corpus/data');
 
 export interface QuranVerse {
   chapter: number;
@@ -20,7 +22,7 @@ export interface HadithGrade {
 
 export interface HadithRecord {
   hadithnumber: number;
-  arabicnumber: number;
+  arabicnumber: number | string;
   text: string;
   grades: HadithGrade[];
   reference: {
@@ -61,8 +63,43 @@ let loadDurationMs = 0;
 
 function readJsonFile(filename: string): any {
   const filePath = path.join(DATA_DIR, filename);
+  if (!fs.existsSync(filePath)) return {};
   const content = fs.readFileSync(filePath, 'utf8');
   return JSON.parse(content);
+}
+
+// Lazy English loaders
+let cachedQuranEn: QuranVerse[] | null = null;
+export function getQuranEn(): QuranVerse[] {
+  if (!cachedQuranEn) {
+    const raw = readJsonFile('quran_en.json');
+    const list = raw.quran || raw[Object.keys(raw)[0]] || [];
+    cachedQuranEn = list.map((v: any) => ({
+      chapter: v.chapter,
+      verse: v.verse,
+      text: v.text || '',
+    }));
+  }
+  return cachedQuranEn!;
+}
+
+const cachedHadithEn: Partial<Record<string, HadithRecord[]>> = {};
+export function getHadithEn(col: string): HadithRecord[] {
+  if (!cachedHadithEn[col]) {
+    const raw = readJsonFile(`hadith_${col}_en.json`);
+    const list = raw.hadiths || [];
+    cachedHadithEn[col] = list.map((h: any) => ({
+      hadithnumber: h.hadithnumber,
+      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      text: h.text || '',
+      grades: [],
+      reference: {
+        book: h.reference?.book || 0,
+        hadith: h.reference?.hadith || 0,
+      },
+    }));
+  }
+  return cachedHadithEn[col]!;
 }
 
 export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
@@ -73,32 +110,40 @@ export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
   const start = performance.now();
 
   const quranArRaw = readJsonFile('quran_ar.json');
-  const quranEnRaw = readJsonFile('quran_en.json');
+  const quranArVerses: QuranVerse[] = quranArRaw.quran || quranArRaw[Object.keys(quranArRaw)[0]] || [];
+
+  const collections = ['bukhari', 'muslim', 'abudawud', 'tirmidhi', 'nasai', 'ibnmajah', 'nawawi'] as const;
+  const hadithAr: any = {};
+
+  for (const col of collections) {
+    const raw = readJsonFile(`hadith_${col}_ar.json`);
+    const list = raw.hadiths || [];
+    hadithAr[col] = list.map((h: any) => ({
+      hadithnumber: h.hadithnumber,
+      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      text: h.text || '',
+      grades: h.grades || [],
+      reference: {
+        book: h.reference?.book || 0,
+        hadith: h.reference?.hadith || 0,
+      },
+    }));
+  }
 
   const corpus: LoadedCorpus = {
     quran: {
-      ar: quranArRaw.quran || quranArRaw[Object.keys(quranArRaw)[0]],
-      en: quranEnRaw.quran || quranEnRaw[Object.keys(quranEnRaw)[0]],
-    },
+      ar: quranArVerses,
+      get en() {
+        return getQuranEn();
+      },
+    } as any,
     hadith: {
-      ar: {
-        bukhari: readJsonFile('hadith_bukhari_ar.json').hadiths || [],
-        muslim: readJsonFile('hadith_muslim_ar.json').hadiths || [],
-        abudawud: readJsonFile('hadith_abudawud_ar.json').hadiths || [],
-        tirmidhi: readJsonFile('hadith_tirmidhi_ar.json').hadiths || [],
-        nasai: readJsonFile('hadith_nasai_ar.json').hadiths || [],
-        ibnmajah: readJsonFile('hadith_ibnmajah_ar.json').hadiths || [],
-        nawawi: readJsonFile('hadith_nawawi_ar.json').hadiths || [],
-      },
-      en: {
-        bukhari: readJsonFile('hadith_bukhari_en.json').hadiths || [],
-        muslim: readJsonFile('hadith_muslim_en.json').hadiths || [],
-        abudawud: readJsonFile('hadith_abudawud_en.json').hadiths || [],
-        tirmidhi: readJsonFile('hadith_tirmidhi_en.json').hadiths || [],
-        nasai: readJsonFile('hadith_nasai_en.json').hadiths || [],
-        ibnmajah: readJsonFile('hadith_ibnmajah_en.json').hadiths || [],
-        nawawi: readJsonFile('hadith_nawawi_en.json').hadiths || [],
-      },
+      ar: hadithAr,
+      en: new Proxy({} as any, {
+        get(_target, prop: string) {
+          return getHadithEn(prop);
+        },
+      }),
     },
   };
 
@@ -107,3 +152,4 @@ export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
 
   return { corpus: cachedCorpus, loadTimeMs: loadDurationMs };
 }
+

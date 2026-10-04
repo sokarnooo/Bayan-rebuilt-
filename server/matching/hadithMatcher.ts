@@ -13,7 +13,9 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_DIR = path.resolve(__dirname, '../corpus/data');
+const DATA_DIR = fs.existsSync(path.resolve(__dirname, '../corpus/data'))
+  ? path.resolve(__dirname, '../corpus/data')
+  : path.resolve(process.cwd(), 'server/corpus/data');
 
 export interface HadithGradeItem {
   name: string;
@@ -35,8 +37,8 @@ export interface ChangedWordItem {
 export interface HadithRecord {
   c: string; // collection slug
   n: number; // hadithnumber
-  m: number[]; // matn word token IDs
-  f: number[]; // full word token IDs
+  m: Int32Array | number[]; // matn word token IDs
+  f: Int32Array | number[]; // full word token IDs
   r: number; // isnadRemovedRatio
   o: number; // isnadWordOffset
 }
@@ -66,6 +68,7 @@ export interface HadithMatchResult {
   grades: HadithGradeItem[];
   hasNoGrading: boolean;
   isnadStripped: boolean;
+  isnadChecked?: boolean;
   attestations?: HadithAttestationItem[];
 }
 
@@ -426,7 +429,8 @@ export function isPunctuationWord(word: string): boolean {
 }
 
 export function tokenizeDisplayWords(rawText: string): { displayWords: string[]; tokens: DisplayToken[]; nonSkipped: DisplayToken[] } {
-  const displayWords = rawText.split(/\s+/).filter(Boolean);
+  const cleanRaw = (rawText || '').replace(/<br\s*\/?>/gi, ' ');
+  const displayWords = cleanRaw.split(/\s+/).filter(Boolean);
   const tokens: DisplayToken[] = displayWords.map((word, originalIndex) => {
     const norm = normalizeArabic(word).replace(/[\u200E\u200F]/g, '');
     const skip = isPunctuationWord(word) || !norm;
@@ -849,7 +853,13 @@ export function stripIsnadFromNormalized(normalizedText: string): {
 let corpusHadiths: HadithRecord[] = [];
 let vocabulary: string[] = [];
 let wordToIdMap = new Map<string, number>();
-let twoGramIndex = new Map<number, Map<number, number[]>>(); // id1 -> id2 -> array of record indices
+
+// CSR Inverted Index for TwoGrams
+let twoGramKeyIndexMap = new Map<number, number>();
+let twoGramOffsets = new Uint32Array(0);
+let twoGramLengths = new Uint16Array(0);
+let twoGramPostings = new Int32Array(0);
+
 let isInitialized = false;
 let sectionsCache = new Map<string, Record<string, string>>();
 
@@ -863,24 +873,13 @@ export function getWordId(word: string, add = false): number {
   return id ?? -1;
 }
 
-function addToIndex(id1: number, id2: number, recordIdx: number) {
-  let m1 = twoGramIndex.get(id1);
-  if (!m1) {
-    m1 = new Map<number, number[]>();
-    twoGramIndex.set(id1, m1);
-  }
-  let list = m1.get(id2);
-  if (!list) {
-    list = [];
-    m1.set(id2, list);
-  }
-  if (list[list.length - 1] !== recordIdx) {
-    list.push(recordIdx);
-  }
-}
-
-function getIndexHits(id1: number, id2: number): number[] {
-  return twoGramIndex.get(id1)?.get(id2) || [];
+function getIndexHits(id1: number, id2: number): Int32Array | number[] {
+  const key = Number(id1) * 100000 + Number(id2);
+  const kIdx = twoGramKeyIndexMap.get(key);
+  if (kIdx === undefined) return [];
+  const start = twoGramOffsets[kIdx];
+  const len = twoGramLengths[kIdx];
+  return twoGramPostings.subarray(start, start + len);
 }
 
 export function getIndexedCounts() {
@@ -936,8 +935,8 @@ export function preprocessAllRawHadiths(): { records: HadithRecord[]; vocab: str
       records.push({
         c: col,
         n: h.hadithnumber,
-        m: matnTokens.map(t => getWordId(t, true)),
-        f: fullTokens.map(t => getWordId(t, true)),
+        m: new Int32Array(matnTokens.map(t => getWordId(t, true))),
+        f: new Int32Array(fullTokens.map(t => getWordId(t, true))),
         r: strippedRatio,
         o: isnadWordOffset ?? 0,
       });
@@ -952,7 +951,7 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
     return {
       totalIndexed: corpusHadiths.length,
       emptyExcluded: 379,
-      indexMemoryBytes: twoGramIndex.size * 64,
+      indexMemoryBytes: twoGramPostings.byteLength + twoGramOffsets.byteLength,
     };
   }
 
@@ -962,7 +961,7 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
   const prebuiltPathPlain = path.join(DATA_DIR, 'prebuilt_hadiths.json');
 
   corpusHadiths = [];
-  twoGramIndex.clear();
+  twoGramKeyIndexMap.clear();
   let emptyCount = 379;
 
   if (fs.existsSync(prebuiltPathGz)) {
@@ -971,7 +970,43 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
     const decompressed = zlib.gunzipSync(buffer).toString('utf8');
     const data = JSON.parse(decompressed);
     vocabulary = data.v || [];
-    corpusHadiths = data.r || [];
+
+    const rawRecords = data.r || [];
+    let totalM = 0;
+    let totalF = 0;
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mLen = Array.isArray(r.m) ? r.m.length : (r.m ? Object.keys(r.m).length : 0);
+      const fLen = Array.isArray(r.f) ? r.f.length : (r.f ? Object.keys(r.f).length : 0);
+      totalM += mLen;
+      totalF += fLen;
+    }
+
+    const allM = new Int32Array(totalM);
+    const allF = new Int32Array(totalF);
+    let curM = 0;
+    let curF = 0;
+
+    corpusHadiths = new Array(rawRecords.length);
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mArr = Array.isArray(r.m) ? r.m : (r.m ? Object.values(r.m) : []);
+      const fArr = Array.isArray(r.f) ? r.f : (r.f ? Object.values(r.f) : []);
+
+      const mStart = curM;
+      for (let j = 0; j < mArr.length; j++) allM[curM++] = Number(mArr[j]);
+      const fStart = curF;
+      for (let j = 0; j < fArr.length; j++) allF[curF++] = Number(fArr[j]);
+
+      corpusHadiths[i] = {
+        c: r.c,
+        n: r.n,
+        m: allM.subarray(mStart, curM),
+        f: allF.subarray(fStart, curF),
+        r: r.r,
+        o: r.o,
+      };
+    }
     
     // Populate sections cache from prebuilt
     sectionsCache.clear();
@@ -983,7 +1018,42 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
   } else if (fs.existsSync(prebuiltPathPlain)) {
     const data = JSON.parse(fs.readFileSync(prebuiltPathPlain, 'utf8'));
     vocabulary = data.v || [];
-    corpusHadiths = data.r || [];
+    const rawRecords = data.r || [];
+    let totalM = 0;
+    let totalF = 0;
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mLen = Array.isArray(r.m) ? r.m.length : (r.m ? Object.keys(r.m).length : 0);
+      const fLen = Array.isArray(r.f) ? r.f.length : (r.f ? Object.keys(r.f).length : 0);
+      totalM += mLen;
+      totalF += fLen;
+    }
+
+    const allM = new Int32Array(totalM);
+    const allF = new Int32Array(totalF);
+    let curM = 0;
+    let curF = 0;
+
+    corpusHadiths = new Array(rawRecords.length);
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mArr = Array.isArray(r.m) ? r.m : (r.m ? Object.values(r.m) : []);
+      const fArr = Array.isArray(r.f) ? r.f : (r.f ? Object.values(r.f) : []);
+
+      const mStart = curM;
+      for (let j = 0; j < mArr.length; j++) allM[curM++] = Number(mArr[j]);
+      const fStart = curF;
+      for (let j = 0; j < fArr.length; j++) allF[curF++] = Number(fArr[j]);
+
+      corpusHadiths[i] = {
+        c: r.c,
+        n: r.n,
+        m: allM.subarray(mStart, curM),
+        f: allF.subarray(fStart, curF),
+        r: r.r,
+        o: r.o,
+      };
+    }
     if (data.s) {
       for (const [col, sData] of Object.entries(data.s)) {
         sectionsCache.set(col, sData as Record<string, string>);
@@ -1008,13 +1078,53 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
     wordToIdMap.set(vocabulary[i], i);
   }
 
-  // Populate twoGramIndex of full text (covering both isnad and matn)
-  twoGramIndex.clear();
+  // Populate CSR inverted index of full text (covering both isnad and matn)
+  const keyCounts = new Map<number, number>();
   for (let recordIdx = 0; recordIdx < corpusHadiths.length; recordIdx++) {
-    const record = corpusHadiths[recordIdx];
-    const tokenIds = record.f;
+    const tokenIds = corpusHadiths[recordIdx].f;
+    const seen = new Set<number>();
     for (let i = 0; i < tokenIds.length - 1; i++) {
-      addToIndex(tokenIds[i], tokenIds[i + 1], recordIdx);
+      const key = tokenIds[i] * 100000 + tokenIds[i + 1];
+      if (!seen.has(key)) {
+        seen.add(key);
+        keyCounts.set(key, (keyCounts.get(key) || 0) + 1);
+      }
+    }
+  }
+
+  let keyIdx = 0;
+  let totalPostings = 0;
+  for (const [key, count] of keyCounts.entries()) {
+    twoGramKeyIndexMap.set(key, keyIdx++);
+    totalPostings += count;
+  }
+
+  twoGramOffsets = new Uint32Array(keyIdx + 1);
+  twoGramLengths = new Uint16Array(keyIdx);
+  twoGramPostings = new Int32Array(totalPostings);
+
+  let curOffset = 0;
+  keyIdx = 0;
+  for (const [_, count] of keyCounts.entries()) {
+    twoGramOffsets[keyIdx] = curOffset;
+    twoGramLengths[keyIdx] = 0;
+    curOffset += count;
+    keyIdx++;
+  }
+  twoGramOffsets[keyIdx] = curOffset;
+
+  for (let recordIdx = 0; recordIdx < corpusHadiths.length; recordIdx++) {
+    const tokenIds = corpusHadiths[recordIdx].f;
+    const seen = new Set<number>();
+    for (let i = 0; i < tokenIds.length - 1; i++) {
+      const key = tokenIds[i] * 100000 + tokenIds[i + 1];
+      if (!seen.has(key)) {
+        seen.add(key);
+        const kIdx = twoGramKeyIndexMap.get(key)!;
+        const pos = twoGramOffsets[kIdx] + twoGramLengths[kIdx];
+        twoGramPostings[pos] = recordIdx;
+        twoGramLengths[kIdx]++;
+      }
     }
   }
 
@@ -1025,7 +1135,7 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
   return {
     totalIndexed: corpusHadiths.length,
     emptyExcluded: emptyCount,
-    indexMemoryBytes: twoGramIndex.size * 64,
+    indexMemoryBytes: twoGramPostings.byteLength + twoGramOffsets.byteLength,
   };
 }
 
@@ -1038,7 +1148,7 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
  */
 export function scoreContainment(
   queryTokens: string[],
-  recordTokenIds: number[]
+  recordTokenIds: ArrayLike<number>
 ): {
   score: number;
   startWordIndex: number;
@@ -1256,8 +1366,7 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
     const longer = targetTokenIds.length <= candTokenIds.length ? candTokenIds : targetTokenIds;
 
     // scoreContainment takes string[] as first arg. 
-    // We need a variant or just convert shorter to strings for this call.
-    const shorterStrings = shorter.map(id => vocabulary[id]);
+    const shorterStrings = Array.from(shorter).map((id: number) => vocabulary[id] || '');
     const res = scoreContainment(shorterStrings, longer);
     const containmentRatio = Math.round((res.score / 100) * 100) / 100;
 
@@ -1282,7 +1391,7 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
         containmentRatio,
         grades,
         hasNoGrading,
-        matnSnippet: candidate.m.slice(0, 20).map(id => vocabulary[id] || '').join(' ').slice(0, 100) + '...',
+        matnSnippet: Array.from(candidate.m.slice(0, 20)).map((id: number) => vocabulary[id] || '').join(' ').slice(0, 100) + '...',
       });
     }
   }
@@ -1586,9 +1695,12 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     }
 
     if (res.confidence >= 70) {
-      const enList = corpus.hadith.en[record.c as keyof typeof corpus.hadith.en] || [];
-      const rawEn = enList.find(h => h.hadithnumber === record.n);
-      const rawEnglishText = rawEn?.text;
+      let rawEnglishText: string | undefined = undefined;
+      if (isEnglish) {
+        const enList = corpus.hadith.en[record.c as keyof typeof corpus.hadith.en] || [];
+        const rawEn = enList.find(h => h.hadithnumber === record.n);
+        rawEnglishText = rawEn?.text;
+      }
       const grades: HadithGradeItem[] = (rawAr?.grades || []).map(parseGrade);
       const hasNoGrading = grades.length === 0;
 
@@ -1635,7 +1747,8 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
         changedWords: res.changedWords,
         grades,
         hasNoGrading,
-        isnadStripped: usedMatn && record.r > 0,
+        isnadStripped: qStripped.isnadStripped || usedMatn,
+        isnadChecked: !(qStripped.isnadStripped || usedMatn),
       });
     }
   }

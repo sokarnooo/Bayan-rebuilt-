@@ -73,6 +73,7 @@ interface HadithMatchResult {
   grades: HadithGradeItem[];
   hasNoGrading: boolean;
   isnadStripped: boolean;
+  isnadChecked?: boolean;
   attestations?: HadithAttestationItem[];
 }
 
@@ -153,7 +154,8 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
     changedWords?: Array<{ queryWord: string | null; sourceWord: string | null; position: number; type?: string }>,
     matchedOriginalIndices?: number[]
   ) => {
-    const words = fullText.split(/\s+/).filter(Boolean);
+    const cleanText = fullText.replace(/<br\s*\/?>/gi, ' \n ');
+    const words = cleanText.split(/\s+/).filter(Boolean);
     if (!words.length) {
       return fullText;
     }
@@ -166,10 +168,15 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
         .filter(Boolean) as string[]
     );
 
+    let displayWordIdx = 0;
     return words.map((w, idx) => {
-      const isMatched = matchedSet ? matchedSet.has(idx) : (idx >= startIdx && idx <= endIdx);
+      if (w === '\n') {
+        return <br key={`br-${idx}`} className="my-2" />;
+      }
+      const currentIdx = displayWordIdx++;
+      const isMatched = matchedSet ? matchedSet.has(currentIdx) : (currentIdx >= startIdx && currentIdx <= endIdx);
       if (isMatched) {
-        const statusIdx = idx - startIdx;
+        const statusIdx = currentIdx - startIdx;
         const status = wordStatus?.[statusIdx] || 'exact';
 
         if (status === 'none' || (changedWords && changedWords.length > 0 && changedSourceSet.has(w))) {
@@ -485,6 +492,18 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
                 </div>
               </div>
 
+              {/* Matn-only match notice when isnad was stripped and unverified */}
+              {item.isnadChecked === false && (
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>
+                    {isAr
+                      ? 'تمت المطابقة على المتن فقط؛ لم يُتحقق من السند المُدخل'
+                      : 'Matched on the text (matn) only; the pasted chain was not verified'}
+                  </span>
+                </div>
+              )}
+
               {/* Hadith Text with Position Highlighting */}
               <div className="space-y-2">
                 <p
@@ -496,21 +515,41 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
                 </p>
 
                 {/* Changed / unmatched words legend */}
-                {item.changedWords && item.changedWords.filter(c => c.type !== 'exact').length > 0 && (
-                  <div className="flex flex-col items-center justify-center gap-1 pt-1 text-xs text-red-400 font-medium">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block w-4 border-b-2 border-dashed border-red-500" />
-                      <span>{isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}</span>
+                {item.changedWords && item.changedWords.filter(c => c.type !== 'exact').length > 0 && (() => {
+                  const sourceOnlyWords = item.changedWords
+                    .filter(c => c.type !== 'exact' && c.sourceWord && (!c.queryWord || c.type === 'inserted'))
+                    .map(c => c.sourceWord)
+                    .filter(Boolean);
+                  const queryOnlyWords = item.changedWords
+                    .filter(c => c.type !== 'exact' && c.queryWord && (!c.sourceWord || c.type === 'deleted'))
+                    .map(c => c.queryWord)
+                    .filter(Boolean);
+
+                  return (
+                    <div className="flex flex-col gap-1.5 pt-2 text-xs font-medium border-t border-[#6150EA]/15 text-start">
+                      {sourceOnlyWords.length > 0 && (
+                        <div className="flex items-start gap-1.5 text-red-300">
+                          <span className="font-semibold shrink-0">
+                            {isAr ? 'كلمات في المصدر ليست في نصك:' : 'Words in the source not in your text:'}
+                          </span>
+                          <span className="text-red-200 font-bold">
+                            «{sourceOnlyWords.join(' ')}»
+                          </span>
+                        </div>
+                      )}
+                      {queryOnlyWords.length > 0 && (
+                        <div className="flex items-start gap-1.5 text-amber-300">
+                          <span className="font-semibold shrink-0">
+                            {isAr ? 'كلمات في نصك ليست في المصدر:' : 'Words in your text not in the source:'}
+                          </span>
+                          <span className="text-amber-200 font-bold">
+                            «{queryOnlyWords.join(' ')}»
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-red-300/80">
-                      {item.changedWords.filter(c => c.type !== 'exact').map((cw, cwIdx) => (
-                        <span key={cwIdx} className="bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
-                          «{cw.queryWord || (isAr ? 'بدون' : 'none')}» {cw.sourceWord ? (isAr ? `(في الأصل: «${cw.sourceWord}»)` : `(Original: "${cw.sourceWord}")`) : ''}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Approximate match legend if any word was approximate */}
                 {item.hasApproximateMatch && (

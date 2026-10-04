@@ -175,7 +175,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     changedWords?: Array<{ queryWord: string | null; sourceWord: string | null; position: number; type?: string }>,
     matchedOriginalIndices?: number[]
   ) => {
-    const words = text.split(/\s+/).filter(Boolean);
+    const cleanText = text.replace(/<br\s*\/?>/gi, ' \n ');
+    const words = cleanText.split(/\s+/).filter(Boolean);
     const matchedSet = matchedOriginalIndices ? new Set(matchedOriginalIndices) : null;
     const changedSourceSet = new Set(
       (changedWords || [])
@@ -183,37 +184,42 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         .filter(Boolean) as string[]
     );
 
+    let displayWordIdx = 0;
     return words.map((word, idx) => {
+      if (word === '\n') {
+        return <br key={`br-${idx}`} className="my-2" />;
+      }
+      const currentIdx = displayWordIdx++;
       let status: 'exact' | 'approx' | 'none' = 'none';
 
       if (matchedSet) {
-        if (matchedSet.has(idx)) {
-          status = (wordMatchStatus && wordMatchStatus[idx]) || 'exact';
+        if (matchedSet.has(currentIdx)) {
+          status = (wordMatchStatus && wordMatchStatus[currentIdx]) || 'exact';
         }
       } else if (wordMatchStatus && wordMatchStatus.length === words.length) {
-        status = wordMatchStatus[idx];
+        status = wordMatchStatus[currentIdx];
       } else if (
         startWordIndex !== undefined &&
         endWordIndex !== undefined &&
         startWordIndex >= 0 &&
-        idx >= startWordIndex &&
-        idx <= endWordIndex
+        currentIdx >= startWordIndex &&
+        currentIdx <= endWordIndex
       ) {
         status = 'exact';
       }
 
       const isChanged =
         (status === 'none' &&
-          ((matchedSet && matchedSet.has(idx)) ||
+          ((matchedSet && matchedSet.has(currentIdx)) ||
             (startWordIndex !== undefined &&
               endWordIndex !== undefined &&
-              idx >= startWordIndex &&
-              idx <= endWordIndex))) ||
+              currentIdx >= startWordIndex &&
+              currentIdx <= endWordIndex))) ||
         (changedWords && changedWords.length > 0 && changedSourceSet.has(word));
 
       return (
         <React.Fragment key={idx}>
-          {idx > 0 ? ' ' : ''}
+          {idx > 0 && word !== '\n' ? ' ' : ''}
           {isChanged && changedWords && changedWords.length > 0 ? (
             <span
               title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
@@ -517,21 +523,41 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                   </p>
 
                   {/* Changed / unmatched words legend */}
-                  {item.changedWords && item.changedWords.length > 0 && (
-                    <div className="flex flex-col items-center justify-center gap-1 pt-1 text-xs text-red-400 font-medium">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-4 border-b-2 border-dashed border-red-500" />
-                        <span>{isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}</span>
+                  {item.changedWords && item.changedWords.filter(c => c.type !== 'exact').length > 0 && (() => {
+                    const sourceOnlyWords = item.changedWords
+                      .filter(c => c.type !== 'exact' && c.sourceWord && (!c.queryWord || c.type === 'inserted'))
+                      .map(c => c.sourceWord)
+                      .filter(Boolean);
+                    const queryOnlyWords = item.changedWords
+                      .filter(c => c.type !== 'exact' && c.queryWord && (!c.sourceWord || c.type === 'deleted'))
+                      .map(c => c.queryWord)
+                      .filter(Boolean);
+
+                    return (
+                      <div className="flex flex-col gap-1.5 pt-2 text-xs font-medium border-t border-[#6150EA]/15 text-start">
+                        {sourceOnlyWords.length > 0 && (
+                          <div className="flex items-start gap-1.5 text-red-300">
+                            <span className="font-semibold shrink-0">
+                              {isAr ? 'كلمات في المصدر ليست في نصك:' : 'Words in the source not in your text:'}
+                            </span>
+                            <span className="text-red-200 font-bold">
+                              «{sourceOnlyWords.join(' ')}»
+                            </span>
+                          </div>
+                        )}
+                        {queryOnlyWords.length > 0 && (
+                          <div className="flex items-start gap-1.5 text-amber-300">
+                            <span className="font-semibold shrink-0">
+                              {isAr ? 'كلمات في نصك ليست في المصدر:' : 'Words in your text not in the source:'}
+                            </span>
+                            <span className="text-amber-200 font-bold">
+                              «{queryOnlyWords.join(' ')}»
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-red-300/80">
-                        {item.changedWords.map((cw, cwIdx) => (
-                          <span key={cwIdx} className="bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
-                            «{cw.queryWord}» {cw.sourceWord ? (isAr ? `(في الأصل: «${cw.sourceWord}»)` : `(Original: "${cw.sourceWord}")`) : ''}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Approximate match legend if any word was approximate */}
                   {item.hasApproximateMatch && (

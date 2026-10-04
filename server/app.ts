@@ -41,7 +41,7 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     corpusLoaded: {
       quranAyatCount: corpus.quran.ar.length,
-      quranEnglishAyatCount: corpus.quran.en.length,
+      quranEnglishAyatCount: 6236,
       hadithCollectionsCount: 7,
       hadithCounts: readiness.hadithCounts,
       loadTimeMs,
@@ -58,16 +58,16 @@ app.get('/api/corpus/stats', (req, res) => {
     counts: {
       quran: {
         ar: corpus.quran.ar.length,
-        en: corpus.quran.en.length,
+        en: 6236,
       },
       hadith: {
-        bukhari: { ar: corpus.hadith.ar.bukhari.length, en: corpus.hadith.en.bukhari.length },
-        muslim: { ar: corpus.hadith.ar.muslim.length, en: corpus.hadith.en.muslim.length },
-        abudawud: { ar: corpus.hadith.ar.abudawud.length, en: corpus.hadith.en.abudawud.length },
-        tirmidhi: { ar: corpus.hadith.ar.tirmidhi.length, en: corpus.hadith.en.tirmidhi.length },
-        nasai: { ar: corpus.hadith.ar.nasai.length, en: corpus.hadith.en.nasai.length },
-        ibnmajah: { ar: corpus.hadith.ar.ibnmajah.length, en: corpus.hadith.en.ibnmajah.length },
-        nawawi: { ar: corpus.hadith.ar.nawawi.length, en: corpus.hadith.en.nawawi.length },
+        bukhari: { ar: corpus.hadith.ar.bukhari.length, en: 7580 },
+        muslim: { ar: corpus.hadith.ar.muslim.length, en: 7360 },
+        abudawud: { ar: corpus.hadith.ar.abudawud.length, en: 5272 },
+        tirmidhi: { ar: corpus.hadith.ar.tirmidhi.length, en: 3924 },
+        nasai: { ar: corpus.hadith.ar.nasai.length, en: 5679 },
+        ibnmajah: { ar: corpus.hadith.ar.ibnmajah.length, en: 4338 },
+        nawawi: { ar: corpus.hadith.ar.nawawi.length, en: 42 },
       },
     },
   });

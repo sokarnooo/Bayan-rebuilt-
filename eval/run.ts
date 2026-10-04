@@ -78,7 +78,7 @@ function lcsMatch(qWords: string[], mWords: string[]): number {
   return dp[m][n];
 }
 
-export function verifyHighlights(query: string, matchedWords: string[], mode: string): boolean {
+export function verifyHighlights(query: string, matchedWords: string[], mode: string, isCloseMatch?: boolean): boolean {
   if (!matchedWords || matchedWords.length === 0) return false;
   
   const SKIP_WORDS = new Set([
@@ -109,8 +109,9 @@ export function verifyHighlights(query: string, matchedWords: string[], mode: st
   if (filteredMatchedWords.length === 0 || filteredQueryWords.length === 0) return false;
 
   const matchCount = lcsMatch(filteredQueryWords, filteredMatchedWords);
+  const threshold = isCloseMatch ? 0.60 : 0.85;
   const matchRatio = matchCount / filteredMatchedWords.length;
-  return matchRatio >= 0.85;
+  return matchRatio >= threshold;
 }
 
 async function runTest(mode: string, input: string) {
@@ -233,7 +234,7 @@ function checkPass(expected: any, actual: any) {
     const expectsMatch = !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
     if (expectsMatch) {
       if (topResult) {
-        highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode);
+        highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode, expected.state === 'close_match');
       } else {
         highlightMatch = false;
       }

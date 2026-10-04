@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { app, REGISTERED_ROUTES } from './app.ts';
 import { loadCorpus } from './corpus/loader.ts';
+import { runPrebuild } from './corpus/prebuild.ts';
 import { initHadithEngine, getIndexedCounts } from './matching/hadithMatcher.ts';
 import { initAyahEngine } from './matching/ayahMatcher.ts';
 
@@ -15,7 +16,7 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 async function startServer() {
   const distPath = path.resolve(__dirname, '../dist');
   const hasDist = fs.existsSync(distPath);
-  const isProd = process.env.NODE_ENV === 'production' || hasDist;
+  const isProd = process.env.NODE_ENV === 'production';
 
   if (!isProd) {
     const vite = await createViteServer({
@@ -23,7 +24,7 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
+  } else if (hasDist) {
     app.use(express.static(distPath));
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api')) return next();
@@ -33,10 +34,24 @@ async function startServer() {
 
   // Initialize Engines
   console.log('Initializing Search Engines...');
+  const corpusDir = fs.existsSync(path.resolve(__dirname, './corpus/data'))
+    ? path.resolve(__dirname, './corpus/data')
+    : (fs.existsSync(path.resolve(__dirname, '../server/corpus/data'))
+        ? path.resolve(__dirname, '../server/corpus/data')
+        : path.resolve(process.cwd(), 'server/corpus/data'));
+  const quranArFile = path.join(corpusDir, 'quran_ar.json');
+  if (!fs.existsSync(quranArFile)) {
+    console.log('Corpus data missing, running prebuild data acquisition...');
+    await runPrebuild();
+  }
   const { corpus, loadTimeMs: corpusTime } = loadCorpus();
   const { totalIndexed: hadithCount, indexMemoryBytes: hadithMem } = initHadithEngine();
   const { totalIndexed: ayahCount } = initAyahEngine();
   const counts = getIndexedCounts();
+
+  if (global.gc) {
+    global.gc();
+  }
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);

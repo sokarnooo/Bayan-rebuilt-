@@ -1,8 +1,8 @@
 // server/server.ts
 import express2 from "express";
-import fs4 from "fs";
-import path4 from "path";
-import { fileURLToPath as fileURLToPath4 } from "url";
+import fs5 from "fs";
+import path5 from "path";
+import { fileURLToPath as fileURLToPath5 } from "url";
 import { createServer as createViteServer } from "vite";
 
 // server/app.ts
@@ -14,13 +14,45 @@ import path from "path";
 import { fileURLToPath } from "url";
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
-var DATA_DIR = path.resolve(__dirname, "./data");
+var DATA_DIR = fs.existsSync(path.resolve(__dirname, "./data")) ? path.resolve(__dirname, "./data") : path.resolve(process.cwd(), "server/corpus/data");
 var cachedCorpus = null;
 var loadDurationMs = 0;
 function readJsonFile(filename) {
   const filePath = path.join(DATA_DIR, filename);
+  if (!fs.existsSync(filePath)) return {};
   const content = fs.readFileSync(filePath, "utf8");
   return JSON.parse(content);
+}
+var cachedQuranEn = null;
+function getQuranEn() {
+  if (!cachedQuranEn) {
+    const raw = readJsonFile("quran_en.json");
+    const list = raw.quran || raw[Object.keys(raw)[0]] || [];
+    cachedQuranEn = list.map((v) => ({
+      chapter: v.chapter,
+      verse: v.verse,
+      text: v.text || ""
+    }));
+  }
+  return cachedQuranEn;
+}
+var cachedHadithEn = {};
+function getHadithEn(col) {
+  if (!cachedHadithEn[col]) {
+    const raw = readJsonFile(`hadith_${col}_en.json`);
+    const list = raw.hadiths || [];
+    cachedHadithEn[col] = list.map((h) => ({
+      hadithnumber: h.hadithnumber,
+      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      text: h.text || "",
+      grades: [],
+      reference: {
+        book: h.reference?.book || 0,
+        hadith: h.reference?.hadith || 0
+      }
+    }));
+  }
+  return cachedHadithEn[col];
 }
 function loadCorpus() {
   if (cachedCorpus) {
@@ -28,31 +60,37 @@ function loadCorpus() {
   }
   const start = performance.now();
   const quranArRaw = readJsonFile("quran_ar.json");
-  const quranEnRaw = readJsonFile("quran_en.json");
+  const quranArVerses = quranArRaw.quran || quranArRaw[Object.keys(quranArRaw)[0]] || [];
+  const collections = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "nawawi"];
+  const hadithAr = {};
+  for (const col of collections) {
+    const raw = readJsonFile(`hadith_${col}_ar.json`);
+    const list = raw.hadiths || [];
+    hadithAr[col] = list.map((h) => ({
+      hadithnumber: h.hadithnumber,
+      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      text: h.text || "",
+      grades: h.grades || [],
+      reference: {
+        book: h.reference?.book || 0,
+        hadith: h.reference?.hadith || 0
+      }
+    }));
+  }
   const corpus = {
     quran: {
-      ar: quranArRaw.quran || quranArRaw[Object.keys(quranArRaw)[0]],
-      en: quranEnRaw.quran || quranEnRaw[Object.keys(quranEnRaw)[0]]
+      ar: quranArVerses,
+      get en() {
+        return getQuranEn();
+      }
     },
     hadith: {
-      ar: {
-        bukhari: readJsonFile("hadith_bukhari_ar.json").hadiths || [],
-        muslim: readJsonFile("hadith_muslim_ar.json").hadiths || [],
-        abudawud: readJsonFile("hadith_abudawud_ar.json").hadiths || [],
-        tirmidhi: readJsonFile("hadith_tirmidhi_ar.json").hadiths || [],
-        nasai: readJsonFile("hadith_nasai_ar.json").hadiths || [],
-        ibnmajah: readJsonFile("hadith_ibnmajah_ar.json").hadiths || [],
-        nawawi: readJsonFile("hadith_nawawi_ar.json").hadiths || []
-      },
-      en: {
-        bukhari: readJsonFile("hadith_bukhari_en.json").hadiths || [],
-        muslim: readJsonFile("hadith_muslim_en.json").hadiths || [],
-        abudawud: readJsonFile("hadith_abudawud_en.json").hadiths || [],
-        tirmidhi: readJsonFile("hadith_tirmidhi_en.json").hadiths || [],
-        nasai: readJsonFile("hadith_nasai_en.json").hadiths || [],
-        ibnmajah: readJsonFile("hadith_ibnmajah_en.json").hadiths || [],
-        nawawi: readJsonFile("hadith_nawawi_en.json").hadiths || []
-      }
+      ar: hadithAr,
+      en: new Proxy({}, {
+        get(_target, prop) {
+          return getHadithEn(prop);
+        }
+      })
     }
   };
   loadDurationMs = Math.round(performance.now() - start);
@@ -191,9 +229,20 @@ function wordSimilarityCorpusDerived(qNorm, cNorm, cRawUthmani) {
 }
 
 // server/matching/ayahMatcher.ts
+var quranEnMap = null;
+function getQuranEnText(chapter, verse) {
+  if (!quranEnMap) {
+    quranEnMap = /* @__PURE__ */ new Map();
+    const enVerses = getQuranEn();
+    for (const v of enVerses) {
+      quranEnMap.set(`${v.chapter}:${v.verse}`, v.text);
+    }
+  }
+  return quranEnMap.get(`${chapter}:${verse}`) || "";
+}
 var __filename2 = fileURLToPath2(import.meta.url);
 var __dirname2 = path2.dirname(__filename2);
-var DATA_DIR2 = path2.resolve(__dirname2, "../corpus/data");
+var DATA_DIR2 = fs2.existsSync(path2.resolve(__dirname2, "../corpus/data")) ? path2.resolve(__dirname2, "../corpus/data") : path2.resolve(process.cwd(), "server/corpus/data");
 var indexedAyat = [];
 var surahMetadata = /* @__PURE__ */ new Map();
 var surahWordStreams = /* @__PURE__ */ new Map();
@@ -220,18 +269,8 @@ function initAyahEngine() {
       totalVerses: c.verses ? c.verses.length : 0
     });
   }
-  const arRaw = JSON.parse(
-    fs2.readFileSync(path2.join(DATA_DIR2, "quran_ar.json"), "utf8")
-  );
-  const enRaw = JSON.parse(
-    fs2.readFileSync(path2.join(DATA_DIR2, "quran_en.json"), "utf8")
-  );
-  const arVerses = arRaw.quran || arRaw[Object.keys(arRaw)[0]];
-  const enVerses = enRaw.quran || enRaw[Object.keys(enRaw)[0]];
-  const enMap = /* @__PURE__ */ new Map();
-  for (const v of enVerses) {
-    enMap.set(`${v.chapter}:${v.verse}`, v.text);
-  }
+  const { corpus } = loadCorpus();
+  const arVerses = corpus.quran.ar;
   indexedAyat = arVerses.map((v, idx) => {
     let cleanDisplay = cleanWhitespaceBeforeCombiningMarks(v.text);
     cleanDisplay = cleanDisplay.replace(/[\u06DE\u06E9\u06DD\uFD3E\uFD3F]/g, " ").replace(/\s+/g, " ").trim();
@@ -265,7 +304,9 @@ function initAyahEngine() {
       chapter: v.chapter,
       verse: v.verse,
       text: cleanDisplay,
-      enText: enMap.get(`${v.chapter}:${v.verse}`) || "",
+      get enText() {
+        return getQuranEnText(v.chapter, v.verse);
+      },
       normalizedText: norm,
       alefInvariant: alefInv,
       rawWords,
@@ -304,7 +345,7 @@ function initAyahEngine() {
           posList = [];
           wordPositionIndex.set(alefInvariant, posList);
         }
-        posList.push({ chapter: ayah.chapter, globalIndex });
+        posList.push(ayah.chapter << 16 | globalIndex);
       }
       if (w > 0 && ayah.alefInvariantWords[w - 1]) {
         const prevAlef = ayah.alefInvariantWords[w - 1];
@@ -314,7 +355,7 @@ function initAyahEngine() {
           twoList = [];
           twoGramIndex.set(twoGram, twoList);
         }
-        twoList.push({ chapter: ayah.chapter, globalIndex: globalIndex - 1 });
+        twoList.push(ayah.chapter << 16 | globalIndex - 1);
       }
     }
   }
@@ -396,28 +437,34 @@ function searchAyah(rawQuery) {
       const twoGram = `${vAlef[i]}_${vAlef[i + 1]}`;
       const hits = twoGramIndex.get(twoGram);
       if (hits) {
-        for (const h of hits) {
-          if (variant.isBasmalaStripped && h.chapter === 1) continue;
-          let sSet = candidateStartsBySurah.get(h.chapter);
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 65535;
+          if (variant.isBasmalaStripped && ch === 1) continue;
+          let sSet = candidateStartsBySurah.get(ch);
           if (!sSet) {
             sSet = /* @__PURE__ */ new Set();
-            candidateStartsBySurah.set(h.chapter, sSet);
+            candidateStartsBySurah.set(ch, sSet);
           }
-          sSet.add(Math.max(0, h.globalIndex - i));
+          sSet.add(Math.max(0, gIdx - i));
         }
       }
     }
     for (let i = 0; i < Math.min(2, vLen); i++) {
       const hits = wordPositionIndex.get(vAlef[i]);
       if (hits) {
-        for (const h of hits) {
-          if (variant.isBasmalaStripped && h.chapter === 1) continue;
-          let sSet = candidateStartsBySurah.get(h.chapter);
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 65535;
+          if (variant.isBasmalaStripped && ch === 1) continue;
+          let sSet = candidateStartsBySurah.get(ch);
           if (!sSet) {
             sSet = /* @__PURE__ */ new Set();
-            candidateStartsBySurah.set(h.chapter, sSet);
+            candidateStartsBySurah.set(ch, sSet);
           }
-          sSet.add(Math.max(0, h.globalIndex - i));
+          sSet.add(Math.max(0, gIdx - i));
         }
       }
     }
@@ -754,7 +801,7 @@ import zlib from "zlib";
 import { fileURLToPath as fileURLToPath3 } from "url";
 var __filename3 = fileURLToPath3(import.meta.url);
 var __dirname3 = path3.dirname(__filename3);
-var DATA_DIR3 = path3.resolve(__dirname3, "../corpus/data");
+var DATA_DIR3 = fs3.existsSync(path3.resolve(__dirname3, "../corpus/data")) ? path3.resolve(__dirname3, "../corpus/data") : path3.resolve(process.cwd(), "server/corpus/data");
 var COLLECTION_METADATA = {
   bukhari: { arName: "\u0635\u062D\u064A\u062D \u0627\u0644\u0628\u062E\u0627\u0631\u064A", enName: "Sahih al-Bukhari" },
   muslim: { arName: "\u0635\u062D\u064A\u062D \u0645\u0633\u0644\u0645", enName: "Sahih Muslim" },
@@ -1047,7 +1094,8 @@ function isPunctuationWord(word) {
   return /^[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ\s\u200B-\u200F\uFEFF]*$/.test(norm);
 }
 function tokenizeDisplayWords(rawText) {
-  const displayWords = rawText.split(/\s+/).filter(Boolean);
+  const cleanRaw = (rawText || "").replace(/<br\s*\/?>/gi, " ");
+  const displayWords = cleanRaw.split(/\s+/).filter(Boolean);
   const tokens = displayWords.map((word, originalIndex) => {
     const norm = normalizeArabic(word).replace(/[\u200E\u200F]/g, "");
     const skip = isPunctuationWord(word) || !norm;
@@ -1070,7 +1118,6 @@ function tokenizeDisplayWords(rawText) {
       tokens[i].skip = true;
       tokens[i + 1].skip = true;
       tokens[i + 2].skip = true;
-      tokens[i + 3].skip = true;
     }
     if (norms[i] === "\u0639\u0644\u064A\u0647" && norms[i + 1] === "\u0627\u0644\u0633\u0644\u0627\u0645") {
       tokens[i].skip = true;
@@ -1332,26 +1379,6 @@ function findBestWindow(query, source) {
   const end = Math.min(source.length, bestStart + winLen + 6);
   return source.slice(start, end);
 }
-function findBestQueryWindow(query, source) {
-  if (query.length <= source.length + 8) return query;
-  const sWords = new Set(source.map((t) => t.normalized));
-  let bestStart = 0;
-  let maxHits = -1;
-  const winLen = Math.min(query.length, source.length + 6);
-  for (let i = 0; i <= query.length - winLen; i++) {
-    let hits = 0;
-    for (let j = 0; j < winLen; j++) {
-      if (sWords.has(query[i + j].normalized)) hits++;
-    }
-    if (hits > maxHits) {
-      maxHits = hits;
-      bestStart = i;
-    }
-  }
-  const start = Math.max(0, bestStart - 2);
-  const end = Math.min(query.length, bestStart + winLen + 4);
-  return query.slice(start, end);
-}
 function stripIsnadFromNormalized(normalizedText) {
   const words = normalizedText.split(/\s+/).filter(Boolean);
   if (words.length <= 4) {
@@ -1399,7 +1426,10 @@ function stripIsnadFromNormalized(normalizedText) {
 var corpusHadiths = [];
 var vocabulary = [];
 var wordToIdMap = /* @__PURE__ */ new Map();
-var twoGramIndex2 = /* @__PURE__ */ new Map();
+var twoGramKeyIndexMap = /* @__PURE__ */ new Map();
+var twoGramOffsets = new Uint32Array(0);
+var twoGramLengths = new Uint16Array(0);
+var twoGramPostings = new Int32Array(0);
 var isInitialized2 = false;
 var sectionsCache = /* @__PURE__ */ new Map();
 function getWordId(word, add = false) {
@@ -1411,23 +1441,13 @@ function getWordId(word, add = false) {
   }
   return id ?? -1;
 }
-function addToIndex(id1, id2, recordIdx) {
-  let m1 = twoGramIndex2.get(id1);
-  if (!m1) {
-    m1 = /* @__PURE__ */ new Map();
-    twoGramIndex2.set(id1, m1);
-  }
-  let list = m1.get(id2);
-  if (!list) {
-    list = [];
-    m1.set(id2, list);
-  }
-  if (list[list.length - 1] !== recordIdx) {
-    list.push(recordIdx);
-  }
-}
 function getIndexHits(id1, id2) {
-  return twoGramIndex2.get(id1)?.get(id2) || [];
+  const key = Number(id1) * 1e5 + Number(id2);
+  const kIdx = twoGramKeyIndexMap.get(key);
+  if (kIdx === void 0) return [];
+  const start = twoGramOffsets[kIdx];
+  const len = twoGramLengths[kIdx];
+  return twoGramPostings.subarray(start, start + len);
 }
 function getIndexedCounts() {
   const counts = {
@@ -1475,8 +1495,8 @@ function preprocessAllRawHadiths() {
       records.push({
         c: col,
         n: h.hadithnumber,
-        m: matnTokens.map((t) => getWordId(t, true)),
-        f: fullTokens.map((t) => getWordId(t, true)),
+        m: new Int32Array(matnTokens.map((t) => getWordId(t, true))),
+        f: new Int32Array(fullTokens.map((t) => getWordId(t, true))),
         r: strippedRatio,
         o: isnadWordOffset ?? 0
       });
@@ -1489,21 +1509,52 @@ function initHadithEngine() {
     return {
       totalIndexed: corpusHadiths.length,
       emptyExcluded: 379,
-      indexMemoryBytes: twoGramIndex2.size * 64
+      indexMemoryBytes: twoGramPostings.byteLength + twoGramOffsets.byteLength
     };
   }
   const startTime = performance.now();
   const prebuiltPathGz = path3.join(DATA_DIR3, "prebuilt_hadiths.json.gz");
   const prebuiltPathPlain = path3.join(DATA_DIR3, "prebuilt_hadiths.json");
   corpusHadiths = [];
-  twoGramIndex2.clear();
+  twoGramKeyIndexMap.clear();
   let emptyCount = 379;
   if (fs3.existsSync(prebuiltPathGz)) {
     const buffer = fs3.readFileSync(prebuiltPathGz);
     const decompressed = zlib.gunzipSync(buffer).toString("utf8");
     const data = JSON.parse(decompressed);
     vocabulary = data.v || [];
-    corpusHadiths = data.r || [];
+    const rawRecords = data.r || [];
+    let totalM = 0;
+    let totalF = 0;
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mLen = Array.isArray(r.m) ? r.m.length : r.m ? Object.keys(r.m).length : 0;
+      const fLen = Array.isArray(r.f) ? r.f.length : r.f ? Object.keys(r.f).length : 0;
+      totalM += mLen;
+      totalF += fLen;
+    }
+    const allM = new Int32Array(totalM);
+    const allF = new Int32Array(totalF);
+    let curM = 0;
+    let curF = 0;
+    corpusHadiths = new Array(rawRecords.length);
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mArr = Array.isArray(r.m) ? r.m : r.m ? Object.values(r.m) : [];
+      const fArr = Array.isArray(r.f) ? r.f : r.f ? Object.values(r.f) : [];
+      const mStart = curM;
+      for (let j = 0; j < mArr.length; j++) allM[curM++] = Number(mArr[j]);
+      const fStart = curF;
+      for (let j = 0; j < fArr.length; j++) allF[curF++] = Number(fArr[j]);
+      corpusHadiths[i] = {
+        c: r.c,
+        n: r.n,
+        m: allM.subarray(mStart, curM),
+        f: allF.subarray(fStart, curF),
+        r: r.r,
+        o: r.o
+      };
+    }
     sectionsCache.clear();
     if (data.s) {
       for (const [col, sData] of Object.entries(data.s)) {
@@ -1513,7 +1564,38 @@ function initHadithEngine() {
   } else if (fs3.existsSync(prebuiltPathPlain)) {
     const data = JSON.parse(fs3.readFileSync(prebuiltPathPlain, "utf8"));
     vocabulary = data.v || [];
-    corpusHadiths = data.r || [];
+    const rawRecords = data.r || [];
+    let totalM = 0;
+    let totalF = 0;
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mLen = Array.isArray(r.m) ? r.m.length : r.m ? Object.keys(r.m).length : 0;
+      const fLen = Array.isArray(r.f) ? r.f.length : r.f ? Object.keys(r.f).length : 0;
+      totalM += mLen;
+      totalF += fLen;
+    }
+    const allM = new Int32Array(totalM);
+    const allF = new Int32Array(totalF);
+    let curM = 0;
+    let curF = 0;
+    corpusHadiths = new Array(rawRecords.length);
+    for (let i = 0; i < rawRecords.length; i++) {
+      const r = rawRecords[i];
+      const mArr = Array.isArray(r.m) ? r.m : r.m ? Object.values(r.m) : [];
+      const fArr = Array.isArray(r.f) ? r.f : r.f ? Object.values(r.f) : [];
+      const mStart = curM;
+      for (let j = 0; j < mArr.length; j++) allM[curM++] = Number(mArr[j]);
+      const fStart = curF;
+      for (let j = 0; j < fArr.length; j++) allF[curF++] = Number(fArr[j]);
+      corpusHadiths[i] = {
+        c: r.c,
+        n: r.n,
+        m: allM.subarray(mStart, curM),
+        f: allF.subarray(fStart, curF),
+        r: r.r,
+        o: r.o
+      };
+    }
     if (data.s) {
       for (const [col, sData] of Object.entries(data.s)) {
         sectionsCache.set(col, sData);
@@ -1533,12 +1615,48 @@ function initHadithEngine() {
   for (let i = 0; i < vocabulary.length; i++) {
     wordToIdMap.set(vocabulary[i], i);
   }
-  twoGramIndex2.clear();
+  const keyCounts = /* @__PURE__ */ new Map();
   for (let recordIdx = 0; recordIdx < corpusHadiths.length; recordIdx++) {
-    const record = corpusHadiths[recordIdx];
-    const tokenIds = record.f;
+    const tokenIds = corpusHadiths[recordIdx].f;
+    const seen = /* @__PURE__ */ new Set();
     for (let i = 0; i < tokenIds.length - 1; i++) {
-      addToIndex(tokenIds[i], tokenIds[i + 1], recordIdx);
+      const key = tokenIds[i] * 1e5 + tokenIds[i + 1];
+      if (!seen.has(key)) {
+        seen.add(key);
+        keyCounts.set(key, (keyCounts.get(key) || 0) + 1);
+      }
+    }
+  }
+  let keyIdx = 0;
+  let totalPostings = 0;
+  for (const [key, count] of keyCounts.entries()) {
+    twoGramKeyIndexMap.set(key, keyIdx++);
+    totalPostings += count;
+  }
+  twoGramOffsets = new Uint32Array(keyIdx + 1);
+  twoGramLengths = new Uint16Array(keyIdx);
+  twoGramPostings = new Int32Array(totalPostings);
+  let curOffset = 0;
+  keyIdx = 0;
+  for (const [_, count] of keyCounts.entries()) {
+    twoGramOffsets[keyIdx] = curOffset;
+    twoGramLengths[keyIdx] = 0;
+    curOffset += count;
+    keyIdx++;
+  }
+  twoGramOffsets[keyIdx] = curOffset;
+  for (let recordIdx = 0; recordIdx < corpusHadiths.length; recordIdx++) {
+    const tokenIds = corpusHadiths[recordIdx].f;
+    const seen = /* @__PURE__ */ new Set();
+    for (let i = 0; i < tokenIds.length - 1; i++) {
+      const key = tokenIds[i] * 1e5 + tokenIds[i + 1];
+      if (!seen.has(key)) {
+        seen.add(key);
+        const kIdx = twoGramKeyIndexMap.get(key);
+        const pos = twoGramOffsets[kIdx] + twoGramLengths[kIdx];
+        twoGramPostings[pos] = recordIdx;
+        twoGramLengths[kIdx]++;
+      }
     }
   }
   isInitialized2 = true;
@@ -1547,7 +1665,7 @@ function initHadithEngine() {
   return {
     totalIndexed: corpusHadiths.length,
     emptyExcluded: emptyCount,
-    indexMemoryBytes: twoGramIndex2.size * 64
+    indexMemoryBytes: twoGramPostings.byteLength + twoGramOffsets.byteLength
   };
 }
 function scoreContainment(queryTokens, recordTokenIds) {
@@ -1727,7 +1845,7 @@ function findAttestationCluster(targetRecord) {
     if (candTokenIds.length < 3) continue;
     const shorter = targetTokenIds.length <= candTokenIds.length ? targetTokenIds : candTokenIds;
     const longer = targetTokenIds.length <= candTokenIds.length ? candTokenIds : targetTokenIds;
-    const shorterStrings = shorter.map((id) => vocabulary[id]);
+    const shorterStrings = Array.from(shorter).map((id) => vocabulary[id] || "");
     const res = scoreContainment(shorterStrings, longer);
     const containmentRatio = Math.round(res.score / 100 * 100) / 100;
     if (containmentRatio >= 0.8) {
@@ -1749,7 +1867,7 @@ function findAttestationCluster(targetRecord) {
         containmentRatio,
         grades,
         hasNoGrading,
-        matnSnippet: candidate.m.slice(0, 20).map((id) => vocabulary[id] || "").join(" ").slice(0, 100) + "..."
+        matnSnippet: Array.from(candidate.m.slice(0, 20)).map((id) => vocabulary[id] || "").join(" ").slice(0, 100) + "..."
       });
     }
   }
@@ -2003,23 +2121,24 @@ function searchHadith(rawQuery) {
     const { displayWords, nonSkipped } = tokenizeDisplayWords(rawArabicText);
     if (nonSkipped.length === 0) continue;
     const windowFull = findBestWindow(qNonSkipped, nonSkipped);
-    const qWinFull = findBestQueryWindow(qNonSkipped, windowFull);
-    const resFull = alignWordsDP(qWinFull, windowFull);
+    const resFull = alignWordsDP(qNonSkipped, windowFull);
     let res = resFull;
     let usedMatn = false;
     if (qStripped.isnadStripped && matnQTokens.length >= 3) {
       const windowMatn = findBestWindow(matnQTokens, nonSkipped);
-      const qWinMatn = findBestQueryWindow(matnQTokens, windowMatn);
-      const resMatn = alignWordsDP(qWinMatn, windowMatn);
+      const resMatn = alignWordsDP(matnQTokens, windowMatn);
       if (resMatn.confidence > resFull.confidence) {
         res = resMatn;
         usedMatn = true;
       }
     }
     if (res.confidence >= 70) {
-      const enList = corpus.hadith.en[record.c] || [];
-      const rawEn = enList.find((h) => h.hadithnumber === record.n);
-      const rawEnglishText = rawEn?.text;
+      let rawEnglishText = void 0;
+      if (isEnglish) {
+        const enList = corpus.hadith.en[record.c] || [];
+        const rawEn = enList.find((h) => h.hadithnumber === record.n);
+        rawEnglishText = rawEn?.text;
+      }
       const grades = (rawAr?.grades || []).map(parseGrade);
       const hasNoGrading = grades.length === 0;
       const bookNum = rawAr?.reference?.book ?? 0;
@@ -2059,7 +2178,8 @@ function searchHadith(rawQuery) {
         changedWords: res.changedWords,
         grades,
         hasNoGrading,
-        isnadStripped: usedMatn && record.r > 0
+        isnadStripped: qStripped.isnadStripped || usedMatn,
+        isnadChecked: !(qStripped.isnadStripped || usedMatn)
       });
     }
   }
@@ -2144,7 +2264,7 @@ app.get("/api/health", (req, res) => {
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
     corpusLoaded: {
       quranAyatCount: corpus.quran.ar.length,
-      quranEnglishAyatCount: corpus.quran.en.length,
+      quranEnglishAyatCount: 6236,
       hadithCollectionsCount: 7,
       hadithCounts: readiness.hadithCounts,
       loadTimeMs
@@ -2160,16 +2280,16 @@ app.get("/api/corpus/stats", (req, res) => {
     counts: {
       quran: {
         ar: corpus.quran.ar.length,
-        en: corpus.quran.en.length
+        en: 6236
       },
       hadith: {
-        bukhari: { ar: corpus.hadith.ar.bukhari.length, en: corpus.hadith.en.bukhari.length },
-        muslim: { ar: corpus.hadith.ar.muslim.length, en: corpus.hadith.en.muslim.length },
-        abudawud: { ar: corpus.hadith.ar.abudawud.length, en: corpus.hadith.en.abudawud.length },
-        tirmidhi: { ar: corpus.hadith.ar.tirmidhi.length, en: corpus.hadith.en.tirmidhi.length },
-        nasai: { ar: corpus.hadith.ar.nasai.length, en: corpus.hadith.en.nasai.length },
-        ibnmajah: { ar: corpus.hadith.ar.ibnmajah.length, en: corpus.hadith.en.ibnmajah.length },
-        nawawi: { ar: corpus.hadith.ar.nawawi.length, en: corpus.hadith.en.nawawi.length }
+        bukhari: { ar: corpus.hadith.ar.bukhari.length, en: 7580 },
+        muslim: { ar: corpus.hadith.ar.muslim.length, en: 7360 },
+        abudawud: { ar: corpus.hadith.ar.abudawud.length, en: 5272 },
+        tirmidhi: { ar: corpus.hadith.ar.tirmidhi.length, en: 3924 },
+        nasai: { ar: corpus.hadith.ar.nasai.length, en: 5679 },
+        ibnmajah: { ar: corpus.hadith.ar.ibnmajah.length, en: 4338 },
+        nawawi: { ar: corpus.hadith.ar.nawawi.length, en: 42 }
       }
     }
   });
@@ -2201,32 +2321,147 @@ app.post("/api/ocr", (req, res) => {
   res.json({ status: "scaffold_ready", text: "" });
 });
 
-// server/server.ts
+// server/corpus/prebuild.ts
+import fs4 from "fs";
+import path4 from "path";
+import zlib2 from "zlib";
+import { fileURLToPath as fileURLToPath4 } from "url";
 var __filename4 = fileURLToPath4(import.meta.url);
 var __dirname4 = path4.dirname(__filename4);
+var DATA_DIR4 = path4.resolve(__dirname4, "./data");
+var EXPECTED_COUNTS = {
+  bukhari: 7580,
+  muslim: 7360,
+  abudawud: 5272,
+  tirmidhi: 3924,
+  nasai: 5679,
+  ibnmajah: 4338,
+  nawawi: 42
+};
+var QURAN_EXPECTED = 6236;
+var COLLECTIONS = Object.keys(EXPECTED_COUNTS);
+async function downloadFile(url, dest) {
+  console.log(`Downloading ${url} ...`);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
+  const text = await res.text();
+  fs4.writeFileSync(dest, text);
+}
+async function runPrebuild() {
+  console.log("====================================================");
+  console.log("Starting Prebuild: Data Acquisition & Index Generation");
+  const startTime = performance.now();
+  if (!fs4.existsSync(DATA_DIR4)) {
+    fs4.mkdirSync(DATA_DIR4, { recursive: true });
+  }
+  try {
+    for (const col of COLLECTIONS) {
+      const arPath = path4.join(DATA_DIR4, `hadith_${col}_ar.json`);
+      const enPath = path4.join(DATA_DIR4, `hadith_${col}_en.json`);
+      if (!fs4.existsSync(arPath)) {
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/ara-${col}.json`, arPath);
+      }
+      if (!fs4.existsSync(enPath)) {
+        await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/eng-${col}.json`, enPath);
+      }
+    }
+    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_info.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path4.join(DATA_DIR4, "quran_info.json"));
+    }
+    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_ar.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path4.join(DATA_DIR4, "quran_ar.json"));
+    }
+    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_en.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-abdullahyusufal.json`, path4.join(DATA_DIR4, "quran_en.json"));
+    }
+  } catch (err) {
+    console.error("CRITICAL: Download failed. Prebuild aborted.");
+    console.error(err);
+    process.exit(1);
+  }
+  console.log("Preprocessing records and verifying counts...");
+  const { records, vocab, sections, emptyCount } = preprocessAllRawHadiths();
+  const actualCounts = {};
+  for (const r of records) {
+    actualCounts[r.c] = (actualCounts[r.c] || 0) + 1;
+  }
+  let mismatch = false;
+  for (const col of COLLECTIONS) {
+    if (actualCounts[col] !== EXPECTED_COUNTS[col]) {
+      console.error(`ERROR: ${col} count mismatch! Expected ${EXPECTED_COUNTS[col]}, got ${actualCounts[col]}`);
+      mismatch = true;
+    }
+  }
+  const quranAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR4, "quran_ar.json"), "utf8"));
+  const quranList = quranAr.quran || quranAr[Object.keys(quranAr)[0]];
+  if (quranList.length !== QURAN_EXPECTED) {
+    console.error(`ERROR: Quran count mismatch! Expected ${QURAN_EXPECTED}, got ${quranList.length}`);
+    mismatch = true;
+  }
+  if (mismatch) {
+    console.error("CRITICAL: Data verification failed. Build aborted.");
+    process.exit(1);
+  }
+  console.log("Verification PASSED.");
+  const outPathGz = path4.join(DATA_DIR4, "prebuilt_hadiths.json.gz");
+  const serializedRecords = records.map((r) => ({
+    c: r.c,
+    n: r.n,
+    m: Array.from(r.m),
+    f: Array.from(r.f),
+    r: r.r,
+    o: r.o
+  }));
+  const jsonStr = JSON.stringify({ v: vocab, r: serializedRecords, s: sections });
+  const compressed = zlib2.gzipSync(Buffer.from(jsonStr, "utf8"));
+  fs4.writeFileSync(outPathGz, compressed);
+  const elapsed = Math.round(performance.now() - startTime);
+  console.log(`Prebuild Completed successfully in ${elapsed}ms!`);
+  console.log(`Saved ${records.length} records to ${outPathGz} (${compressed.length} bytes).`);
+  console.log("====================================================");
+}
+if (process.argv[1]?.includes("prebuild")) {
+  runPrebuild().catch((err) => {
+    console.error("Prebuild failed:", err);
+    process.exit(1);
+  });
+}
+
+// server/server.ts
+var __filename5 = fileURLToPath5(import.meta.url);
+var __dirname5 = path5.dirname(__filename5);
 var PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3e3;
 async function startServer() {
-  const distPath = path4.resolve(__dirname4, "../dist");
-  const hasDist = fs4.existsSync(distPath);
-  const isProd = process.env.NODE_ENV === "production" || hasDist;
+  const distPath = path5.resolve(__dirname5, "../dist");
+  const hasDist = fs5.existsSync(distPath);
+  const isProd = process.env.NODE_ENV === "production";
   if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true, host: true },
       appType: "spa"
     });
     app.use(vite.middlewares);
-  } else {
+  } else if (hasDist) {
     app.use(express2.static(distPath));
     app.get("*", (req, res, next) => {
       if (req.path.startsWith("/api")) return next();
-      res.sendFile(path4.join(distPath, "index.html"));
+      res.sendFile(path5.join(distPath, "index.html"));
     });
   }
   console.log("Initializing Search Engines...");
+  const corpusDir = fs5.existsSync(path5.resolve(__dirname5, "./corpus/data")) ? path5.resolve(__dirname5, "./corpus/data") : fs5.existsSync(path5.resolve(__dirname5, "../server/corpus/data")) ? path5.resolve(__dirname5, "../server/corpus/data") : path5.resolve(process.cwd(), "server/corpus/data");
+  const quranArFile = path5.join(corpusDir, "quran_ar.json");
+  if (!fs5.existsSync(quranArFile)) {
+    console.log("Corpus data missing, running prebuild data acquisition...");
+    await runPrebuild();
+  }
   const { corpus, loadTimeMs: corpusTime } = loadCorpus();
   const { totalIndexed: hadithCount, indexMemoryBytes: hadithMem } = initHadithEngine();
   const { totalIndexed: ayahCount } = initAyahEngine();
   const counts = getIndexedCounts();
+  if (global.gc) {
+    global.gc();
+  }
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`====================================================`);
     console.log(`Bayan Server listening on http://0.0.0.0:${PORT}`);

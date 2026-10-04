@@ -312,8 +312,13 @@ async function prepare() {
     const clean = stripMarks(h.text);
     const words = clean.split(/\s+/).filter(Boolean);
     if (words.length < 6) throw new Error('Hadith too short for word change');
-    const mid = Math.floor(words.length / 2);
-    words[mid] = poolWords[(i * 43) % poolWords.length];
+    let targetIdx = Math.floor(words.length / 2);
+    if (hInfo.col === 'tirmidhi' && hInfo.num === 20) {
+      // In Tirmidhi 20, words in the middle sit in Abu Isa's commentary. Select 'يرتاد' inside the matn.
+      const pos = words.indexOf('يرتاد');
+      targetIdx = pos !== -1 ? pos : targetIdx;
+    }
+    words[targetIdx] = poolWords[(i * 43) % poolWords.length];
     
     cases.push({
       id: `hadith_changed_${i + 1}`,

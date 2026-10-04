@@ -31,7 +31,7 @@ async function downloadFile(url: string, dest: string) {
   fs.writeFileSync(dest, text);
 }
 
-async function runPrebuild() {
+export async function runPrebuild() {
   console.log('====================================================');
   console.log('Starting Prebuild: Data Acquisition & Index Generation');
   const startTime = performance.now();
@@ -104,7 +104,15 @@ async function runPrebuild() {
 
   // 3. Save Gzipped Index
   const outPathGz = path.join(DATA_DIR, 'prebuilt_hadiths.json.gz');
-  const jsonStr = JSON.stringify({ v: vocab, r: records, s: sections });
+  const serializedRecords = records.map(r => ({
+    c: r.c,
+    n: r.n,
+    m: Array.from(r.m),
+    f: Array.from(r.f),
+    r: r.r,
+    o: r.o,
+  }));
+  const jsonStr = JSON.stringify({ v: vocab, r: serializedRecords, s: sections });
   const compressed = zlib.gzipSync(Buffer.from(jsonStr, 'utf8'));
   fs.writeFileSync(outPathGz, compressed);
 
@@ -114,7 +122,9 @@ async function runPrebuild() {
   console.log('====================================================');
 }
 
-runPrebuild().catch(err => {
-  console.error('Prebuild failed:', err);
-  process.exit(1);
-});
+if (process.argv[1]?.includes('prebuild')) {
+  runPrebuild().catch(err => {
+    console.error('Prebuild failed:', err);
+    process.exit(1);
+  });
+}

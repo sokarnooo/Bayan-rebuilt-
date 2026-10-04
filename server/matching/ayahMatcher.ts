@@ -7,6 +7,19 @@ import {
   cleanWhitespaceBeforeCombiningMarks,
   wordSimilarityCorpusDerived,
 } from './normalizer.ts';
+import { loadCorpus, getQuranEn } from '../corpus/loader.ts';
+
+let quranEnMap: Map<string, string> | null = null;
+export function getQuranEnText(chapter: number, verse: number): string {
+  if (!quranEnMap) {
+    quranEnMap = new Map();
+    const enVerses = getQuranEn();
+    for (const v of enVerses) {
+      quranEnMap.set(`${v.chapter}:${v.verse}`, v.text);
+    }
+  }
+  return quranEnMap.get(`${chapter}:${verse}`) || '';
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -113,7 +126,9 @@ export interface AyahSearchResponse {
   executionTimeMs: number;
 }
 
-const DATA_DIR = path.resolve(__dirname, '../corpus/data');
+const DATA_DIR = fs.existsSync(path.resolve(__dirname, '../corpus/data'))
+  ? path.resolve(__dirname, '../corpus/data')
+  : path.resolve(process.cwd(), 'server/corpus/data');
 
 let indexedAyat: IndexedAyah[] = [];
 let surahMetadata: Map<number, SurahMeta> = new Map();
@@ -124,9 +139,9 @@ let surahAyatMap: Map<number, IndexedAyah[]> = new Map();
 const exactNormalizedMap: Map<string, number[]> = new Map();
 const exactAlefMap: Map<string, number[]> = new Map();
 
-// Inverted index for word tokens -> { chapter, globalIndex }
-const wordPositionIndex: Map<string, Array<{ chapter: number; globalIndex: number }>> = new Map();
-const twoGramIndex: Map<string, Array<{ chapter: number; globalIndex: number }>> = new Map();
+// Inverted index for word tokens -> packed (chapter << 16) | globalIndex
+const wordPositionIndex: Map<string, number[]> = new Map();
+const twoGramIndex: Map<string, number[]> = new Map();
 
 let isInitialized = false;
 
@@ -149,20 +164,8 @@ export function initAyahEngine(): { totalIndexed: number } {
     });
   }
 
-  const arRaw = JSON.parse(
-    fs.readFileSync(path.join(DATA_DIR, 'quran_ar.json'), 'utf8')
-  );
-  const enRaw = JSON.parse(
-    fs.readFileSync(path.join(DATA_DIR, 'quran_en.json'), 'utf8')
-  );
-
-  const arVerses = arRaw.quran || arRaw[Object.keys(arRaw)[0]];
-  const enVerses = enRaw.quran || enRaw[Object.keys(enRaw)[0]];
-
-  const enMap = new Map<string, string>();
-  for (const v of enVerses) {
-    enMap.set(`${v.chapter}:${v.verse}`, v.text);
-  }
+  const { corpus } = loadCorpus();
+  const arVerses = corpus.quran.ar;
 
   indexedAyat = arVerses.map((v: { chapter: number; verse: number; text: string }, idx: number) => {
     let cleanDisplay = cleanWhitespaceBeforeCombiningMarks(v.text);
@@ -203,7 +206,9 @@ export function initAyahEngine(): { totalIndexed: number } {
       chapter: v.chapter,
       verse: v.verse,
       text: cleanDisplay,
-      enText: enMap.get(`${v.chapter}:${v.verse}`) || '',
+      get enText() {
+        return getQuranEnText(v.chapter, v.verse);
+      },
       normalizedText: norm,
       alefInvariant: alefInv,
       rawWords,
@@ -249,7 +254,7 @@ export function initAyahEngine(): { totalIndexed: number } {
           posList = [];
           wordPositionIndex.set(alefInvariant, posList);
         }
-        posList.push({ chapter: ayah.chapter, globalIndex });
+        posList.push((ayah.chapter << 16) | globalIndex);
       }
 
       if (w > 0 && ayah.alefInvariantWords[w - 1]) {
@@ -260,7 +265,7 @@ export function initAyahEngine(): { totalIndexed: number } {
           twoList = [];
           twoGramIndex.set(twoGram, twoList);
         }
-        twoList.push({ chapter: ayah.chapter, globalIndex: globalIndex - 1 });
+        twoList.push((ayah.chapter << 16) | (globalIndex - 1));
       }
     }
   }
@@ -377,14 +382,17 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       const twoGram = `${vAlef[i]}_${vAlef[i + 1]}`;
       const hits = twoGramIndex.get(twoGram);
       if (hits) {
-        for (const h of hits) {
-          if (variant.isBasmalaStripped && h.chapter === 1) continue;
-          let sSet = candidateStartsBySurah.get(h.chapter);
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 0xFFFF;
+          if (variant.isBasmalaStripped && ch === 1) continue;
+          let sSet = candidateStartsBySurah.get(ch);
           if (!sSet) {
             sSet = new Set();
-            candidateStartsBySurah.set(h.chapter, sSet);
+            candidateStartsBySurah.set(ch, sSet);
           }
-          sSet.add(Math.max(0, h.globalIndex - i));
+          sSet.add(Math.max(0, gIdx - i));
         }
       }
     }
@@ -393,14 +401,17 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
     for (let i = 0; i < Math.min(2, vLen); i++) {
       const hits = wordPositionIndex.get(vAlef[i]);
       if (hits) {
-        for (const h of hits) {
-          if (variant.isBasmalaStripped && h.chapter === 1) continue;
-          let sSet = candidateStartsBySurah.get(h.chapter);
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 0xFFFF;
+          if (variant.isBasmalaStripped && ch === 1) continue;
+          let sSet = candidateStartsBySurah.get(ch);
           if (!sSet) {
             sSet = new Set();
-            candidateStartsBySurah.set(h.chapter, sSet);
+            candidateStartsBySurah.set(ch, sSet);
           }
-          sSet.add(Math.max(0, h.globalIndex - i));
+          sSet.add(Math.max(0, gIdx - i));
         }
       }
     }
