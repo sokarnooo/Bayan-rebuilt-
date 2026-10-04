@@ -459,7 +459,6 @@ export function tokenizeDisplayWords(rawText: string): { displayWords: string[];
       tokens[i].skip = true;
       tokens[i + 1].skip = true;
       tokens[i + 2].skip = true;
-      tokens[i + 3].skip = true;
     }
     if (norms[i] === 'عليه' && norms[i + 1] === 'السلام') {
       tokens[i].skip = true;
@@ -1573,15 +1572,13 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
 
     // Fast window extraction
     const windowFull = findBestWindow(qNonSkipped, nonSkipped);
-    const qWinFull = findBestQueryWindow(qNonSkipped, windowFull);
-    const resFull = alignWordsDP(qWinFull, windowFull);
+    const resFull = alignWordsDP(qNonSkipped, windowFull);
     let res = resFull;
     let usedMatn = false;
 
     if (qStripped.isnadStripped && matnQTokens.length >= 3) {
       const windowMatn = findBestWindow(matnQTokens, nonSkipped);
-      const qWinMatn = findBestQueryWindow(matnQTokens, windowMatn);
-      const resMatn = alignWordsDP(qWinMatn, windowMatn);
+      const resMatn = alignWordsDP(matnQTokens, windowMatn);
       if (resMatn.confidence > resFull.confidence) {
         res = resMatn;
         usedMatn = true;

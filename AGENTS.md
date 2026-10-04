@@ -53,6 +53,16 @@
 - **Arabic Key Phrases**: «لم يتم العثور على تطابق موثوق، راجع أهل العلم» (Mandatory referral).
 - **Forbidden**: No "Ask AI" chat bubbles, no system logs in UI, no unverified grades.
 
+## Session Protocol
+At the start of every session and after any interruption, read `AGENTS.md`, `current_state.md`, and `PROGRESS.md`, run the build (`npm run build`), then continue from the first unchecked item. One task per message.
+After EVERY task:
+1. Tick `PROGRESS.md` with date and a one-line result.
+2. Append a judge-facing entry to `DEVLOG.md`.
+3. Update `current_state.md` if state or decisions changed.
+4. List the changed files (the owner commits to GitHub; no git in the container).
+When the last item of a list is done, add a "Completed" section at the top of `PROGRESS.md` (date, finished items, key numbers, proposed next list) and wait for the owner.
+Token discipline: long commands run in the foreground with output redirected to a file, read once; no polling; run eval in `--quiet` mode with one run (`--runs 1`); no full JSON dumps; read files by line range. Never change an evaluation expectation without recording id, old value, new value, and reason in `DEVLOG.md`.
+
 ## Working Process
 - Investigate code first -> Report proposed changes -> Build -> Test with real terminal output.
 - Never claim "100%" or "Ready" without running the evaluation harness.

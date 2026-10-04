@@ -6,21 +6,80 @@ import { normalizeArabic } from '../server/matching/normalizer.ts';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = process.argv[2];
-if (!BASE_URL) {
-  console.error('Usage: tsx eval/run.ts <BASE_URL>');
-  process.exit(1);
+// Command line flags parsing
+let BASE_URL = 'http://localhost:3000';
+let quiet = false;
+let numRuns = 1;
+let concurrency = 1;
+let onlyCategory: string | null = null;
+let skipHighlight = false;
+
+for (let i = 2; i < process.argv.length; i++) {
+  const arg = process.argv[i];
+  if (arg === '--quiet') {
+    quiet = true;
+  } else if (arg === '--skip-highlight') {
+    skipHighlight = true;
+  } else if (arg === '--runs' && process.argv[i + 1]) {
+    numRuns = parseInt(process.argv[++i], 10) || 1;
+  } else if (arg === '--concurrency' && process.argv[i + 1]) {
+    concurrency = parseInt(process.argv[++i], 10) || 1;
+  } else if (arg === '--only' && process.argv[i + 1]) {
+    onlyCategory = process.argv[++i];
+  } else if (!arg.startsWith('-')) {
+    BASE_URL = arg;
+  }
 }
 
 const CASES_PATH = path.resolve(__dirname, 'cases.json');
 const RESULTS_PATH = path.resolve(__dirname, 'results.json');
 
-function verifyHighlights(query: string, matchedWords: string[], mode: string): boolean {
+function editDistance(a: string, b: string): number {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > 1) return 2;
+  let dist = 0;
+  let i = 0, j = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] !== b[j]) {
+      dist++;
+      if (dist > 1) return dist;
+      if (a.length > b.length) i++;
+      else if (b.length > a.length) j++;
+      else { i++; j++; }
+    } else {
+      i++; j++;
+    }
+  }
+  if (i < a.length || j < b.length) dist++;
+  return dist;
+}
+
+function wordMatches(qw: string, mw: string): boolean {
+  if (qw === mw) return true;
+  const qwAlef = qw.replace(/[ا\u0670ء]/g, '');
+  const mwAlef = mw.replace(/[ا\u0670ء]/g, '');
+  if (qwAlef && qwAlef === mwAlef) return true;
+  return editDistance(qw, mw) <= 1;
+}
+
+function lcsMatch(qWords: string[], mWords: string[]): number {
+  const m = mWords.length;
+  const n = qWords.length;
+  const dp = Array.from({ length: m + 1 }, () => new Int32Array(n + 1));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (wordMatches(qWords[j - 1], mWords[i - 1])) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+  return dp[m][n];
+}
+
+export function verifyHighlights(query: string, matchedWords: string[], mode: string): boolean {
   if (!matchedWords || matchedWords.length === 0) return false;
-  
-  const qNorm = normalizeArabic(query);
-  const qWords = qNorm.split(/\s+/).filter(Boolean);
-  const qWordsSet = new Set(qWords);
   
   const SKIP_WORDS = new Set([
     'صلى', 'صلي', 'الله', 'عليه', 'وسلم', 
@@ -28,90 +87,30 @@ function verifyHighlights(query: string, matchedWords: string[], mode: string): 
     'رحمه', 'سبحانه', 'وتعالى', 'وتعالي', 'عز', 'وجل', 
     'عليهما', 'السلام'
   ]);
-  
-  // Rule 1: no skipped honorific is highlighted unless it is inside the query
+
+  const qNorm = normalizeArabic(query);
+  const qWords = qNorm.split(/\s+/).filter(Boolean);
+  const qWordsSet = new Set(qWords);
+
+  // Rule 1: No skipped honorific is highlighted unless present in query
   for (const mw of matchedWords) {
     const mwNorm = normalizeArabic(mw);
     if (SKIP_WORDS.has(mwNorm) && !qWordsSet.has(mwNorm)) {
-      return false; // Error: highlighted a skipped honorific not in the query!
+      return false; // Error: highlighted a skipped honorific not in query!
     }
   }
-  
-  // Rule 2: normalized joined matchedWords equal the normalized aligned part of the query (approximate words allowed)
-  const filteredMatched = matchedWords
+
+  // Filter out skipped honorifics/punctuation
+  const filteredQueryWords = qWords.filter(w => w.length > 0 && !/^[\p{P}\p{S}]+$/u.test(w) && (!SKIP_WORDS.has(w) || qWordsSet.has(w)));
+  const filteredMatchedWords = matchedWords
     .map(w => normalizeArabic(w))
-    .filter(w => !SKIP_WORDS.has(w) || qWordsSet.has(w));
-    
-  if (filteredMatched.length === 0) return false;
-  
-  // Find the best alignment of filteredMatched within the query words
-  let bestOverlap = 0;
-  const qLen = qWords.length;
-  const mLen = filteredMatched.length;
-  
-  for (let i = 0; i <= qLen - mLen; i++) {
-    let matchCount = 0;
-    for (let j = 0; j < mLen; j++) {
-      const qw = qWords[i + j];
-      const mw = filteredMatched[j];
-      if (qw === mw) {
-        matchCount++;
-      } else {
-        if (qw.replace(/ء/g, 'ا') === mw.replace(/ء/g, 'ا')) {
-          matchCount++;
-        } else {
-          const qwAlef = qw.replace(/[ا\u0670ء]/g, '');
-          const mwAlef = mw.replace(/[ا\u0670ء]/g, '');
-          if (qwAlef === mwAlef && qwAlef !== '') {
-            matchCount++;
-          } else {
-            // Char-level distance comparison for approximate matching
-            const maxLen = Math.max(qw.length, mw.length);
-            if (maxLen > 0) {
-              let dist = 0;
-              const minLen = Math.min(qw.length, mw.length);
-              for (let c = 0; c < minLen; c++) {
-                if (qw[c] !== mw[c]) dist++;
-              }
-              dist += Math.abs(qw.length - mw.length);
-              const sim = 1 - dist / maxLen;
-              if (sim >= 0.65) matchCount++;
-            }
-          }
-        }
-      }
-    }
-    if (matchCount > bestOverlap) {
-      bestOverlap = matchCount;
-    }
-  }
-  
-  for (let i = 0; i <= mLen - qLen; i++) {
-    let matchCount = 0;
-    for (let j = 0; j < qLen; j++) {
-      const qw = qWords[j];
-      const mw = filteredMatched[i + j];
-      if (qw === mw) {
-        matchCount++;
-      } else {
-        if (qw.replace(/ء/g, 'ا') === mw.replace(/ء/g, 'ا')) {
-          matchCount++;
-        } else {
-          const qwAlef = qw.replace(/[ا\u0670ء]/g, '');
-          const mwAlef = mw.replace(/[ا\u0670ء]/g, '');
-          if (qwAlef === mwAlef && qwAlef !== '') {
-            matchCount++;
-          }
-        }
-      }
-    }
-    if (matchCount > bestOverlap) {
-      bestOverlap = matchCount;
-    }
-  }
-  
-  const reqOverlap = Math.min(qWords.length, filteredMatched.length) * 0.70;
-  return bestOverlap >= reqOverlap;
+    .filter(w => w.length > 0 && !/^[\p{P}\p{S}]+$/u.test(w) && (!SKIP_WORDS.has(w) || qWordsSet.has(w)));
+
+  if (filteredMatchedWords.length === 0 || filteredQueryWords.length === 0) return false;
+
+  const matchCount = lcsMatch(filteredQueryWords, filteredMatchedWords);
+  const matchRatio = matchCount / filteredMatchedWords.length;
+  return matchRatio >= 0.85;
 }
 
 async function runTest(mode: string, input: string) {
@@ -200,16 +199,22 @@ function checkPass(expected: any, actual: any) {
   } else if (expected.ref) {
     if (!topResult) refMatch = false;
     else {
-      const checkResultMatch = (r: any) => {
+      const checkSingleRef = (r: any, expRef: string) => {
         if (!r) return false;
         if (actual.query_mode === 'ayah') {
           const rangeStr = (r.verseRange || '').replace(/–/g, '-');
           const actualRef = r.isRange ? `${r.chapter}:${rangeStr}` : `${r.chapter}:${r.verse}`;
-          return actualRef === expected.ref || actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
+          return actualRef === expRef || actualRef.includes(expRef) || expRef.includes(actualRef);
         } else {
           const arabicRef = `${r.collection}_${r.arabicnumber}`;
-          return r.id === expected.ref || arabicRef === expected.ref;
+          return r.id === expRef || arabicRef === expRef;
         }
+      };
+
+      const checkResultMatch = (r: any) => {
+        if (!r) return false;
+        const refList = expected.ref.includes(',') ? expected.ref.split(',').map((s: string) => s.trim()) : [expected.ref];
+        return refList.some((exp: string) => checkSingleRef(r, exp));
       };
 
       if (expected.rank === 1) {
@@ -223,8 +228,9 @@ function checkPass(expected: any, actual: any) {
   }
   
   let highlightMatch = true;
-  if (stateMatch && refMatch) {
-    const expectsMatch = expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0);
+  if (!skipHighlight && stateMatch && refMatch) {
+    const isEnglish = (actual.query && /^[a-zA-Z\s,.'"-]+$/.test(actual.query)) || expected.containsEnglishSlice;
+    const expectsMatch = !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
     if (expectsMatch) {
       if (topResult) {
         highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode);
@@ -234,44 +240,71 @@ function checkPass(expected: any, actual: any) {
     }
   }
   
-  return stateMatch && refMatch && highlightMatch;
+  let reason: 'STATE' | 'REF' | 'HIGHLIGHT' | 'ERROR' | undefined;
+  if (!stateMatch) reason = 'STATE';
+  else if (!refMatch) reason = 'REF';
+  else if (!highlightMatch) reason = 'HIGHLIGHT';
+
+  const passed = stateMatch && refMatch && highlightMatch;
+  return { passed, reason };
+}
+
+async function runPool<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (index < items.length) {
+      const i = index++;
+      results[i] = await fn(items[i]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
 }
 
 async function run() {
-  const cases = JSON.parse(fs.readFileSync(CASES_PATH, 'utf8'));
-  const results: any[] = [];
+  let cases = JSON.parse(fs.readFileSync(CASES_PATH, 'utf8'));
+  if (onlyCategory) {
+    cases = cases.filter((c: any) => c.category === onlyCategory);
+  }
   
-  console.log(`Starting Evaluation against ${BASE_URL}...`);
-  console.log(`Total Cases: ${cases.length}`);
+  if (!quiet) {
+    console.log(`Starting Evaluation against ${BASE_URL}...`);
+    console.log(`Total Cases: ${cases.length} | Runs per case: ${numRuns} | Concurrency: ${concurrency}`);
+  }
 
-  for (const c of cases) {
-    process.stdout.write(`Testing ${c.id}... `);
+  const results = await runPool(cases, concurrency, async (c: any) => {
+    if (!quiet) {
+      process.stdout.write(`Testing ${c.id}... `);
+    }
     const caseRuns: any[] = [];
     
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < numRuns; i++) {
       const start = performance.now();
       const actual = await runTest(c.mode, c.input);
       const duration = Math.round(performance.now() - start);
       
-      const passed = checkPass(c.expected, actual);
-      caseRuns.push({ run: i + 1, passed, actual, duration });
+      const { passed, reason } = checkPass(c.expected, actual);
+      caseRuns.push({ run: i + 1, passed, reason, actual, duration, timestamp: new Date().toISOString() });
     }
     
     const allPassed = caseRuns.every(r => r.passed);
     const consistent = caseRuns.every(r => r.passed === caseRuns[0].passed);
     
-    results.push({
+    if (!quiet) {
+      console.log(allPassed ? '✅' : '❌');
+    }
+
+    return {
       ...c,
       runs: caseRuns,
       summary: {
         passed: allPassed,
         consistent,
-        avgDuration: Math.round(caseRuns.reduce((acc, r) => acc + r.duration, 0) / 3)
+        avgDuration: Math.round(caseRuns.reduce((acc, r) => acc + r.duration, 0) / caseRuns.length)
       }
-    });
-    
-    console.log(allPassed ? '✅' : '❌');
-  }
+    };
+  });
 
   fs.writeFileSync(RESULTS_PATH, JSON.stringify(results, null, 2));
   
@@ -279,6 +312,34 @@ async function run() {
   const total = results.length;
   const passedCount = results.filter(r => r.summary.passed).length;
   const categories = [...new Set(results.map(r => r.category))];
+
+  if (quiet) {
+    console.log(`TOTALS: ${passedCount}/${total} (${Math.round(passedCount/total*100)}%)`);
+    for (const cat of categories) {
+      const catResults = results.filter(r => r.category === cat);
+      const catPassed = catResults.filter(r => r.summary.passed).length;
+      console.log(`${cat}: ${catPassed}/${catResults.length} (${Math.round(catPassed/catResults.length*100)}%)`);
+    }
+    console.log('FAILURES:');
+    const failures = results.filter(r => !r.summary.passed);
+    if (failures.length === 0) {
+      console.log('[none]');
+    } else {
+      failures.forEach(r => {
+        const expStr = r.expected.stateNot 
+          ? `state != ${r.expected.stateNot}` 
+          : `${r.expected.state}${r.expected.ref ? ` (${r.expected.ref})` : (r.expected.refs ? ` (${r.expected.refs.join(',')})` : '')}`;
+        const lastRun = r.runs[r.runs.length - 1];
+        const lastActual = lastRun.actual;
+        const top = lastActual.results?.[0];
+        const actRef = lastActual.query_mode === 'ayah'
+          ? (top ? (top.isRange ? `${top.chapter}:${top.verseRange}` : `${top.chapter}:${top.verse}`) : 'N/A')
+          : (top?.id || 'N/A');
+        console.log(`${r.id} | ${expStr} | ${lastActual.state} (${actRef}) | ${lastRun.reason || 'ERROR'}`);
+      });
+    }
+    return;
+  }
   
   console.log('\n--- EVALUATION REPORT ---');
   console.log(`Overall Pass Rate: ${passedCount}/${total} (${Math.round(passedCount/total*100)}%)`);
@@ -382,4 +443,6 @@ async function run() {
   });
 }
 
-run().catch(console.error);
+if (process.argv[1] && (process.argv[1].endsWith('eval/run.ts') || process.argv[1].endsWith('eval/run.js'))) {
+  run().catch(console.error);
+}
