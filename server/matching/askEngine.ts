@@ -23,6 +23,7 @@ export interface AskCitationItem {
   quote: string;
   role: 'supports' | 'refutes';
   sourceTitle: string;
+  editionName?: string;
   fullText: string;
   grades?: HadithGradeItem[];
   hasNoGrading?: boolean;
@@ -104,7 +105,7 @@ export const CURATED_FABRICATED_SAYINGS = [
 
 // Helper: Strip Arabic light prefixes (ال، و، ب، ل، ف، ك)
 export function stripArabicPrefixes(word: string): string {
-  let w = normalizeArabic(word);
+  let w = normalizeArabic(word).replace(/[\u064B-\u065F\u0670]/g, '');
   if (w.startsWith('وال') && w.length > 4) w = w.slice(3);
   else if (w.startsWith('فال') && w.length > 4) w = w.slice(3);
   else if (w.startsWith('بال') && w.length > 4) w = w.slice(3);
@@ -126,7 +127,6 @@ export function stripArabicPrefixes(word: string): string {
 // Clean matn text: remove isnad preamble if present and limit to max 120 words
 export function extractCleanMatn(text: string, maxWords = 120): string {
   if (!text) return '';
-  // Remove isnad formulas if prominent
   let s = text.replace(/<[^>]*>/g, ' ');
   const isnadMarkers = [
     'قال رسول الله صلى الله عليه وسلم',
@@ -135,6 +135,7 @@ export function extractCleanMatn(text: string, maxWords = 120): string {
     'سمعت رسول الله صلى الله عليه وسلم يقول',
     'أن النبي صلى الله عليه وسلم قال',
     'قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم',
+    'قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم',
   ];
   for (const m of isnadMarkers) {
     const idx = s.indexOf(m);
@@ -147,10 +148,48 @@ export function extractCleanMatn(text: string, maxWords = 120): string {
   return words.slice(0, maxWords).join(' ');
 }
 
-// Inverted Index Structure for fast keyword retrieval without embeddings
-interface RetrievedDoc {
+// Select best relevant sentence for quote (never cut mid-word!)
+export function selectBestRelevantQuote(fullText: string, terms: string[], isAr: boolean): string {
+  if (!fullText) return '';
+  const cleanFull = fullText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  
+  // Split into sentences / clauses
+  const rawSentences = cleanFull.split(/[.!?؟،؛\n]+/).map(s => s.trim()).filter(s => s.length >= 10);
+  if (rawSentences.length === 0) {
+    return cleanFull.length <= 150 ? cleanFull : '';
+  }
+
+  const cleanTerms = terms.map(t => isAr ? stripArabicPrefixes(t) : t.toLowerCase()).filter(t => t.length >= 2);
+
+  let bestSentence = '';
+  let bestScore = 0;
+
+  for (const sentence of rawSentences) {
+    const normSentence = isAr 
+      ? stripArabicPrefixes(sentence) 
+      : sentence.toLowerCase();
+    
+    let score = 0;
+    for (const term of cleanTerms) {
+      if (normSentence.includes(term)) {
+        score += term.length >= 5 ? 2 : 1;
+      }
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestSentence = sentence;
+    }
+  }
+
+  // Only return if at least 1 term matches with positive relevance score
+  return bestScore >= 1 ? bestSentence.trim() : '';
+}
+
+export interface RetrievedDoc {
   id: string;
   sourceLabel: string;
+  editionName?: string;
   fullText: string;
   matnText: string;
   score: number;
@@ -165,10 +204,42 @@ interface RetrievedDoc {
   hasNoGrading?: boolean;
 }
 
+const AR_STOP_WORDS = new Set([
+  'قال', 'النبي', 'رسول', 'الله', 'صلى', 'عليه', 'وسلم', 'عن', 'في', 'من', 'إلى', 'على',
+  'ما', 'لا', 'أن', 'إن', 'كان', 'هو', 'هي', 'هل', 'كم', 'كل', 'ذلك', 'هذا', 'هذه', 'مع',
+  'أو', 'ثم', 'قد', 'بين', 'عند', 'فإن', 'إذا', 'حيث', 'نحو', 'سنة', 'حديث', 'رواه',
+  'نبي', 'أمر', 'ورد', 'حكم', 'شريعة', 'إسلام', 'صحيح', 'حسن', 'ضعيف'
+]);
+
+const EN_STOP_WORDS = new Set([
+  'the', 'a', 'an', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'from',
+  'is', 'was', 'are', 'were', 'it', 'its', 'he', 'she', 'they', 'prophet', 'said', 'messenger',
+  'ordered', 'people', 'man', 'men', 'hadith', 'narrated', 'peace', 'be', 'upon', 'him',
+  'about', 'did', 'does', 'that', 'this', 'these', 'those', 'who', 'whom', 'which', 'what',
+  'sunnah', 'islamic', 'islam', 'ruling', 'order', 'sahih', 'hasan', 'daif', 'authentic'
+]);
+
+// Check if a term is rare (classical high-specificity term)
+function isRareTerm(term: string, isAr: boolean): boolean {
+  if (!term) return false;
+  if (isAr && AR_STOP_WORDS.has(term)) return false;
+  if (!isAr && EN_STOP_WORDS.has(term.toLowerCase())) return false;
+  
+  if (isAr && term.length >= 6) return true;
+  if (!isAr && term.length >= 8) return true;
+
+  const rareKeywords = [
+    'شوال', 'تبسمك', 'صدقة', 'القبلة', 'قبلة', 'مثنى', 'ثلاث', 'رباع',
+    'فانكحوا', 'اليتامى', 'استقبال', 'استدبار', 'غائط', 'بول', 'صيام'
+  ];
+  const norm = stripArabicPrefixes(term);
+  return rareKeywords.some(k => norm.includes(k) || k.includes(norm));
+}
+
 export function searchCorpusKeywords(
   terms: string[],
   lang: 'ar' | 'en'
-): { hadiths: RetrievedDoc[]; ayat: RetrievedDoc[] } {
+): { hadiths: RetrievedDoc[]; ayat: RetrievedDoc[]; passingSources: RetrievedDoc[] } {
   const { corpus } = loadCorpus();
   initHadithEngine();
   initAyahEngine();
@@ -190,42 +261,57 @@ export function searchCorpusKeywords(
     new Set(
       rawTerms
         .map((t) => (isAr ? stripArabicPrefixes(t) : t.toLowerCase().trim()))
-        .filter((t) => t.length >= 2)
+        .filter((t) => {
+          if (t.length < 2) return false;
+          if (isAr && AR_STOP_WORDS.has(t)) return false;
+          if (!isAr && EN_STOP_WORDS.has(t)) return false;
+          return true;
+        })
     )
   ).slice(0, 16);
 
   if (cleanTerms.length === 0) {
-    return { hadiths: [], ayat: [] };
+    return { hadiths: [], ayat: [], passingSources: [] };
   }
 
-  // 1. Search Quran
+  // 1. Search Quran (Ayat)
   const matchedAyat: RetrievedDoc[] = [];
   const quranList = isAr ? corpus.quran.ar : getQuranEn();
   for (let i = 0; i < quranList.length; i++) {
     const item = quranList[i];
     const text = item.text || '';
-    const norm = isAr ? stripArabicPrefixes(text) : text.toLowerCase();
+    const norm = isAr 
+      ? normalizeArabic(text).replace(/[\u064B-\u065F\u0670]/g, '')
+      : text.toLowerCase();
 
     let matchCount = 0;
     let score = 0;
+    let hasRare = false;
+
     for (const term of cleanTerms) {
       if (norm.includes(term)) {
         matchCount++;
-        score += term.length > 5 ? 3 : 1.5;
+        const weight = term.length > 5 ? 3.5 : 2.0;
+        score += weight;
+        if (isRareTerm(term, isAr)) {
+          hasRare = true;
+        }
       }
     }
 
-    if (matchCount >= 2 || (matchCount >= 1 && cleanTerms.length <= 2)) {
+    // Keep candidate in Ayat list
+    if (matchCount >= 1) {
       matchedAyat.push({
         id: `ayah_${item.chapter}_${item.verse}`,
         sourceLabel: isAr
           ? `سورة ${item.chapter} - آية ${item.verse}`
           : `Surah ${item.chapter}:${item.verse}`,
+        editionName: isAr ? 'القرآن الكريم' : 'Saheeh International (eng-ummmuhammad)',
         fullText: text,
         matnText: extractCleanMatn(text, 120),
         score,
         matchedTermsCount: matchCount,
-        hasRareTerm: matchCount >= 1,
+        hasRareTerm: hasRare,
         type: 'ayah',
         chapter: item.chapter,
         verse: item.verse,
@@ -233,7 +319,7 @@ export function searchCorpusKeywords(
     }
   }
 
-  // 2. Search Hadiths across all 7 collections
+  // 2. Search Hadiths across all 7 collections (MATN ONLY!)
   const matchedHadiths: RetrievedDoc[] = [];
   const collections = ['bukhari', 'muslim', 'tirmidhi', 'abudawud', 'nasai', 'ibnmajah', 'nawawi'] as const;
 
@@ -246,22 +332,29 @@ export function searchCorpusKeywords(
       const h = isAr ? list[i] : enList[i];
       if (!h || !h.text) continue;
       const text = h.text;
-      const norm = isAr ? stripArabicPrefixes(text) : text.toLowerCase();
+      
+      // Matn only to avoid isnad narrator noise
+      const matn = isAr ? extractCleanMatn(text, 120) : text;
+      const normMatn = isAr 
+        ? normalizeArabic(matn).replace(/[\u064B-\u065F\u0670]/g, '')
+        : matn.toLowerCase();
 
       let matchCount = 0;
       let score = 0;
+      let hasRare = false;
+
       for (const term of cleanTerms) {
-        if (norm.includes(term)) {
+        if (normMatn.includes(term)) {
           matchCount++;
-          // Classical terms weighted by rarity and length
-          const weight = term.length > 5 ? 3.5 : 1.8;
+          const weight = term.length > 5 ? 3.5 : 2.0;
           score += weight;
+          if (isRareTerm(term, isAr)) {
+            hasRare = true;
+          }
         }
       }
 
-      // Filter: at least 2 matched terms or 1 rare/long term
-      const hasRare = cleanTerms.some((t) => t.length >= 6 && norm.includes(t));
-      if (matchCount >= 2 || (hasRare && matchCount >= 1)) {
+      if (matchCount >= 1) {
         const arHadith = isAr ? h : lookupHadithAr(col, h.hadithnumber || i + 1);
         const grades = arHadith?.grades || [];
         const hasNoGrading = col === 'bukhari' || col === 'muslim' || col === 'nawawi';
@@ -270,9 +363,10 @@ export function searchCorpusKeywords(
           id: `${col}_${h.hadithnumber || i + 1}`,
           sourceLabel: isAr
             ? `${getCollectionArabicName(col)} - حديث ${h.hadithnumber || i + 1}`
-            : `${col} - Hadith ${h.hadithnumber || i + 1}`,
+            : `${getCollectionEnglishName(col)} - Hadith ${h.hadithnumber || i + 1}`,
+          editionName: isAr ? getCollectionArabicName(col) : `${getCollectionEnglishName(col)} (English translation)`,
           fullText: text,
-          matnText: extractCleanMatn(text, 120),
+          matnText: matn,
           score,
           matchedTermsCount: matchCount,
           hasRareTerm: hasRare,
@@ -286,13 +380,29 @@ export function searchCorpusKeywords(
     }
   }
 
-  // Sort by score descending
+  // Sort Hadiths and Ayat separately
   matchedHadiths.sort((a, b) => b.score - a.score);
   matchedAyat.sort((a, b) => b.score - a.score);
 
+  const top8Hadiths = matchedHadiths.slice(0, 8);
+  const top5Ayat = matchedAyat.slice(0, 5);
+
+  // Apply Relevance Floor:
+  // Show a source only if it matches at least 2 distinct expanded terms OR 1 rare term
+  const passesFloor = (d: RetrievedDoc) => d.matchedTermsCount >= 2 || d.hasRareTerm;
+
+  const filteredHadiths = top8Hadiths.filter(passesFloor);
+  const filteredAyat = top5Ayat.filter(passesFloor);
+
+  // Combine and sort by score, cap at max 5 sources
+  const allFiltered = [...filteredHadiths, ...filteredAyat];
+  allFiltered.sort((a, b) => b.score - a.score);
+  const passingSources = allFiltered.slice(0, 5);
+
   return {
-    hadiths: matchedHadiths.slice(0, 8),
-    ayat: matchedAyat.slice(0, 5),
+    hadiths: top8Hadiths,
+    ayat: top5Ayat,
+    passingSources,
   };
 }
 
@@ -312,6 +422,27 @@ function getCollectionArabicName(col: string): string {
       return 'سنن ابن ماجه';
     case 'nawawi':
       return 'الأربعون النووية';
+    default:
+      return col;
+  }
+}
+
+function getCollectionEnglishName(col: string): string {
+  switch (col) {
+    case 'bukhari':
+      return 'Sahih al-Bukhari';
+    case 'muslim':
+      return 'Sahih Muslim';
+    case 'abudawud':
+      return 'Sunan Abi Dawud';
+    case 'tirmidhi':
+      return 'Jami` at-Tirmidhi';
+    case 'nasai':
+      return "Sunan an-Nasa'i";
+    case 'ibnmajah':
+      return 'Sunan Ibn Majah';
+    case 'nawawi':
+      return "An-Nawawi's 40 Hadith";
     default:
       return col;
   }
@@ -486,7 +617,7 @@ export async function askQuestion(
       language: 'ar',
       category: 'other',
       verdict: 'unclear',
-      verdictBadgeLabel: 'لم يتم العثور على تطابق موثوق، راجع أهل العلم',
+      verdictBadgeLabel: 'لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم',
       summary: '',
       searchedTerms: [],
       items: [],
@@ -640,18 +771,40 @@ export async function askQuestion(
     }
   }
 
-  // 2. Deterministic Retrieval (No embeddings)
-  const { hadiths, ayat } = searchCorpusKeywords(terms, language);
-  const combinedRetrieved = [...ayat, ...hadiths];
-  const topRetrievedIds = combinedRetrieved.map((d) => d.id).slice(0, 3);
+  // 2. Deterministic Retrieval with matn-only tokens & Relevance Floor
+  const { passingSources } = searchCorpusKeywords(terms, language);
+  const topRetrievedIds = passingSources.map((d) => d.id).slice(0, 3);
+
+  // If NO sources pass the relevance floor:
+  if (passingSources.length === 0) {
+    const res: AskResponse = {
+      question: rawQuestion,
+      language,
+      category,
+      verdict: 'unclear',
+      verdictBadgeLabel: language === 'en' 
+        ? 'No relevant text found in indexed sources; consult qualified scholars'
+        : 'لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم',
+      summary: '',
+      searchedTerms: terms,
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime),
+    };
+    askCache.set(normKey, { data: res, timestamp: Date.now() });
+    return res;
+  }
 
   // If permissibility question: SKIP CALL 2 per instructions!
   if (is_ruling_question || category === 'permissibility') {
-    const verifiedItems: AskCitationItem[] = combinedRetrieved.map((d) => ({
+    const verifiedItems: AskCitationItem[] = passingSources.map((d) => ({
       id: d.id,
-      quote: d.matnText.slice(0, 160),
+      quote: selectBestRelevantQuote(d.matnText || d.fullText, terms, language !== 'en'),
       role: 'supports',
       sourceTitle: d.sourceLabel,
+      editionName: d.editionName,
       fullText: d.fullText,
       grades: d.grades,
       hasNoGrading: d.hasNoGrading,
@@ -667,34 +820,16 @@ export async function askQuestion(
       language,
       category: 'permissibility',
       verdict: 'permissibility',
-      verdictBadgeLabel: 'هذا سؤال في الحكم الشرعي؛ نعرض النصوص فقط، والفتوى لأهل العلم',
+      verdictBadgeLabel: language === 'en'
+        ? 'This is a ruling question; we present texts only, fatwa is for qualified scholars'
+        : 'هذا سؤال في الحكم الشرعي؛ نعرض النصوص فقط، والفتوى لأهل العلم',
       isPermissibility: true,
       summary: '',
       searchedTerms: terms,
       items: verifiedItems,
-      retrievedCount: combinedRetrieved.length,
+      retrievedCount: passingSources.length,
       droppedItemsCount: 0,
       topRetrievedIds,
-      executionTimeMs: Math.round(performance.now() - startTime),
-    };
-    askCache.set(normKey, { data: res, timestamp: Date.now() });
-    return res;
-  }
-
-  // If no documents found:
-  if (combinedRetrieved.length === 0) {
-    const res: AskResponse = {
-      question: rawQuestion,
-      language,
-      category,
-      verdict: 'unclear',
-      verdictBadgeLabel: 'لم يتم العثور على تطابق موثوق، راجع أهل العلم',
-      summary: '',
-      searchedTerms: terms,
-      items: [],
-      retrievedCount: 0,
-      droppedItemsCount: 0,
-      topRetrievedIds: [],
       executionTimeMs: Math.round(performance.now() - startTime),
     };
     askCache.set(normKey, { data: res, timestamp: Date.now() });
@@ -704,15 +839,14 @@ export async function askQuestion(
   // 3. Gemini Call 2: Grounded Synthesis
   let call2Result;
   try {
-    call2Result = await executeCall2(rawQuestion, combinedRetrieved);
+    call2Result = await executeCall2(rawQuestion, passingSources);
   } catch (err) {
-    // If call 2 fails, fallback to unclear
     call2Result = { verdict: 'unclear' as const, summary: '', items: [] };
   }
 
   // 4. Code-Side Grounding Checks (Strictly code, not the model!)
   const retrievedMap = new Map<string, RetrievedDoc>();
-  for (const d of combinedRetrieved) {
+  for (const d of passingSources) {
     retrievedMap.set(d.id, d);
   }
 
@@ -739,9 +873,10 @@ export async function askQuestion(
 
     verifiedItems.push({
       id: sourceDoc.id,
-      quote: item.quote,
+      quote: item.quote.trim(),
       role: item.role === 'refutes' ? 'refutes' : 'supports',
       sourceTitle: sourceDoc.sourceLabel,
+      editionName: sourceDoc.editionName,
       fullText: sourceDoc.fullText,
       grades: sourceDoc.grades,
       hasNoGrading: sourceDoc.hasNoGrading,
@@ -802,10 +937,15 @@ export async function askQuestion(
       verdictBadgeSubline = 'هذا ليس حكماً بصحة النص';
     }
   } else if (finalVerdict === 'contradicted') {
-    verdictBadgeLabel = 'معارض للنصوص المعتمدة';
+    verdictBadgeLabel = language === 'en' ? 'Contradicted by canonical texts' : 'معارض للنصوص المعتمدة';
   } else {
-    verdictBadgeLabel = 'لم يتم العثور على تطابق موثوق، راجع أهل العلم';
+    verdictBadgeLabel = language === 'en' 
+      ? 'No relevant text found in indexed sources; consult qualified scholars' 
+      : 'لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم';
   }
+
+  // If final verdict is unclear or supported with no verified items, do not show unverified cards
+  const displayItems = finalVerdict === 'unclear' ? [] : verifiedItems;
 
   const res: AskResponse = {
     question: rawQuestion,
@@ -817,8 +957,8 @@ export async function askQuestion(
     isWeakOnly,
     summary: finalSummary || (finalVerdict === 'supported' ? 'تم العثور على نص مسند في المصادر أدناه.' : ''),
     searchedTerms: terms,
-    items: verifiedItems,
-    retrievedCount: combinedRetrieved.length,
+    items: displayItems,
+    retrievedCount: passingSources.length,
     droppedItemsCount,
     topRetrievedIds,
     executionTimeMs: Math.round(performance.now() - startTime),

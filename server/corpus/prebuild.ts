@@ -21,7 +21,7 @@ const EXPECTED_COUNTS: Record<string, number> = {
 const QURAN_EXPECTED = 6236;
 
 const COLLECTIONS = Object.keys(EXPECTED_COUNTS);
-const QURAN_EDITIONS = ['ara-quranacademy', 'eng-abdullahyusufal'];
+const QURAN_EDITIONS = ['ara-quranacademy', 'eng-ummmuhammad'];
 
 async function downloadFile(url: string, dest: string) {
   console.log(`Downloading ${url} ...`);
@@ -60,9 +60,7 @@ export async function runPrebuild() {
     if (!fs.existsSync(path.join(DATA_DIR, 'quran_ar.json'))) {
       await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
     }
-    if (!fs.existsSync(path.join(DATA_DIR, 'quran_en.json'))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-abdullahyusufal.json`, path.join(DATA_DIR, 'quran_en.json'));
-    }
+    await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-ummmuhammad.json`, path.join(DATA_DIR, 'quran_en.json'));
   } catch (err) {
     console.error('CRITICAL: Download failed. Prebuild aborted.');
     console.error(err);

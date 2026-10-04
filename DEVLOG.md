@@ -6,6 +6,21 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-04 — Task 8: Ask Mode Fixes (Part 1) & Corpus Evaluation
+- **Goal**: Resolve quote slicing, implement strict relevance floor, support English dir/alignment & translation editions, diagnose 4 specific query cases, and report on external explanation sources (QuranEnc, HadeethEnc, mcp.islamiccontent.org).
+- **Change (files)**: `server/matching/askEngine.ts`, `server/corpus/prebuild.ts`, `server/corpus/data/quran_en.json`, `src/components/modes/AskMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Prevent arbitrary mid-word quote slicing on permissibility queries, eliminate spurious card displays on questions with 0 relevant texts (e.g. green tea), align English layout/direction, and investigate tafsir/explanation integration feasibility.
+- **Key Enhancements & Fixes**:
+  1. **Quote Selection (`selectBestRelevantQuote`)**: Removed default `slice(0, 160)` mid-word truncation. For permissibility questions, code finds the sentence with highest distinct keyword overlap without slicing mid-word; with no match, no quote box is rendered.
+  2. **Relevance Floor & Stopwords**: Filtered out common functional/meta stopwords (`ordered`, `people`, `prophet`, `حديث`, `سنة`, `نبي`, etc.). Documents must match $\ge 2$ distinct content terms or 1 rare content term. Combined results capped at top 5 sources. When 0 sources pass, UI displays «لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم» with zero cards.
+  3. **English Formatting & Edition Metadata**: Rendered English cards with `dir="ltr"` and left text alignment. Added edition attributions on all cards. Pinned Quran English edition to Saheeh International (`eng-ummmuhammad`) in `prebuild.ts` and `quran_en.json`.
+  4. **Matn-Only Token Search**: Eliminated isnad narrator noise from Hadith keyword matching by scoring queries strictly against `matn` tokens.
+  5. **Verification**: Executed 14/14 ask cases in `eval/run_ask.ts` and 133/133 (100%) regression cases in `eval/run.ts`.
+- **Limits**: Explanation sources index not built yet per instructions.
+- **Commit**: `pending`
+
+---
+
 ### 2026-10-04 — Task 8: Ask Mode Implementation & Benchmark Verification (اسأل)
 - **Goal**: Implement complete full-stack Ask Mode (`POST /api/ask` and React `AskMode` UI) using dual-call Gemini grounding, deterministic word-level corpus retrieval (zero embeddings), strict code-side quote/ID verification, permissibility & weak hadith guards, and rate limiting.
 - **Change (files)**: `server/matching/askEngine.ts`, `server/app.ts`, `src/components/modes/AskMode.tsx`, `src/components/layout/ModeNav.tsx`, `eval/ask_cases.json`, `eval/run_ask.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.

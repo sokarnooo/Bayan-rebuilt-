@@ -21,9 +21,10 @@ interface AskModeProps {
 
 interface AskCitationItem {
   id: string;
-  quote: string;
+  quote?: string;
   role: 'supports' | 'refutes';
   sourceTitle: string;
+  editionName?: string;
   fullText: string;
   grades?: Array<{
     name: string;
@@ -294,117 +295,134 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
                 </span>
               </div>
 
-              {result.items.map((item, idx) => (
-                <div
-                  key={item.id || idx}
-                  className="rounded-xl bg-[#12183F] border border-[#6150EA]/25 p-5 shadow-lg space-y-4 transition hover:border-[#6150EA]/50"
-                >
-                  {/* Card Header Strip */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#6150EA]/15">
-                    <div className="flex items-center gap-2">
-                      {item.type === 'ayah' ? (
-                        <BookOpen className="w-4 h-4 text-[#2EF2C2]" />
-                      ) : (
-                        <ScrollText className="w-4 h-4 text-[#6150EA]" />
-                      )}
-                      <span className="font-bold text-[#F2F4FF] text-base">
-                        {item.sourceTitle}
-                      </span>
+              {result.items.map((item, idx) => {
+                const isItemEnglish = result.language === 'en';
+                return (
+                  <div
+                    key={item.id || idx}
+                    className="rounded-xl bg-[#12183F] border border-[#6150EA]/25 p-5 shadow-lg space-y-4 transition hover:border-[#6150EA]/50"
+                  >
+                    {/* Card Header Strip */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#6150EA]/15">
+                      <div className="flex items-center gap-2">
+                        {item.type === 'ayah' ? (
+                          <BookOpen className="w-4 h-4 text-[#2EF2C2]" />
+                        ) : (
+                          <ScrollText className="w-4 h-4 text-[#6150EA]" />
+                        )}
+                        <div>
+                          <span className="font-bold text-[#F2F4FF] text-base">
+                            {item.sourceTitle}
+                          </span>
+                          {item.editionName && (
+                            <span className="block text-[11px] text-[#F2F4FF]/50 mt-0.5">
+                              {item.editionName}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(item.fullText, item.id)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#6150EA]/20 hover:bg-[#6150EA]/40 text-xs text-[#F2F4FF]/80 transition cursor-pointer"
+                      >
+                        {copiedId === item.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#2EF2C2]" />
+                            <span>{isAr ? 'تم النسخ' : 'Copied'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>{isAr ? 'نسخ النص' : 'Copy'}</span>
+                          </>
+                        )}
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(item.fullText, item.id)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#6150EA]/20 hover:bg-[#6150EA]/40 text-xs text-[#F2F4FF]/80 transition cursor-pointer"
-                    >
-                      {copiedId === item.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-[#2EF2C2]" />
-                          <span>{isAr ? 'تم النسخ' : 'Copied'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>{isAr ? 'نسخ النص' : 'Copy'}</span>
-                        </>
+                    {/* Scripture Text: Amiri for Arabic, clean Sans for English */}
+                    <div className="space-y-2">
+                      <p
+                        dir={isItemEnglish ? 'ltr' : 'rtl'}
+                        lang={isItemEnglish ? 'en' : 'ar'}
+                        className={`${
+                          isItemEnglish
+                            ? 'text-left font-sans text-base sm:text-lg leading-relaxed text-[#F2F4FF]/95'
+                            : 'text-right font-serif text-xl sm:text-2xl leading-[2.3] text-[#F2F4FF]'
+                        } select-text`}
+                      >
+                        « {item.fullText} »
+                      </p>
+
+                      {/* Quote Box: only when item.quote is present and non-empty */}
+                      {item.quote && item.quote.trim().length > 0 && (
+                        <div className="mt-2 p-2.5 rounded-lg bg-[#2EF2C2]/10 border border-[#2EF2C2]/20 text-xs text-[#2EF2C2]">
+                          <span className="font-bold">{isAr ? 'الشاهد المقتبس: ' : 'Quoted excerpt: '}</span>
+                          <span className={isItemEnglish ? 'font-sans text-sm' : 'font-serif text-sm'}>
+                            «{item.quote.trim()}»
+                          </span>
+                        </div>
                       )}
-                    </button>
-                  </div>
+                    </div>
 
-                  {/* Scripture Text in Amiri font */}
-                  <div className="space-y-2">
-                    <p
-                      dir="rtl"
-                      lang="ar"
-                      className="font-serif text-xl sm:text-2xl leading-[2.3] text-[#F2F4FF] select-text"
-                    >
-                      « {item.fullText} »
-                    </p>
+                    {/* Grade panel for Hadiths */}
+                    {item.type === 'hadith' && (
+                      <div className="pt-3 border-t border-[#6150EA]/15 space-y-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2EF2C2]">
+                          <Award className="w-3.5 h-3.5" />
+                          <span>{isAr ? 'درجة الحديث والتخريج:' : 'Grading & Takhrij:'}</span>
+                        </div>
 
-                    {item.quote && (
-                      <div className="mt-2 p-2.5 rounded-lg bg-[#2EF2C2]/10 border border-[#2EF2C2]/20 text-xs text-[#2EF2C2]">
-                        <span className="font-bold">{isAr ? 'الشاهد المقتبس: ' : 'Quoted excerpt: '}</span>
-                        <span className="font-serif text-sm">«{item.quote}»</span>
+                        {/* Bukhari / Muslim / Nawawi Rule 2 notice */}
+                        {item.hasNoGrading && (
+                          <div className="p-3 rounded-lg bg-[#6150EA]/10 border border-[#6150EA]/20 space-y-1">
+                            <p className="text-sm font-semibold text-[#F2F4FF]">
+                              {isAr ? 'لا تتوفر درجة موثقة في مصدر البيانات' : 'No documented grade in dataset source'}
+                            </p>
+                            <p className="text-xs text-[#F2F4FF]/50">
+                              {isAr
+                                ? 'كتاب معتمد في المرجعية العلمية للتحدي'
+                                : "Listed as an approved source in the challenge's scientific reference"}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Real grader citations */}
+                        {!item.hasNoGrading && item.grades && item.grades.length > 0 && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {item.grades.map((g, gIdx) => (
+                              <div
+                                key={gIdx}
+                                className={`p-2.5 rounded-lg border text-xs flex flex-col justify-between gap-1.5 ${
+                                  g.family === 'صحيح'
+                                    ? 'bg-[#2EF2C2]/10 border-[#2EF2C2]/30 text-[#2EF2C2]'
+                                    : g.family === 'حسن'
+                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                                    : g.family === 'ضعيف'
+                                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                                    : g.family === 'موضوع'
+                                    ? 'bg-red-500/15 border-red-500/40 text-red-300'
+                                    : 'bg-[#6150EA]/10 border-[#6150EA]/25 text-[#F2F4FF]/80'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold">{g.name}</span>
+                                  <span className="font-bold">{g.arabicLabel}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] opacity-75">
+                                  <span>{g.originalGrade}</span>
+                                  {g.note && <span className="italic">{g.note}</span>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-
-                  {/* Grade panel for Hadiths */}
-                  {item.type === 'hadith' && (
-                    <div className="pt-3 border-t border-[#6150EA]/15 space-y-2">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2EF2C2]">
-                        <Award className="w-3.5 h-3.5" />
-                        <span>{isAr ? 'درجة الحديث والتخريج:' : 'Grading & Takhrij:'}</span>
-                      </div>
-
-                      {/* Bukhari / Muslim / Nawawi Rule 2 notice */}
-                      {item.hasNoGrading && (
-                        <div className="p-3 rounded-lg bg-[#6150EA]/10 border border-[#6150EA]/20 space-y-1">
-                          <p className="text-sm font-semibold text-[#F2F4FF]">
-                            {isAr ? 'لا تتوفر درجة موثقة في مصدر البيانات' : 'No documented grade in dataset source'}
-                          </p>
-                          <p className="text-xs text-[#F2F4FF]/50">
-                            {isAr
-                              ? 'كتاب معتمد في المرجعية العلمية للتحدي'
-                              : "Listed as an approved source in the challenge's scientific reference"}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Real grader citations */}
-                      {!item.hasNoGrading && item.grades && item.grades.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {item.grades.map((g, gIdx) => (
-                            <div
-                              key={gIdx}
-                              className={`p-2.5 rounded-lg border text-xs flex flex-col justify-between gap-1.5 ${
-                                g.family === 'صحيح'
-                                  ? 'bg-[#2EF2C2]/10 border-[#2EF2C2]/30 text-[#2EF2C2]'
-                                  : g.family === 'حسن'
-                                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                                  : g.family === 'ضعيف'
-                                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-                                  : g.family === 'موضوع'
-                                  ? 'bg-red-500/15 border-red-500/40 text-red-300'
-                                  : 'bg-[#6150EA]/10 border-[#6150EA]/25 text-[#F2F4FF]/80'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="font-semibold">{g.name}</span>
-                                <span className="font-bold">{g.arabicLabel}</span>
-                              </div>
-                              <div className="flex items-center justify-between text-[11px] opacity-75">
-                                <span>{g.originalGrade}</span>
-                                {g.note && <span className="italic">{g.note}</span>}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

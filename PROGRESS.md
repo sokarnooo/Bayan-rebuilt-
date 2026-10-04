@@ -32,7 +32,7 @@
 
 ## Next
 [ ] 7 Review the import-run edits (ayahMatcher.ts, hadithMatcher.ts, AyahMode.tsx, HadithMode.tsx)
-[x] 8 Ask mode: build (2026-10-04: Implemented POST /api/ask with dual-call grounding, inverted index retrieval, permissibility & weak hadith guards, 14-case ask suite in eval/run_ask.ts, and AskMode UI)
+[x] 8 Ask mode: fixes part 1 (2026-10-04: Fixed quote box mid-word slicing, relevance floor with max 5 sources & no-cards banner on 0 matches, matn-only tokens, English dir=ltr with translation edition names & Saheeh International eng-ummmuhammad, 14/14 ask suite & 133/133 core tests pass)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
 [ ] 9 OCR test
 [ ] 10 Server key and hourly limits (owner supplies RPD values)

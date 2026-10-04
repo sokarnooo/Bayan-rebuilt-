@@ -3,7 +3,10 @@
 ## Status
 - **Ask Mode (اسأل بالدليل)**:
   - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
-  - Deterministic word-level TF-IDF corpus retrieval with light Arabic prefix stripping (zero embeddings).
+  - Deterministic word-level TF-IDF corpus retrieval with matn-only token matching (eliminating isnad noise) and light Arabic prefix stripping (zero embeddings).
+  - Relevance floor: filters out candidates failing $\ge 2$ distinct content terms or 1 rare term; caps output at 5 sources; displays «لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم» with zero cards when 0 pass.
+  - Quote selection: no mid-word slicing; permissibility uses highest sentence keyword overlap or displays no quote box.
+  - English support: `dir="ltr"`, left alignment, translation edition metadata, and pinned Saheeh International (`eng-ummmuhammad`) Quran edition.
   - Strict code-side quote and ID substring validation; forbidden ruling words filtered from automated summary.
   - Scholarly safeguards: Permissibility questions bypass Call 2 and show texts + scholar banner; weak hadiths show «وُجد نص، لكن درجته ضعيفة عند المصدر»; Dorar.net fabricated entries return `contradicted` + card.
   - 14-case ask evaluation suite in `eval/run_ask.ts` executed.
