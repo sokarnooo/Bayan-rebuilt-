@@ -31,9 +31,6 @@ export const ModeNav: React.FC<ModeNavProps> = ({
       labelAr: 'اسـأل بالـدليـل',
       labelEn: 'Ask with Proof',
       icon: MessageSquareQuote,
-      disabled: true,
-      badgeAr: 'قريباً',
-      badgeEn: 'Soon',
     },
   ];
 

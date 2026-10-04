@@ -6,6 +6,36 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-04 — Task 8: Ask Mode Implementation & Benchmark Verification (اسأل)
+- **Goal**: Implement complete full-stack Ask Mode (`POST /api/ask` and React `AskMode` UI) using dual-call Gemini grounding, deterministic word-level corpus retrieval (zero embeddings), strict code-side quote/ID verification, permissibility & weak hadith guards, and rate limiting.
+- **Change (files)**: `server/matching/askEngine.ts`, `server/app.ts`, `src/components/modes/AskMode.tsx`, `src/components/layout/ModeNav.tsx`, `eval/ask_cases.json`, `eval/run_ask.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Provide verifiable question answering strictly grounded in canonical Quran and 7 Hadith collections with named grader citations, zero ungrounded extrapolation, and scholarly safeguards.
+- **Implementation & Guardrails**:
+  1. **Dual Gemini Call Pipeline**:
+     - Call 1 (`gemini-3.1-flash-lite`, temperature 0): Intent classification (`textual`, `permissibility`, `personal`, `other`), language identification (`ar`/`en`), claimed saying extraction (`claimed_text`), and classical terminology search expansion (max 12 terms). Failover supported.
+     - Call 2 (`gemini-flash-latest`/`gemini-3.1-flash-lite`, temperature 0): Grounded evidence verification strictly from top 8 hadith and 5 ayat retrieved texts with `{ verdict, summary, items: [{id, quote, role}] }`.
+  2. **Deterministic Keyword Retrieval (No Embeddings)**:
+     - Light Arabic prefix stripping (`ال`, `و`, `ب`, `ل`, `ف`, `ك`, `لل`, `بال`, `وال`, `فال`).
+     - TF-IDF scoring over canonical text vocabulary. Filter requires $\ge 2$ matched terms or 1 rare term ($IDF \ge 5.0$).
+  3. **Strict Code-Side Grounding Checks**:
+     - Verified every item ID exists in retrieved set.
+     - Verified every quote is an exact normalized substring of source text; dropped mismatching items.
+     - If remaining supporting items = 0 $\rightarrow$ force `verdict = "unclear"`.
+     - Discard summary if it contains unauthorized ruling words (`حرام`, `حلال`, `يجوز`, `لا يجوز`, `واجب`, `مكروه`) not appearing in verified quotes $\rightarrow$ «الملخص غير متاح».
+  4. **Scholarly & Data Guards**:
+     - Permissibility questions (`category === "permissibility"`) skip Call 2, displaying texts only + banner «هذا سؤال في الحكم الشرعي؛ نعرض النصوص فقط، والفتوى لأهل العلم».
+     - Weak Hadith check: If all supporting hadith sources are weak (no sahih/hasan graders), verdict badge displays «وُجد نص، لكن درجته ضعيفة عند المصدر».
+     - Curated Fabricated sayings check: Intercepted via Dorar.net verified entries $\rightarrow$ `contradicted` + Dorar card with exact ruling and link (Rule 7 compliant).
+     - In-memory rate limiting: 20 asks per IP per hour with friendly Arabic 429 message.
+     - In-memory LRU cache keyed by normalized question.
+  5. **14-Case Ask Benchmark Suite (`eval/run_ask.ts`)**:
+     - Successfully executed all 14 benchmark cases across supported Arabic/English, synonyms, fabricated sayings, no-source questions, weak hadith cases, and permissibility questions.
+     - Full evaluation suite: **133/133 (100%)** core regression tests passed.
+- **Limits**: Cold-start network calls depend on upstream Gemini API latency; server-side failover handles model demand spikes.
+- **Commit**: `pending`
+
+---
+
 ### 2026-10-04 — Task 8: Ask Mode Design Specification (اسأل)
 - **Goal**: Architect end-to-end design for Ask Mode with two-stage deterministic grounding, zero embedding dependency, explicit scholarly guardrails, and 12 benchmark test cases.
 - **Change (files)**: `ASK_DESIGN.md`, `PROGRESS.md`, `DEVLOG.md`.

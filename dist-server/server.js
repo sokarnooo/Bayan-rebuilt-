@@ -2311,6 +2311,620 @@ function searchHadith(rawQuery) {
   };
 }
 
+// server/matching/askEngine.ts
+import { GoogleGenAI } from "@google/genai";
+var LITE_MODEL = "gemini-3.1-flash-lite";
+var MAIN_MODEL = "gemini-flash-latest";
+var BACKUP_MODEL = "gemini-3.1-flash-lite";
+var askCache = /* @__PURE__ */ new Map();
+var CACHE_TTL_MS = 60 * 60 * 1e3;
+var ipRateLimits = /* @__PURE__ */ new Map();
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const record = ipRateLimits.get(ip);
+  if (!record || now > record.resetTime) {
+    ipRateLimits.set(ip, { count: 1, resetTime: now + 60 * 60 * 1e3 });
+    return true;
+  }
+  if (record.count >= 20) {
+    return false;
+  }
+  record.count++;
+  return true;
+}
+var CURATED_FABRICATED_SAYINGS = [
+  {
+    keywords: ["\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0641\u064A \u0627\u0644\u0635\u064A\u0646"],
+    matn: "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646",
+    ruling: "\u0644\u0627 \u064A\u0635\u062D",
+    url: "https://dorar.net/fake-hadith/38"
+  },
+  {
+    keywords: ["\u062D\u0628 \u0627\u0644\u0648\u0637\u0646 \u0645\u0646 \u0627\u0644\u0625\u064A\u0645\u0627\u0646"],
+    matn: "\u062D\u0628 \u0627\u0644\u0648\u0637\u0646 \u0645\u0646 \u0627\u0644\u0625\u064A\u0645\u0627\u0646",
+    ruling: "\u0644\u064A\u0633 \u0628\u062D\u062F\u064A\u062B",
+    url: "https://dorar.net/fake-hadith/74"
+  },
+  {
+    keywords: ["\u0627\u0644\u0645\u0639\u062F\u0629 \u0628\u064A\u062A \u0627\u0644\u062F\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0627\u0644\u062F\u0648\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0643\u0644 \u062F\u0648\u0627\u0621"],
+    matn: "\u0627\u0644\u0645\u0639\u0650\u062F\u0629 \u0628\u064A\u062A \u0627\u0644\u062F\u0627\u0621\u060C \u0648\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0627\u0644\u062F\u0648\u0627\u0621",
+    ruling: "\u0644\u0627 \u0623\u0635\u0644 \u0644\u0647",
+    url: "https://dorar.net/fake-hadith/557"
+  }
+];
+function stripArabicPrefixes(word) {
+  let w = normalizeArabic(word);
+  if (w.startsWith("\u0648\u0627\u0644") && w.length > 4) w = w.slice(3);
+  else if (w.startsWith("\u0641\u0627\u0644") && w.length > 4) w = w.slice(3);
+  else if (w.startsWith("\u0628\u0627\u0644") && w.length > 4) w = w.slice(3);
+  else if (w.startsWith("\u0644\u0644") && w.length > 3) w = w.slice(2);
+  else if (w.startsWith("\u0627\u0644") && w.length > 3) w = w.slice(2);
+  else if ((w.startsWith("\u0648") || w.startsWith("\u0641") || w.startsWith("\u0628") || w.startsWith("\u0644") || w.startsWith("\u0643")) && w.length > 3) {
+    w = w.slice(1);
+  }
+  return w;
+}
+function extractCleanMatn(text, maxWords = 120) {
+  if (!text) return "";
+  let s = text.replace(/<[^>]*>/g, " ");
+  const isnadMarkers = [
+    "\u0642\u0627\u0644 \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645",
+    "\u0623\u0646 \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+    "\u0639\u0646 \u0627\u0644\u0646\u0628\u064A \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+    "\u0633\u0645\u0639\u062A \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u064A\u0642\u0648\u0644",
+    "\u0623\u0646 \u0627\u0644\u0646\u0628\u064A \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+    "\u0642\u064E\u0627\u0644\u064E \u0631\u064E\u0633\u064F\u0648\u0644\u064F \u0627\u0644\u0644\u0651\u064E\u0647\u0650 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645"
+  ];
+  for (const m of isnadMarkers) {
+    const idx = s.indexOf(m);
+    if (idx !== -1 && idx < s.length * 0.65) {
+      s = s.slice(idx + m.length);
+      break;
+    }
+  }
+  const words = s.trim().split(/\s+/).filter(Boolean);
+  return words.slice(0, maxWords).join(" ");
+}
+function searchCorpusKeywords(terms, lang) {
+  const { corpus } = loadCorpus();
+  initHadithEngine();
+  initAyahEngine();
+  const isAr = lang !== "en";
+  const rawTerms = [];
+  for (const t of terms) {
+    if (!t) continue;
+    rawTerms.push(t);
+    const splitWords = t.split(/\s+/).filter((w) => w.length >= 2);
+    if (splitWords.length > 1) {
+      rawTerms.push(...splitWords);
+    }
+  }
+  const cleanTerms = Array.from(
+    new Set(
+      rawTerms.map((t) => isAr ? stripArabicPrefixes(t) : t.toLowerCase().trim()).filter((t) => t.length >= 2)
+    )
+  ).slice(0, 16);
+  if (cleanTerms.length === 0) {
+    return { hadiths: [], ayat: [] };
+  }
+  const matchedAyat = [];
+  const quranList = isAr ? corpus.quran.ar : getQuranEn();
+  for (let i = 0; i < quranList.length; i++) {
+    const item = quranList[i];
+    const text = item.text || "";
+    const norm = isAr ? stripArabicPrefixes(text) : text.toLowerCase();
+    let matchCount = 0;
+    let score = 0;
+    for (const term of cleanTerms) {
+      if (norm.includes(term)) {
+        matchCount++;
+        score += term.length > 5 ? 3 : 1.5;
+      }
+    }
+    if (matchCount >= 2 || matchCount >= 1 && cleanTerms.length <= 2) {
+      matchedAyat.push({
+        id: `ayah_${item.chapter}_${item.verse}`,
+        sourceLabel: isAr ? `\u0633\u0648\u0631\u0629 ${item.chapter} - \u0622\u064A\u0629 ${item.verse}` : `Surah ${item.chapter}:${item.verse}`,
+        fullText: text,
+        matnText: extractCleanMatn(text, 120),
+        score,
+        matchedTermsCount: matchCount,
+        hasRareTerm: matchCount >= 1,
+        type: "ayah",
+        chapter: item.chapter,
+        verse: item.verse
+      });
+    }
+  }
+  const matchedHadiths = [];
+  const collections = ["bukhari", "muslim", "tirmidhi", "abudawud", "nasai", "ibnmajah", "nawawi"];
+  for (const col of collections) {
+    const list = corpus.hadith.ar[col] || [];
+    const enList = !isAr ? getHadithEn(col) : [];
+    const count = isAr ? list.length : enList.length;
+    for (let i = 0; i < count; i++) {
+      const h = isAr ? list[i] : enList[i];
+      if (!h || !h.text) continue;
+      const text = h.text;
+      const norm = isAr ? stripArabicPrefixes(text) : text.toLowerCase();
+      let matchCount = 0;
+      let score = 0;
+      for (const term of cleanTerms) {
+        if (norm.includes(term)) {
+          matchCount++;
+          const weight = term.length > 5 ? 3.5 : 1.8;
+          score += weight;
+        }
+      }
+      const hasRare = cleanTerms.some((t) => t.length >= 6 && norm.includes(t));
+      if (matchCount >= 2 || hasRare && matchCount >= 1) {
+        const arHadith = isAr ? h : lookupHadithAr(col, h.hadithnumber || i + 1);
+        const grades = arHadith?.grades || [];
+        const hasNoGrading = col === "bukhari" || col === "muslim" || col === "nawawi";
+        matchedHadiths.push({
+          id: `${col}_${h.hadithnumber || i + 1}`,
+          sourceLabel: isAr ? `${getCollectionArabicName(col)} - \u062D\u062F\u064A\u062B ${h.hadithnumber || i + 1}` : `${col} - Hadith ${h.hadithnumber || i + 1}`,
+          fullText: text,
+          matnText: extractCleanMatn(text, 120),
+          score,
+          matchedTermsCount: matchCount,
+          hasRareTerm: hasRare,
+          type: "hadith",
+          collection: col,
+          hadithnumber: h.hadithnumber || i + 1,
+          grades: parseGrades(grades),
+          hasNoGrading
+        });
+      }
+    }
+  }
+  matchedHadiths.sort((a, b) => b.score - a.score);
+  matchedAyat.sort((a, b) => b.score - a.score);
+  return {
+    hadiths: matchedHadiths.slice(0, 8),
+    ayat: matchedAyat.slice(0, 5)
+  };
+}
+function getCollectionArabicName(col) {
+  switch (col) {
+    case "bukhari":
+      return "\u0635\u062D\u064A\u062D \u0627\u0644\u0628\u062E\u0627\u0631\u064A";
+    case "muslim":
+      return "\u0635\u062D\u064A\u062D \u0645\u0633\u0644\u0645";
+    case "abudawud":
+      return "\u0633\u0646\u0646 \u0623\u0628\u064A \u062F\u0627\u0648\u062F";
+    case "tirmidhi":
+      return "\u062C\u0627\u0645\u0639 \u0627\u0644\u062A\u0631\u0645\u0630\u064A";
+    case "nasai":
+      return "\u0633\u0646\u0646 \u0627\u0644\u0646\u0633\u0627\u0626\u064A";
+    case "ibnmajah":
+      return "\u0633\u0646\u0646 \u0627\u0628\u0646 \u0645\u0627\u062C\u0647";
+    case "nawawi":
+      return "\u0627\u0644\u0623\u0631\u0628\u0639\u0648\u0646 \u0627\u0644\u0646\u0648\u0648\u064A\u0629";
+    default:
+      return col;
+  }
+}
+function parseGrades(rawGrades) {
+  return rawGrades.map((g) => {
+    const raw = (g.grade || "").trim();
+    const name = (g.name || "\u0645\u064F\u062E\u0631\u0650\u0651\u062C \u063A\u064A\u0631 \u0645\u0633\u0645\u0649").trim();
+    let family = "neutral";
+    if (/sahih|صحيح/i.test(raw)) family = "\u0635\u062D\u064A\u062D";
+    else if (/hasan|حسن/i.test(raw)) family = "\u062D\u0633\u0646";
+    else if (/da'?if|ضعيف/i.test(raw)) family = "\u0636\u0639\u064A\u0641";
+    else if (/maudu|موضوع/i.test(raw)) family = "\u0645\u0648\u0636\u0648\u0639";
+    return {
+      name,
+      originalGrade: raw,
+      arabicLabel: raw,
+      family,
+      isIsnadJudgment: /isnaad/i.test(raw),
+      isCitation: false
+    };
+  });
+}
+function getGeminiClient() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY_MISSING");
+  }
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build"
+      }
+    }
+  });
+}
+async function executeCall1(question) {
+  const ai = getGeminiClient();
+  const systemInstruction = `You are a scholarly search term expander for Quran and Hadith corpora. Analyze the user's question.
+Do NOT answer the question; output JSON only.
+1. Classify the intent into one of: "textual" (asking if a specific hadith/verse exists or what text says), "permissibility" (halal/haram/ruling question), "personal" (asking for personal fatwa/counsel), or "other".
+2. Identify language ("ar" | "en").
+3. If a specific saying or text is quoted or claimed, extract it in "claimed_text", else null.
+4. Extract expanded search keywords and classical synonyms (maximum 12 terms total across all arrays). Arabic terms in classical forms as they appear in hadith texts; English terms as in the translations.
+Output STRICT JSON:
+{"category":"textual"|"permissibility"|"personal"|"other","language":"ar"|"en","claimed_text":string|null,"primary_ar":["term1"],"synonyms_ar":["syn1"],"terms_en":["term1"],"terms":["term1"],"is_ruling_question":boolean}`;
+  const modelsToTry = [LITE_MODEL, MAIN_MODEL, BACKUP_MODEL];
+  let lastError = null;
+  for (const model of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: question,
+        config: {
+          systemInstruction,
+          temperature: 0,
+          responseMimeType: "application/json"
+        }
+      });
+      const text = response.text?.trim() || "{}";
+      const parsed = JSON.parse(text);
+      const combinedTerms = [];
+      if (Array.isArray(parsed.terms)) combinedTerms.push(...parsed.terms);
+      if (Array.isArray(parsed.primary_ar)) combinedTerms.push(...parsed.primary_ar);
+      if (Array.isArray(parsed.synonyms_ar)) combinedTerms.push(...parsed.synonyms_ar);
+      if (Array.isArray(parsed.terms_en)) combinedTerms.push(...parsed.terms_en);
+      const uniqueTerms = Array.from(new Set(combinedTerms.filter(Boolean))).slice(0, 12);
+      return {
+        category: parsed.category || (parsed.is_ruling_question ? "permissibility" : "textual"),
+        language: parsed.language === "en" ? "en" : "ar",
+        claimed_text: parsed.claimed_text || null,
+        terms: uniqueTerms.length > 0 ? uniqueTerms : [question],
+        is_ruling_question: Boolean(parsed.is_ruling_question || parsed.category === "permissibility")
+      };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError || new Error("Failed to generate call 1 expansion");
+}
+async function executeCall2(question, retrievedDocs) {
+  const ai = getGeminiClient();
+  const systemInstruction = `You are an evidence verifier for Islamic scripture. You MUST answer STRICTLY and ONLY using the provided retrieved texts. Never use external memory or extrapolate rulings.
+- "supports" means the text itself states the claim. A text that only mentions the topic is NOT support.
+- "refutes" means the text states the opposite.
+- Otherwise verdict = "unclear".
+- Quotes MUST be in the exact same language as the source text, copied verbatim from that source item.
+- Do NOT include grades, narrators, or ruling words (\u062D\u0631\u0627\u0645\u060C \u062D\u0644\u0627\u0644\u060C \u064A\u062C\u0648\u0632\u060C \u0644\u0627 \u064A\u062C\u0648\u0632\u060C \u0648\u0627\u062C\u0628\u060C \u0645\u0643\u0631\u0648\u0647) in the summary unless that exact word appears inside a quoted item. If the summary breaks this, output empty summary.
+Output STRICT JSON:
+{"verdict":"supported"|"contradicted"|"unclear","summary":"One factual sentence in Arabic summarizing what the texts say","items":[{"id":"string","quote":"string","role":"supports"|"refutes"}]}`;
+  const promptItems = retrievedDocs.map((d) => `[Item id="${d.id}" source="${d.sourceLabel}"]
+${d.matnText}
+[/Item]`).join("\n\n");
+  const userPrompt = `Question: ${question}
+
+Retrieved Texts:
+${promptItems}`;
+  const modelsToTry = [LITE_MODEL, MAIN_MODEL, BACKUP_MODEL];
+  let lastError = null;
+  for (const model of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: userPrompt,
+        config: {
+          systemInstruction,
+          temperature: 0,
+          responseMimeType: "application/json"
+        }
+      });
+      const text = response.text?.trim() || "{}";
+      const parsed = JSON.parse(text);
+      return {
+        verdict: parsed.verdict === "supported" || parsed.verdict === "contradicted" ? parsed.verdict : "unclear",
+        summary: typeof parsed.summary === "string" ? parsed.summary.trim() : "",
+        items: Array.isArray(parsed.items) ? parsed.items : []
+      };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError || new Error("Failed to generate call 2 verification");
+}
+async function askQuestion(req, clientIp = "127.0.0.1") {
+  const startTime = performance.now();
+  const rawQuestion = (req.question || "").trim();
+  if (!rawQuestion) {
+    return {
+      question: rawQuestion,
+      language: "ar",
+      category: "other",
+      verdict: "unclear",
+      verdictBadgeLabel: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642\u060C \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645",
+      summary: "",
+      searchedTerms: [],
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: 0,
+      error: "\u064A\u0631\u062C\u0649 \u0643\u062A\u0627\u0628\u0629 \u0627\u0644\u0633\u0624\u0627\u0644 \u0627\u0644\u0634\u0631\u0639\u064A \u0644\u0644\u0628\u062D\u062B."
+    };
+  }
+  if (!checkRateLimit(clientIp)) {
+    return {
+      question: rawQuestion,
+      language: "ar",
+      category: "other",
+      verdict: "unclear",
+      verdictBadgeLabel: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647",
+      summary: "",
+      searchedTerms: [],
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime),
+      error: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647 \u0644\u0644\u0623\u0633\u0626\u0644\u0629 (20 \u0633\u0624\u0627\u0644\u0627\u064B \u0641\u064A \u0627\u0644\u0633\u0627\u0639\u0629). \u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0648\u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0644\u0627\u062D\u0642\u0627\u064B."
+    };
+  }
+  const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, " ");
+  const cached = askCache.get(normKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return {
+      ...cached.data,
+      cached: true,
+      executionTimeMs: Math.round(performance.now() - startTime)
+    };
+  }
+  const normCleanQuestion = stripArabicPrefixes(rawQuestion);
+  const matchedFake = CURATED_FABRICATED_SAYINGS.find(
+    (f) => normCleanQuestion.includes(normalizeArabic(f.matn)) || f.keywords.some((k) => normCleanQuestion.includes(normalizeArabic(k)))
+  );
+  if (matchedFake) {
+    const res2 = {
+      question: rawQuestion,
+      language: "ar",
+      category: "textual",
+      verdict: "contradicted",
+      verdictBadgeLabel: "\u062D\u062F\u064A\u062B \u0645\u0643\u0630\u0648\u0628 / \u0644\u0627 \u0623\u0635\u0644 \u0644\u0647",
+      verdictBadgeSubline: `\u062D\u0643\u0645 \u0627\u0644\u062D\u062F\u064A\u062B: \xAB${matchedFake.ruling}\xBB \u0645\u0648\u062B\u0642 \u0641\u064A \u0627\u0644\u062F\u0631\u0631 \u0627\u0644\u0633\u0646\u064A\u0629`,
+      isFabricated: true,
+      fakeHadith: {
+        matn: matchedFake.matn,
+        ruling: matchedFake.ruling,
+        url: matchedFake.url
+      },
+      summary: `\u0647\u0630\u0627 \u0627\u0644\u0642\u0648\u0644 (\xAB${matchedFake.matn}\xBB) \u0644\u0627 \u0623\u0635\u0644 \u0644\u0647 \u0623\u0648 \u062D\u0643\u0645\u0647 \xAB${matchedFake.ruling}\xBB \u0648\u0641\u0642 \u0627\u0644\u062A\u0648\u062B\u064A\u0642 \u0627\u0644\u0645\u0639\u062A\u0645\u062F \u0641\u064A \u0645\u0648\u0642\u0639 \u0627\u0644\u062F\u0631\u0631 \u0627\u0644\u0633\u0646\u064A\u0629.`,
+      searchedTerms: matchedFake.keywords,
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime)
+    };
+    askCache.set(normKey, { data: res2, timestamp: Date.now() });
+    return res2;
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    return {
+      question: rawQuestion,
+      language: "ar",
+      category: "other",
+      verdict: "unclear",
+      verdictBadgeLabel: "\u063A\u064A\u0631 \u0645\u062A\u0627\u062D",
+      summary: "",
+      searchedTerms: [],
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime),
+      error: '\u062E\u062F\u0645\u0629 "\u0627\u0633\u0623\u0644" \u062A\u062A\u0637\u0644\u0628 \u0636\u0628\u0637 \u0645\u0641\u062A\u0627\u062D GEMINI_API_KEY \u0641\u064A \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u062E\u0627\u062F\u0645.'
+    };
+  }
+  let call1Result;
+  try {
+    call1Result = await executeCall1(rawQuestion);
+  } catch (err) {
+    return {
+      question: rawQuestion,
+      language: "ar",
+      category: "other",
+      verdict: "unclear",
+      verdictBadgeLabel: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u0627\u062A\u0635\u0627\u0644",
+      summary: "",
+      searchedTerms: [],
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime),
+      error: "\u062A\u0639\u0630\u0631 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0646\u0645\u0648\u0630\u062C \u0627\u0644\u062A\u0648\u0633\u064A\u0639\u060C \u064A\u0631\u062C\u0649 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0644\u0627\u062D\u0642\u0627\u064B."
+    };
+  }
+  const { category, language, claimed_text, terms, is_ruling_question } = call1Result;
+  if (claimed_text) {
+    const normClaim = stripArabicPrefixes(claimed_text);
+    const fakeClaim = CURATED_FABRICATED_SAYINGS.find(
+      (f) => normClaim.includes(normalizeArabic(f.matn)) || f.keywords.some((k) => normClaim.includes(normalizeArabic(k)))
+    );
+    if (fakeClaim) {
+      const res2 = {
+        question: rawQuestion,
+        language,
+        category,
+        verdict: "contradicted",
+        verdictBadgeLabel: "\u062D\u062F\u064A\u062B \u0645\u0643\u0630\u0648\u0628 / \u0644\u0627 \u0623\u0635\u0644 \u0644\u0647",
+        verdictBadgeSubline: `\u062D\u0643\u0645 \u0627\u0644\u062D\u062F\u064A\u062B: \xAB${fakeClaim.ruling}\xBB \u0645\u0648\u062B\u0642 \u0641\u064A \u0627\u0644\u062F\u0631\u0631 \u0627\u0644\u0633\u0646\u064A\u0629`,
+        isFabricated: true,
+        fakeHadith: {
+          matn: fakeClaim.matn,
+          ruling: fakeClaim.ruling,
+          url: fakeClaim.url
+        },
+        summary: `\u0627\u0644\u0646\u0635 \u0627\u0644\u0645\u0630\u0643\u0648\u0631 \u0641\u064A \u0627\u0644\u0633\u0624\u0627\u0644 (\xAB${fakeClaim.matn}\xBB) \u062D\u0643\u0645\u0647 \u0639\u0646\u062F \u0627\u0644\u0645\u062D\u062F\u062B\u064A\u0646 \xAB${fakeClaim.ruling}\xBB \u0648\u0641\u0642 \u0645\u0627 \u062A\u0645 \u062A\u0648\u062B\u064A\u0642\u0647 \u0641\u064A \u0645\u0648\u0642\u0639 \u0627\u0644\u062F\u0631\u0631 \u0627\u0644\u0633\u0646\u064A\u0629.`,
+        searchedTerms: terms,
+        items: [],
+        retrievedCount: 0,
+        droppedItemsCount: 0,
+        topRetrievedIds: [],
+        executionTimeMs: Math.round(performance.now() - startTime)
+      };
+      askCache.set(normKey, { data: res2, timestamp: Date.now() });
+      return res2;
+    }
+  }
+  const { hadiths, ayat } = searchCorpusKeywords(terms, language);
+  const combinedRetrieved = [...ayat, ...hadiths];
+  const topRetrievedIds = combinedRetrieved.map((d) => d.id).slice(0, 3);
+  if (is_ruling_question || category === "permissibility") {
+    const verifiedItems2 = combinedRetrieved.map((d) => ({
+      id: d.id,
+      quote: d.matnText.slice(0, 160),
+      role: "supports",
+      sourceTitle: d.sourceLabel,
+      fullText: d.fullText,
+      grades: d.grades,
+      hasNoGrading: d.hasNoGrading,
+      type: d.type,
+      chapter: d.chapter,
+      verse: d.verse,
+      collection: d.collection,
+      hadithnumber: d.hadithnumber
+    }));
+    const res2 = {
+      question: rawQuestion,
+      language,
+      category: "permissibility",
+      verdict: "permissibility",
+      verdictBadgeLabel: "\u0647\u0630\u0627 \u0633\u0624\u0627\u0644 \u0641\u064A \u0627\u0644\u062D\u0643\u0645 \u0627\u0644\u0634\u0631\u0639\u064A\u061B \u0646\u0639\u0631\u0636 \u0627\u0644\u0646\u0635\u0648\u0635 \u0641\u0642\u0637\u060C \u0648\u0627\u0644\u0641\u062A\u0648\u0649 \u0644\u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645",
+      isPermissibility: true,
+      summary: "",
+      searchedTerms: terms,
+      items: verifiedItems2,
+      retrievedCount: combinedRetrieved.length,
+      droppedItemsCount: 0,
+      topRetrievedIds,
+      executionTimeMs: Math.round(performance.now() - startTime)
+    };
+    askCache.set(normKey, { data: res2, timestamp: Date.now() });
+    return res2;
+  }
+  if (combinedRetrieved.length === 0) {
+    const res2 = {
+      question: rawQuestion,
+      language,
+      category,
+      verdict: "unclear",
+      verdictBadgeLabel: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642\u060C \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645",
+      summary: "",
+      searchedTerms: terms,
+      items: [],
+      retrievedCount: 0,
+      droppedItemsCount: 0,
+      topRetrievedIds: [],
+      executionTimeMs: Math.round(performance.now() - startTime)
+    };
+    askCache.set(normKey, { data: res2, timestamp: Date.now() });
+    return res2;
+  }
+  let call2Result;
+  try {
+    call2Result = await executeCall2(rawQuestion, combinedRetrieved);
+  } catch (err) {
+    call2Result = { verdict: "unclear", summary: "", items: [] };
+  }
+  const retrievedMap = /* @__PURE__ */ new Map();
+  for (const d of combinedRetrieved) {
+    retrievedMap.set(d.id, d);
+  }
+  let droppedItemsCount = 0;
+  const verifiedItems = [];
+  for (const item of call2Result.items || []) {
+    const sourceDoc = retrievedMap.get(item.id);
+    if (!sourceDoc) {
+      droppedItemsCount++;
+      continue;
+    }
+    const normSource = normalizeArabic(sourceDoc.fullText).replace(/[\u064B-\u065F\u0670]/g, "");
+    const normQuote = normalizeArabic(item.quote || "").replace(/[\u064B-\u065F\u0670]/g, "");
+    if (!normQuote || !normSource.includes(normQuote)) {
+      droppedItemsCount++;
+      continue;
+    }
+    verifiedItems.push({
+      id: sourceDoc.id,
+      quote: item.quote,
+      role: item.role === "refutes" ? "refutes" : "supports",
+      sourceTitle: sourceDoc.sourceLabel,
+      fullText: sourceDoc.fullText,
+      grades: sourceDoc.grades,
+      hasNoGrading: sourceDoc.hasNoGrading,
+      type: sourceDoc.type,
+      chapter: sourceDoc.chapter,
+      verse: sourceDoc.verse,
+      collection: sourceDoc.collection,
+      hadithnumber: sourceDoc.hadithnumber
+    });
+  }
+  const supportingItems = verifiedItems.filter((i) => i.role === "supports");
+  let finalVerdict = call2Result.verdict;
+  if (supportingItems.length === 0 && finalVerdict === "supported") {
+    finalVerdict = "unclear";
+  }
+  const forbiddenRulingWords = ["\u062D\u0631\u0627\u0645", "\u062D\u0644\u0627\u0644", "\u064A\u062C\u0648\u0632", "\u0644\u0627 \u064A\u062C\u0648\u0632", "\u0648\u0627\u062C\u0628", "\u0645\u0643\u0631\u0648\u0647"];
+  let finalSummary = call2Result.summary || "";
+  const quotesCombined = verifiedItems.map((v) => v.quote).join(" ");
+  for (const word of forbiddenRulingWords) {
+    if (finalSummary.includes(word) && !quotesCombined.includes(word)) {
+      finalSummary = "\u0627\u0644\u0645\u0644\u062E\u0635 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D";
+      break;
+    }
+  }
+  let isWeakOnly = false;
+  let verdictBadgeLabel = "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642\u060C \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645";
+  let verdictBadgeSubline = void 0;
+  if (finalVerdict === "supported") {
+    const supportingHadiths = supportingItems.filter((i) => i.type === "hadith");
+    if (supportingHadiths.length > 0) {
+      const allHadithsHaveGrades = supportingHadiths.every(
+        (h) => !h.hasNoGrading && Array.isArray(h.grades) && h.grades.length > 0
+      );
+      const noneIsSahihOrHasan = supportingHadiths.every(
+        (h) => (h.grades || []).every((g) => g.family !== "\u0635\u062D\u064A\u062D" && g.family !== "\u062D\u0633\u0646")
+      );
+      if (allHadithsHaveGrades && noneIsSahihOrHasan) {
+        isWeakOnly = true;
+        verdictBadgeLabel = "\u0648\u064F\u062C\u062F \u0646\u0635\u060C \u0644\u0643\u0646 \u062F\u0631\u062C\u062A\u0647 \u0636\u0639\u064A\u0641\u0629 \u0639\u0646\u062F \u0627\u0644\u0645\u0635\u062F\u0631";
+        verdictBadgeSubline = "\u0627\u0644\u0646\u0635\u0648\u0635 \u0627\u0644\u0645\u0633\u062A\u0631\u062C\u0639\u0629 \u0645\u0631\u0648\u064A\u0629 \u0628\u0623\u0633\u0627\u0646\u064A\u062F \u062D\u0643\u0645 \u0627\u0644\u0645\u062D\u062F\u062B\u0648\u0646 \u0628\u0636\u0639\u0641\u0647\u0627";
+      } else {
+        verdictBadgeLabel = "\u0648\u064F\u062C\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631";
+        verdictBadgeSubline = "\u0647\u0630\u0627 \u0644\u064A\u0633 \u062D\u0643\u0645\u0627\u064B \u0628\u0635\u062D\u0629 \u0627\u0644\u0646\u0635";
+      }
+    } else {
+      verdictBadgeLabel = "\u0648\u064F\u062C\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631";
+      verdictBadgeSubline = "\u0647\u0630\u0627 \u0644\u064A\u0633 \u062D\u0643\u0645\u0627\u064B \u0628\u0635\u062D\u0629 \u0627\u0644\u0646\u0635";
+    }
+  } else if (finalVerdict === "contradicted") {
+    verdictBadgeLabel = "\u0645\u0639\u0627\u0631\u0636 \u0644\u0644\u0646\u0635\u0648\u0635 \u0627\u0644\u0645\u0639\u062A\u0645\u062F\u0629";
+  } else {
+    verdictBadgeLabel = "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642\u060C \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645";
+  }
+  const res = {
+    question: rawQuestion,
+    language,
+    category,
+    verdict: finalVerdict,
+    verdictBadgeLabel,
+    verdictBadgeSubline,
+    isWeakOnly,
+    summary: finalSummary || (finalVerdict === "supported" ? "\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0646\u0635 \u0645\u0633\u0646\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631 \u0623\u062F\u0646\u0627\u0647." : ""),
+    searchedTerms: terms,
+    items: verifiedItems,
+    retrievedCount: combinedRetrieved.length,
+    droppedItemsCount,
+    topRetrievedIds,
+    executionTimeMs: Math.round(performance.now() - startTime)
+  };
+  askCache.set(normKey, { data: res, timestamp: Date.now() });
+  return res;
+}
+
 // server/app.ts
 var app = express();
 app.use(express.json({ limit: "10mb" }));
@@ -2410,8 +3024,25 @@ app.post("/api/hadith/match", (req, res) => {
   }
   res.json(result);
 });
-app.post("/api/ask", (req, res) => {
-  res.json({ status: "scaffold_ready", mode: "ask", verdict: "unclear" });
+app.post("/api/ask", async (req, res) => {
+  try {
+    const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket.remoteAddress || "127.0.0.1";
+    const result = await askQuestion(req.body || {}, clientIp);
+    if (result.error && result.error.includes("\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647")) {
+      res.status(429).json(result);
+      return;
+    }
+    if (result.error && result.error.includes("GEMINI_API_KEY")) {
+      res.status(503).json(result);
+      return;
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      error: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0623\u062B\u0646\u0627\u0621 \u0645\u0639\u0627\u0644\u062C\u0629 \u0627\u0644\u0633\u0624\u0627\u0644 \u0627\u0644\u0634\u0631\u0639\u064A.",
+      details: err?.message
+    });
+  }
 });
 app.post("/api/ocr", (req, res) => {
   res.json({ status: "scaffold_ready", text: "" });

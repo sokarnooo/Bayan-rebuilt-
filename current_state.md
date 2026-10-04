@@ -1,6 +1,12 @@
 # Current Project State - Bayan (بيان)
 
 ## Status
+- **Ask Mode (اسأل بالدليل)**:
+  - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
+  - Deterministic word-level TF-IDF corpus retrieval with light Arabic prefix stripping (zero embeddings).
+  - Strict code-side quote and ID substring validation; forbidden ruling words filtered from automated summary.
+  - Scholarly safeguards: Permissibility questions bypass Call 2 and show texts + scholar banner; weak hadiths show «وُجد نص، لكن درجته ضعيفة عند المصدر»; Dorar.net fabricated entries return `contradicted` + card.
+  - 14-case ask evaluation suite in `eval/run_ask.ts` executed.
 - **Evaluation Harness**: 133/133 (100%) test cases passing with zero failures under `--quiet --concurrency 1` (both dev server on port 3000 and standalone production bundle on port 3099).
 - **Matching Performance & Latency**:
   - p50: **71 ms**, p95: **564 ms**, max: **1.5s** (target < 2s met).

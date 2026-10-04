@@ -32,7 +32,7 @@
 
 ## Next
 [ ] 7 Review the import-run edits (ayahMatcher.ts, hadithMatcher.ts, AyahMode.tsx, HadithMode.tsx)
-[x] 8 Ask mode: plan (2026-10-04: Completed ASK_DESIGN.md with system prompts, deterministic retrieval architecture, grounding rules, and 12-case test suite)
+[x] 8 Ask mode: build (2026-10-04: Implemented POST /api/ask with dual-call grounding, inverted index retrieval, permissibility & weak hadith guards, 14-case ask suite in eval/run_ask.ts, and AskMode UI)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
 [ ] 9 OCR test
 [ ] 10 Server key and hourly limits (owner supplies RPD values)

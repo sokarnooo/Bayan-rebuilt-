@@ -173,16 +173,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 7.58
+          "executionTimeMs": 35.6
         },
-        "duration": 80,
-        "timestamp": "2026-10-04T18:30:59.102Z"
+        "duration": 125,
+        "timestamp": "2026-10-04T19:43:41.648Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 80
+      "avgDuration": 125
     }
   },
   {
@@ -346,16 +346,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 47.07
+          "executionTimeMs": 70.91
         },
-        "duration": 54,
-        "timestamp": "2026-10-04T18:30:59.157Z"
+        "duration": 79,
+        "timestamp": "2026-10-04T19:43:41.730Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 54
+      "avgDuration": 79
     }
   },
   {
@@ -499,16 +499,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.5
+          "executionTimeMs": 5.76
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T18:30:59.167Z"
+        "duration": 23,
+        "timestamp": "2026-10-04T19:43:41.753Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 23
     }
   },
   {
@@ -652,10 +652,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.97
+          "executionTimeMs": 4.23
         },
         "duration": 10,
-        "timestamp": "2026-10-04T18:30:59.177Z"
+        "timestamp": "2026-10-04T19:43:41.764Z"
       }
     ],
     "summary": {
@@ -760,16 +760,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 1.31
+          "executionTimeMs": 1.8
         },
-        "duration": 7,
-        "timestamp": "2026-10-04T18:30:59.184Z"
+        "duration": 21,
+        "timestamp": "2026-10-04T19:43:41.785Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 7
+      "avgDuration": 21
     }
   },
   {
@@ -1043,16 +1043,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 11.76
+          "executionTimeMs": 15.91
         },
-        "duration": 18,
-        "timestamp": "2026-10-04T18:30:59.203Z"
+        "duration": 22,
+        "timestamp": "2026-10-04T19:43:41.807Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 18
+      "avgDuration": 22
     }
   },
   {
@@ -1181,16 +1181,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 3.89
+          "executionTimeMs": 4.4
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T18:30:59.213Z"
+        "duration": 9,
+        "timestamp": "2026-10-04T19:43:41.817Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 9
     }
   },
   {
@@ -1439,10 +1439,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 10.11
+          "executionTimeMs": 8.03
         },
         "duration": 14,
-        "timestamp": "2026-10-04T18:30:59.229Z"
+        "timestamp": "2026-10-04T19:43:41.832Z"
       }
     ],
     "summary": {
@@ -1632,16 +1632,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.07
+          "executionTimeMs": 76.69
         },
-        "duration": 68,
-        "timestamp": "2026-10-04T18:30:59.298Z"
+        "duration": 85,
+        "timestamp": "2026-10-04T19:43:41.918Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 68
+      "avgDuration": 85
     }
   },
   {
@@ -1785,16 +1785,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 5.57
+          "executionTimeMs": 4.24
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T18:30:59.308Z"
+        "duration": 8,
+        "timestamp": "2026-10-04T19:43:41.927Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 8
     }
   },
   {
@@ -2551,16 +2551,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 27.13
+          "executionTimeMs": 24.81
         },
-        "duration": 32,
-        "timestamp": "2026-10-04T18:30:59.341Z"
+        "duration": 31,
+        "timestamp": "2026-10-04T19:43:41.959Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 32
+      "avgDuration": 31
     }
   },
   {
@@ -2684,16 +2684,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 2.57
+          "executionTimeMs": 1.49
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T18:30:59.348Z"
+        "duration": 7,
+        "timestamp": "2026-10-04T19:43:41.966Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 7
     }
   },
   {
@@ -2862,16 +2862,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 6.91
+          "executionTimeMs": 5.71
         },
-        "duration": 15,
-        "timestamp": "2026-10-04T18:30:59.364Z"
+        "duration": 11,
+        "timestamp": "2026-10-04T19:43:41.978Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 15
+      "avgDuration": 11
     }
   },
   {
@@ -3005,16 +3005,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.38
+          "executionTimeMs": 3.06
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T18:30:59.373Z"
+        "duration": 6,
+        "timestamp": "2026-10-04T19:43:41.986Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 6
     }
   },
   {
@@ -3133,16 +3133,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 2.2
+          "executionTimeMs": 3.48
         },
-        "duration": 6,
-        "timestamp": "2026-10-04T18:30:59.380Z"
+        "duration": 8,
+        "timestamp": "2026-10-04T19:43:41.994Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 6
+      "avgDuration": 8
     }
   },
   {
@@ -3276,16 +3276,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.5
+          "executionTimeMs": 3.71
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T18:30:59.389Z"
+        "duration": 8,
+        "timestamp": "2026-10-04T19:43:42.002Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 8
     }
   },
   {
@@ -3456,16 +3456,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 34.29
+          "executionTimeMs": 31.93
         },
-        "duration": 39,
-        "timestamp": "2026-10-04T18:30:59.429Z"
+        "duration": 38,
+        "timestamp": "2026-10-04T19:43:42.041Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 39
+      "avgDuration": 38
     }
   },
   {
@@ -3629,16 +3629,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 6.67
+          "executionTimeMs": 6.45
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T18:30:59.439Z"
+        "duration": 11,
+        "timestamp": "2026-10-04T19:43:42.053Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 11
     }
   },
   {
@@ -4002,16 +4002,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 10.64
+          "executionTimeMs": 9.92
         },
-        "duration": 16,
-        "timestamp": "2026-10-04T18:30:59.455Z"
+        "duration": 15,
+        "timestamp": "2026-10-04T19:43:42.068Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 16
+      "avgDuration": 15
     }
   },
   {
@@ -4151,16 +4151,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.23
+          "executionTimeMs": 4.08
         },
-        "duration": 8,
-        "timestamp": "2026-10-04T18:30:59.464Z"
+        "duration": 9,
+        "timestamp": "2026-10-04T19:43:42.077Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 8
+      "avgDuration": 9
     }
   },
   {
@@ -4336,16 +4336,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.29
+          "executionTimeMs": 3.51
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T18:30:59.474Z"
+        "duration": 6,
+        "timestamp": "2026-10-04T19:43:42.083Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 6
     }
   },
   {
@@ -4507,10 +4507,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 1.32
+          "executionTimeMs": 1.12
         },
         "duration": 5,
-        "timestamp": "2026-10-04T18:30:59.480Z"
+        "timestamp": "2026-10-04T19:43:42.089Z"
       }
     ],
     "summary": {
@@ -4640,16 +4640,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.63
+          "executionTimeMs": 0.7
         },
-        "duration": 7,
-        "timestamp": "2026-10-04T18:30:59.487Z"
+        "duration": 3,
+        "timestamp": "2026-10-04T19:43:42.092Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 7
+      "avgDuration": 3
     }
   },
   {
@@ -4773,10 +4773,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.71
+          "executionTimeMs": 9.32
         },
         "duration": 13,
-        "timestamp": "2026-10-04T18:30:59.500Z"
+        "timestamp": "2026-10-04T19:43:42.106Z"
       }
     ],
     "summary": {
@@ -5193,16 +5193,16 @@
           ],
           "referralRequired": false,
           "notice": "تم تجاهل البسملة في بداية السورة أثناء المطابقة لأنها ليست جزءاً من الآية الأولى في هذه السورة",
-          "executionTimeMs": 28.17
+          "executionTimeMs": 33.19
         },
-        "duration": 33,
-        "timestamp": "2026-10-04T18:30:59.534Z"
+        "duration": 38,
+        "timestamp": "2026-10-04T19:43:42.144Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 33
+      "avgDuration": 38
     }
   },
   {
@@ -5431,10 +5431,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.34
+          "executionTimeMs": 8.13
         },
         "duration": 13,
-        "timestamp": "2026-10-04T18:30:59.548Z"
+        "timestamp": "2026-10-04T19:43:42.158Z"
       }
     ],
     "summary": {
@@ -5559,16 +5559,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.38
+          "executionTimeMs": 0.39
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T18:30:59.553Z"
+        "duration": 5,
+        "timestamp": "2026-10-04T19:43:42.164Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 5
     }
   },
   {
@@ -7833,16 +7833,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 9.7
+          "executionTimeMs": 12.33
         },
-        "duration": 15,
-        "timestamp": "2026-10-04T18:30:59.569Z"
+        "duration": 18,
+        "timestamp": "2026-10-04T19:43:42.182Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 15
+      "avgDuration": 18
     }
   },
   {
@@ -8006,16 +8006,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 7.72
+          "executionTimeMs": 8.54
         },
-        "duration": 12,
-        "timestamp": "2026-10-04T18:30:59.582Z"
+        "duration": 13,
+        "timestamp": "2026-10-04T19:43:42.196Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 12
+      "avgDuration": 13
     }
   },
   {
@@ -8144,10 +8144,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 14.57
+          "executionTimeMs": 15.32
         },
         "duration": 20,
-        "timestamp": "2026-10-04T18:30:59.602Z"
+        "timestamp": "2026-10-04T19:43:42.216Z"
       }
     ],
     "summary": {
@@ -8362,16 +8362,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 22.27
+          "executionTimeMs": 27.69
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:30:59.630Z"
+        "duration": 32,
+        "timestamp": "2026-10-04T19:43:42.249Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 32
     }
   },
   {
@@ -10315,16 +10315,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 56.19
+          "executionTimeMs": 95.87
         },
-        "duration": 61,
-        "timestamp": "2026-10-04T18:30:59.694Z"
+        "duration": 102,
+        "timestamp": "2026-10-04T19:43:42.353Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 61
+      "avgDuration": 102
     }
   },
   {
@@ -16881,16 +16881,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 359.74
+          "executionTimeMs": 324.42
         },
-        "duration": 368,
-        "timestamp": "2026-10-04T18:31:00.095Z"
+        "duration": 332,
+        "timestamp": "2026-10-04T19:43:42.721Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 368
+      "avgDuration": 332
     }
   },
   {
@@ -17590,16 +17590,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 48.22
+          "executionTimeMs": 162.95
         },
-        "duration": 52,
-        "timestamp": "2026-10-04T18:31:00.148Z"
+        "duration": 168,
+        "timestamp": "2026-10-04T19:43:42.890Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 52
+      "avgDuration": 168
     }
   },
   {
@@ -18475,16 +18475,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 103.85
+          "executionTimeMs": 163.5
         },
-        "duration": 108,
-        "timestamp": "2026-10-04T18:31:00.259Z"
+        "duration": 168,
+        "timestamp": "2026-10-04T19:43:43.063Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 108
+      "avgDuration": 168
     }
   },
   {
@@ -20979,16 +20979,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 144.3
+          "executionTimeMs": 77.67
         },
-        "duration": 153,
-        "timestamp": "2026-10-04T18:31:00.415Z"
+        "duration": 84,
+        "timestamp": "2026-10-04T19:43:43.148Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 153
+      "avgDuration": 84
     }
   },
   {
@@ -21372,16 +21372,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 24.55
+          "executionTimeMs": 27.69
         },
-        "duration": 30,
-        "timestamp": "2026-10-04T18:31:00.446Z"
+        "duration": 36,
+        "timestamp": "2026-10-04T19:43:43.185Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 30
+      "avgDuration": 36
     }
   },
   {
@@ -23785,16 +23785,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 90.05
+          "executionTimeMs": 101.14
         },
-        "duration": 96,
-        "timestamp": "2026-10-04T18:31:00.547Z"
+        "duration": 107,
+        "timestamp": "2026-10-04T19:43:43.296Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 96
+      "avgDuration": 107
     }
   },
   {
@@ -27573,16 +27573,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 52.13
+          "executionTimeMs": 54.26
         },
-        "duration": 58,
-        "timestamp": "2026-10-04T18:31:00.606Z"
+        "duration": 60,
+        "timestamp": "2026-10-04T19:43:43.357Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 58
+      "avgDuration": 60
     }
   },
   {
@@ -27766,16 +27766,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 46.53
+          "executionTimeMs": 47.47
         },
-        "duration": 51,
-        "timestamp": "2026-10-04T18:31:00.658Z"
+        "duration": 52,
+        "timestamp": "2026-10-04T19:43:43.409Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 51
+      "avgDuration": 52
     }
   },
   {
@@ -29919,16 +29919,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 139.13
+          "executionTimeMs": 121.8
         },
-        "duration": 145,
-        "timestamp": "2026-10-04T18:31:00.823Z"
+        "duration": 127,
+        "timestamp": "2026-10-04T19:43:43.557Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 145
+      "avgDuration": 127
     }
   },
   {
@@ -30834,16 +30834,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 132.5
+          "executionTimeMs": 101.37
         },
-        "duration": 144,
-        "timestamp": "2026-10-04T18:31:00.970Z"
+        "duration": 106,
+        "timestamp": "2026-10-04T19:43:43.665Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 144
+      "avgDuration": 106
     }
   },
   {
@@ -37400,16 +37400,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 327.27
+          "executionTimeMs": 316.41
         },
-        "duration": 335,
-        "timestamp": "2026-10-04T18:31:01.349Z"
+        "duration": 323,
+        "timestamp": "2026-10-04T19:43:44.023Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 335
+      "avgDuration": 323
     }
   },
   {
@@ -37884,16 +37884,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 59.88
+          "executionTimeMs": 80.12
         },
-        "duration": 64,
-        "timestamp": "2026-10-04T18:31:01.414Z"
+        "duration": 84,
+        "timestamp": "2026-10-04T19:43:44.108Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 64
+      "avgDuration": 84
     }
   },
   {
@@ -38489,16 +38489,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 87.96
+          "executionTimeMs": 86.31
         },
-        "duration": 94,
-        "timestamp": "2026-10-04T18:31:01.510Z"
+        "duration": 91,
+        "timestamp": "2026-10-04T19:43:44.201Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 94
+      "avgDuration": 91
     }
   },
   {
@@ -39106,16 +39106,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 61.85
+          "executionTimeMs": 62.88
         },
-        "duration": 67,
-        "timestamp": "2026-10-04T18:31:01.579Z"
+        "duration": 68,
+        "timestamp": "2026-10-04T19:43:44.271Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 67
+      "avgDuration": 68
     }
   },
   {
@@ -45666,16 +45666,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 335.61
+          "executionTimeMs": 357.9
         },
-        "duration": 343,
-        "timestamp": "2026-10-04T18:31:01.955Z"
+        "duration": 365,
+        "timestamp": "2026-10-04T19:43:44.666Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 343
+      "avgDuration": 365
     }
   },
   {
@@ -47936,16 +47936,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 92.34
+          "executionTimeMs": 107.17
         },
-        "duration": 96,
-        "timestamp": "2026-10-04T18:31:02.054Z"
+        "duration": 113,
+        "timestamp": "2026-10-04T19:43:44.781Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 96
+      "avgDuration": 113
     }
   },
   {
@@ -48877,16 +48877,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 84.71
+          "executionTimeMs": 78.01
         },
-        "duration": 89,
-        "timestamp": "2026-10-04T18:31:02.146Z"
+        "duration": 82,
+        "timestamp": "2026-10-04T19:43:44.866Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 89
+      "avgDuration": 82
     }
   },
   {
@@ -50276,10 +50276,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 24.35
+          "executionTimeMs": 23.52
         },
         "duration": 29,
-        "timestamp": "2026-10-04T18:31:02.176Z"
+        "timestamp": "2026-10-04T19:43:44.895Z"
       }
     ],
     "summary": {
@@ -50831,16 +50831,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 11.8
+          "executionTimeMs": 13.39
         },
-        "duration": 17,
-        "timestamp": "2026-10-04T18:31:02.193Z"
+        "duration": 18,
+        "timestamp": "2026-10-04T19:43:44.914Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 17
+      "avgDuration": 18
     }
   },
   {
@@ -51928,16 +51928,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 24.22
+          "executionTimeMs": 20.35
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T18:31:02.222Z"
+        "duration": 25,
+        "timestamp": "2026-10-04T19:43:44.940Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 25
     }
   },
   {
@@ -52094,16 +52094,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 52.07
+          "executionTimeMs": 49.88
         },
-        "duration": 56,
-        "timestamp": "2026-10-04T18:31:02.279Z"
+        "duration": 54,
+        "timestamp": "2026-10-04T19:43:44.994Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 56
+      "avgDuration": 54
     }
   },
   {
@@ -54228,16 +54228,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 70.73
+          "executionTimeMs": 81.3
         },
-        "duration": 76,
-        "timestamp": "2026-10-04T18:31:02.356Z"
+        "duration": 87,
+        "timestamp": "2026-10-04T19:43:45.082Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 76
+      "avgDuration": 87
     }
   },
   {
@@ -55196,16 +55196,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 41.19
+          "executionTimeMs": 38.83
         },
-        "duration": 46,
-        "timestamp": "2026-10-04T18:31:02.402Z"
+        "duration": 44,
+        "timestamp": "2026-10-04T19:43:45.126Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 46
+      "avgDuration": 44
     }
   },
   {
@@ -55887,16 +55887,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 532.17
+          "executionTimeMs": 897.06
         },
-        "duration": 543,
-        "timestamp": "2026-10-04T18:31:02.946Z"
+        "duration": 908,
+        "timestamp": "2026-10-04T19:43:46.035Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 543
+      "avgDuration": 908
     }
   },
   {
@@ -56431,16 +56431,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 507.56
+          "executionTimeMs": 525.21
         },
-        "duration": 514,
-        "timestamp": "2026-10-04T18:31:03.460Z"
+        "duration": 531,
+        "timestamp": "2026-10-04T19:43:46.566Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 514
+      "avgDuration": 531
     }
   },
   {
@@ -56467,16 +56467,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 490.15
+          "executionTimeMs": 521.1
         },
-        "duration": 495,
-        "timestamp": "2026-10-04T18:31:03.955Z"
+        "duration": 527,
+        "timestamp": "2026-10-04T19:43:47.092Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 495
+      "avgDuration": 527
     }
   },
   {
@@ -56601,16 +56601,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 506.81
+          "executionTimeMs": 556.19
         },
-        "duration": 512,
-        "timestamp": "2026-10-04T18:31:04.467Z"
+        "duration": 560,
+        "timestamp": "2026-10-04T19:43:47.652Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 512
+      "avgDuration": 560
     }
   },
   {
@@ -56637,16 +56637,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 553.58
+          "executionTimeMs": 573.93
         },
-        "duration": 558,
-        "timestamp": "2026-10-04T18:31:05.025Z"
+        "duration": 578,
+        "timestamp": "2026-10-04T19:43:48.230Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 558
+      "avgDuration": 578
     }
   },
   {
@@ -56673,16 +56673,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 554.62
+          "executionTimeMs": 534.37
         },
-        "duration": 559,
-        "timestamp": "2026-10-04T18:31:05.585Z"
+        "duration": 539,
+        "timestamp": "2026-10-04T19:43:48.769Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 559
+      "avgDuration": 539
     }
   },
   {
@@ -56711,16 +56711,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.57
+          "executionTimeMs": 0.43
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T18:31:05.589Z"
+        "duration": 4,
+        "timestamp": "2026-10-04T19:43:48.774Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 4
     }
   },
   {
@@ -56748,16 +56748,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 46.41
+          "executionTimeMs": 48.89
         },
-        "duration": 50,
-        "timestamp": "2026-10-04T18:31:05.640Z"
+        "duration": 53,
+        "timestamp": "2026-10-04T19:43:48.827Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 50
+      "avgDuration": 53
     }
   },
   {
@@ -56786,10 +56786,10 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.19
+          "executionTimeMs": 0.23
         },
         "duration": 4,
-        "timestamp": "2026-10-04T18:31:05.644Z"
+        "timestamp": "2026-10-04T19:43:48.831Z"
       }
     ],
     "summary": {
@@ -56823,16 +56823,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 20.67
+          "executionTimeMs": 18.07
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T18:31:05.669Z"
+        "duration": 22,
+        "timestamp": "2026-10-04T19:43:48.854Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 22
     }
   },
   {
@@ -56861,10 +56861,10 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.08
+          "executionTimeMs": 0.11
         },
         "duration": 4,
-        "timestamp": "2026-10-04T18:31:05.673Z"
+        "timestamp": "2026-10-04T19:43:48.858Z"
       }
     ],
     "summary": {
@@ -56898,16 +56898,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 24.04
+          "executionTimeMs": 26.63
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T18:31:05.703Z"
+        "duration": 31,
+        "timestamp": "2026-10-04T19:43:48.889Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 31
     }
   },
   {
@@ -56936,16 +56936,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.8
+          "executionTimeMs": 1
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T18:31:05.706Z"
+        "duration": 5,
+        "timestamp": "2026-10-04T19:43:48.894Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 5
     }
   },
   {
@@ -56973,16 +56973,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 0.48
+          "executionTimeMs": 0.68
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T18:31:05.711Z"
+        "duration": 5,
+        "timestamp": "2026-10-04T19:43:48.899Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 5
     }
   },
   {
@@ -57011,16 +57011,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 13.65
+          "executionTimeMs": 17.74
         },
-        "duration": 18,
-        "timestamp": "2026-10-04T18:31:05.728Z"
+        "duration": 22,
+        "timestamp": "2026-10-04T19:43:48.921Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 18
+      "avgDuration": 22
     }
   },
   {
@@ -57048,16 +57048,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 44.61
+          "executionTimeMs": 43.57
         },
-        "duration": 49,
-        "timestamp": "2026-10-04T18:31:05.777Z"
+        "duration": 48,
+        "timestamp": "2026-10-04T19:43:48.969Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 49
+      "avgDuration": 48
     }
   },
   {
@@ -57086,10 +57086,10 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.16
+          "executionTimeMs": 0.2
         },
         "duration": 4,
-        "timestamp": "2026-10-04T18:31:05.781Z"
+        "timestamp": "2026-10-04T19:43:48.972Z"
       }
     ],
     "summary": {
@@ -57123,16 +57123,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 23.18
+          "executionTimeMs": 24.44
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:31:05.808Z"
+        "duration": 29,
+        "timestamp": "2026-10-04T19:43:49.002Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 29
     }
   },
   {
@@ -57161,16 +57161,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 22.66
+          "executionTimeMs": 28.23
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:31:05.835Z"
+        "duration": 31,
+        "timestamp": "2026-10-04T19:43:49.033Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 31
     }
   },
   {
@@ -57198,16 +57198,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 66.96
+          "executionTimeMs": 70.02
         },
-        "duration": 71,
-        "timestamp": "2026-10-04T18:31:05.907Z"
+        "duration": 74,
+        "timestamp": "2026-10-04T19:43:49.107Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 71
+      "avgDuration": 74
     }
   },
   {
@@ -57235,16 +57235,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 25.86
+          "executionTimeMs": 28.25
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T18:31:05.935Z"
+        "duration": 33,
+        "timestamp": "2026-10-04T19:43:49.139Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 33
     }
   },
   {
@@ -57280,16 +57280,16 @@
             "source": "user-verified on dorar.net"
           },
           "notice": "حديث منتشر لا يصح\nالنص: «حب الوطن من الإيمان»\nالحكم في الدرر السنية: ليس بحديث\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/74",
-          "executionTimeMs": 0.13
+          "executionTimeMs": 0.11
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T18:31:05.941Z"
+        "duration": 4,
+        "timestamp": "2026-10-04T19:43:49.144Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 4
     }
   },
   {
@@ -57317,10 +57317,10 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 20.43
+          "executionTimeMs": 22.24
         },
         "duration": 25,
-        "timestamp": "2026-10-04T18:31:05.966Z"
+        "timestamp": "2026-10-04T19:43:49.169Z"
       }
     ],
     "summary": {
@@ -57354,10 +57354,10 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 21.25
+          "executionTimeMs": 21.47
         },
         "duration": 26,
-        "timestamp": "2026-10-04T18:31:05.991Z"
+        "timestamp": "2026-10-04T19:43:49.195Z"
       }
     ],
     "summary": {
@@ -57401,14 +57401,14 @@
           "notice": "حديث منتشر لا يصح\nالنص: «المعِدة بيت الداء، والحمية رأس الدواء»\nالحكم في الدرر السنية: لا أصل له\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/557",
           "executionTimeMs": 0.15
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T18:31:05.996Z"
+        "duration": 4,
+        "timestamp": "2026-10-04T19:43:49.199Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 4
     }
   },
   {
@@ -57570,16 +57570,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.66
+          "executionTimeMs": 11.99
         },
-        "duration": 13,
-        "timestamp": "2026-10-04T18:31:06.010Z"
+        "duration": 15,
+        "timestamp": "2026-10-04T19:43:49.213Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 13
+      "avgDuration": 15
     }
   },
   {
@@ -57772,10 +57772,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 22.37
+          "executionTimeMs": 23.64
         },
         "duration": 27,
-        "timestamp": "2026-10-04T18:31:06.037Z"
+        "timestamp": "2026-10-04T19:43:49.240Z"
       }
     ],
     "summary": {
@@ -58029,16 +58029,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 49.18
+          "executionTimeMs": 47.62
         },
-        "duration": 55,
-        "timestamp": "2026-10-04T18:31:06.092Z"
+        "duration": 51,
+        "timestamp": "2026-10-04T19:43:49.292Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 55
+      "avgDuration": 51
     }
   },
   {
@@ -58249,16 +58249,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 13.6
+          "executionTimeMs": 11.84
         },
-        "duration": 19,
-        "timestamp": "2026-10-04T18:31:06.111Z"
+        "duration": 16,
+        "timestamp": "2026-10-04T19:43:49.308Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 19
+      "avgDuration": 16
     }
   },
   {
@@ -58445,16 +58445,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.63
+          "executionTimeMs": 0.47
         },
-        "duration": 3,
-        "timestamp": "2026-10-04T18:31:06.114Z"
+        "duration": 5,
+        "timestamp": "2026-10-04T19:43:49.313Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 3
+      "avgDuration": 5
     }
   },
   {
@@ -58481,16 +58481,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 20.91
+          "executionTimeMs": 24.48
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T18:31:06.139Z"
+        "duration": 27,
+        "timestamp": "2026-10-04T19:43:49.340Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 27
     }
   },
   {
@@ -58517,16 +58517,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 22.35
+          "executionTimeMs": 23.02
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:31:06.166Z"
+        "duration": 28,
+        "timestamp": "2026-10-04T19:43:49.368Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 28
     }
   },
   {
@@ -58553,16 +58553,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 19.31
+          "executionTimeMs": 20.59
         },
-        "duration": 24,
-        "timestamp": "2026-10-04T18:31:06.190Z"
+        "duration": 26,
+        "timestamp": "2026-10-04T19:43:49.394Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 24
+      "avgDuration": 26
     }
   },
   {
@@ -59382,16 +59382,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 19.94
+          "executionTimeMs": 23.76
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T18:31:06.215Z"
+        "duration": 28,
+        "timestamp": "2026-10-04T19:43:49.422Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 28
     }
   },
   {
@@ -59587,16 +59587,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 21.22
+          "executionTimeMs": 23.4
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:31:06.241Z"
+        "duration": 28,
+        "timestamp": "2026-10-04T19:43:49.450Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 28
     }
   },
   {
@@ -59624,16 +59624,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 7.96
+          "executionTimeMs": 7.73
         },
-        "duration": 13,
-        "timestamp": "2026-10-04T18:31:06.254Z"
+        "duration": 14,
+        "timestamp": "2026-10-04T19:43:49.464Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 13
+      "avgDuration": 14
     }
   },
   {
@@ -59661,16 +59661,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 37.95
+          "executionTimeMs": 33.79
         },
-        "duration": 43,
-        "timestamp": "2026-10-04T18:31:06.297Z"
+        "duration": 38,
+        "timestamp": "2026-10-04T19:43:49.502Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 43
+      "avgDuration": 38
     }
   },
   {
@@ -59697,10 +59697,10 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 24.31
+          "executionTimeMs": 24.7
         },
         "duration": 29,
-        "timestamp": "2026-10-04T18:31:06.326Z"
+        "timestamp": "2026-10-04T19:43:49.530Z"
       }
     ],
     "summary": {
@@ -59733,16 +59733,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 21.35
+          "executionTimeMs": 17.46
         },
-        "duration": 26,
-        "timestamp": "2026-10-04T18:31:06.351Z"
+        "duration": 21,
+        "timestamp": "2026-10-04T19:43:49.551Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 26
+      "avgDuration": 21
     }
   },
   {
@@ -59769,16 +59769,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 3.83
+          "executionTimeMs": 3.42
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T18:31:06.360Z"
+        "duration": 7,
+        "timestamp": "2026-10-04T19:43:49.558Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 7
     }
   },
   {
@@ -59806,16 +59806,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 520.76
+          "executionTimeMs": 517.43
         },
-        "duration": 526,
-        "timestamp": "2026-10-04T18:31:06.886Z"
+        "duration": 521,
+        "timestamp": "2026-10-04T19:43:50.080Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 526
+      "avgDuration": 521
     }
   },
   {
@@ -59843,16 +59843,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 501.89
+          "executionTimeMs": 546.13
         },
-        "duration": 506,
-        "timestamp": "2026-10-04T18:31:07.392Z"
+        "duration": 551,
+        "timestamp": "2026-10-04T19:43:50.631Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 506
+      "avgDuration": 551
     }
   },
   {
@@ -59880,16 +59880,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 499.69
+          "executionTimeMs": 502.7
         },
-        "duration": 504,
-        "timestamp": "2026-10-04T18:31:07.896Z"
+        "duration": 507,
+        "timestamp": "2026-10-04T19:43:51.138Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 504
+      "avgDuration": 507
     }
   },
   {
@@ -59917,16 +59917,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 490.89
+          "executionTimeMs": 506.18
         },
-        "duration": 495,
-        "timestamp": "2026-10-04T18:31:08.391Z"
+        "duration": 511,
+        "timestamp": "2026-10-04T19:43:51.649Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 495
+      "avgDuration": 511
     }
   },
   {
@@ -59954,16 +59954,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 527.27
+          "executionTimeMs": 528.58
         },
-        "duration": 532,
-        "timestamp": "2026-10-04T18:31:08.923Z"
+        "duration": 533,
+        "timestamp": "2026-10-04T19:43:52.182Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 532
+      "avgDuration": 533
     }
   },
   {
@@ -59999,16 +59999,16 @@
             "source": "user-verified on dorar.net"
           },
           "notice": "حديث منتشر لا يصح\nالنص: «اطلبوا العلم ولو بالصين»\nالحكم في الدرر السنية: لا يصح\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/38",
-          "executionTimeMs": 0.12
+          "executionTimeMs": 0.09
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T18:31:08.927Z"
+        "duration": 9,
+        "timestamp": "2026-10-04T19:43:52.191Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 9
     }
   },
   {
@@ -60036,16 +60036,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 30.8
+          "executionTimeMs": 33.18
         },
-        "duration": 35,
-        "timestamp": "2026-10-04T18:31:08.963Z"
+        "duration": 38,
+        "timestamp": "2026-10-04T19:43:52.229Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 35
+      "avgDuration": 38
     }
   },
   {
@@ -60073,16 +60073,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 22.11
+          "executionTimeMs": 25.85
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T18:31:08.989Z"
+        "duration": 32,
+        "timestamp": "2026-10-04T19:43:52.261Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 32
     }
   },
   {
@@ -60801,16 +60801,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 66.15
+          "executionTimeMs": 71.12
         },
-        "duration": 71,
-        "timestamp": "2026-10-04T18:31:09.061Z"
+        "duration": 74,
+        "timestamp": "2026-10-04T19:43:52.336Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 71
+      "avgDuration": 74
     }
   },
   {
@@ -61403,16 +61403,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 47.54
+          "executionTimeMs": 53.3
         },
-        "duration": 51,
-        "timestamp": "2026-10-04T18:31:09.114Z"
+        "duration": 58,
+        "timestamp": "2026-10-04T19:43:52.396Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 51
+      "avgDuration": 58
     }
   },
   {
@@ -62088,16 +62088,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.13
+          "executionTimeMs": 69.11
         },
-        "duration": 67,
-        "timestamp": "2026-10-04T18:31:09.183Z"
+        "duration": 74,
+        "timestamp": "2026-10-04T19:43:52.472Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 67
+      "avgDuration": 74
     }
   },
   {
@@ -62873,16 +62873,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 100.85
+          "executionTimeMs": 97.25
         },
-        "duration": 106,
-        "timestamp": "2026-10-04T18:31:09.292Z"
+        "duration": 102,
+        "timestamp": "2026-10-04T19:43:52.576Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 106
+      "avgDuration": 102
     }
   },
   {
@@ -63659,16 +63659,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 57.28
+          "executionTimeMs": 55.71
         },
-        "duration": 61,
-        "timestamp": "2026-10-04T18:31:09.355Z"
+        "duration": 59,
+        "timestamp": "2026-10-04T19:43:52.637Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 61
+      "avgDuration": 59
     }
   },
   {
@@ -64790,16 +64790,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 48.89
+          "executionTimeMs": 53.6
         },
-        "duration": 60,
-        "timestamp": "2026-10-04T18:31:09.416Z"
+        "duration": 59,
+        "timestamp": "2026-10-04T19:43:52.698Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 60
+      "avgDuration": 59
     }
   },
   {
@@ -65142,16 +65142,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 35.34
+          "executionTimeMs": 36.04
         },
-        "duration": 40,
-        "timestamp": "2026-10-04T18:31:09.457Z"
+        "duration": 41,
+        "timestamp": "2026-10-04T19:43:52.740Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 40
+      "avgDuration": 41
     }
   },
   {
@@ -67881,10 +67881,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 40.25
+          "executionTimeMs": 39.93
         },
         "duration": 45,
-        "timestamp": "2026-10-04T18:31:09.506Z"
+        "timestamp": "2026-10-04T19:43:52.788Z"
       }
     ],
     "summary": {
@@ -71864,16 +71864,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 60.09
+          "executionTimeMs": 61.96
         },
-        "duration": 66,
-        "timestamp": "2026-10-04T18:31:09.574Z"
+        "duration": 68,
+        "timestamp": "2026-10-04T19:43:52.857Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 66
+      "avgDuration": 68
     }
   },
   {
@@ -72930,16 +72930,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 77.23
+          "executionTimeMs": 82.97
         },
-        "duration": 83,
-        "timestamp": "2026-10-04T18:31:09.658Z"
+        "duration": 86,
+        "timestamp": "2026-10-04T19:43:52.945Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 83
+      "avgDuration": 86
     }
   },
   {
@@ -73364,16 +73364,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 45
+          "executionTimeMs": 35.73
         },
-        "duration": 51,
-        "timestamp": "2026-10-04T18:31:09.709Z"
+        "duration": 41,
+        "timestamp": "2026-10-04T19:43:52.986Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 51
+      "avgDuration": 41
     }
   },
   {
@@ -74080,16 +74080,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 54.41
+          "executionTimeMs": 52.21
         },
-        "duration": 60,
-        "timestamp": "2026-10-04T18:31:09.771Z"
+        "duration": 57,
+        "timestamp": "2026-10-04T19:43:53.045Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 60
+      "avgDuration": 57
     }
   },
   {
@@ -74772,16 +74772,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 25.05
+          "executionTimeMs": 26.46
         },
-        "duration": 30,
-        "timestamp": "2026-10-04T18:31:09.803Z"
+        "duration": 31,
+        "timestamp": "2026-10-04T19:43:53.078Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 30
+      "avgDuration": 31
     }
   },
   {
@@ -75434,16 +75434,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 64.66
+          "executionTimeMs": 61.49
         },
-        "duration": 70,
-        "timestamp": "2026-10-04T18:31:09.876Z"
+        "duration": 65,
+        "timestamp": "2026-10-04T19:43:53.145Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 70
+      "avgDuration": 65
     }
   },
   {
@@ -75736,16 +75736,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 29.75
+          "executionTimeMs": 24.52
         },
-        "duration": 35,
-        "timestamp": "2026-10-04T18:31:09.912Z"
+        "duration": 30,
+        "timestamp": "2026-10-04T19:43:53.176Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 35
+      "avgDuration": 30
     }
   },
   {
@@ -76361,16 +76361,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 170.81
+          "executionTimeMs": 41.84
         },
-        "duration": 177,
-        "timestamp": "2026-10-04T18:31:10.090Z"
+        "duration": 47,
+        "timestamp": "2026-10-04T19:43:53.223Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 177
+      "avgDuration": 47
     }
   },
   {
@@ -77198,16 +77198,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 35.82
+          "executionTimeMs": 33.34
         },
-        "duration": 40,
-        "timestamp": "2026-10-04T18:31:10.132Z"
+        "duration": 37,
+        "timestamp": "2026-10-04T19:43:53.261Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 40
+      "avgDuration": 37
     }
   },
   {
@@ -78031,16 +78031,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 30.5
+          "executionTimeMs": 26.23
         },
-        "duration": 34,
-        "timestamp": "2026-10-04T18:31:10.166Z"
+        "duration": 31,
+        "timestamp": "2026-10-04T19:43:53.293Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 34
+      "avgDuration": 31
     }
   },
   {
@@ -78323,16 +78323,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 36.88
+          "executionTimeMs": 33.63
         },
-        "duration": 41,
-        "timestamp": "2026-10-04T18:31:10.208Z"
+        "duration": 38,
+        "timestamp": "2026-10-04T19:43:53.332Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 41
+      "avgDuration": 38
     }
   },
   {
@@ -79128,16 +79128,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 46.41
+          "executionTimeMs": 47.97
         },
-        "duration": 51,
-        "timestamp": "2026-10-04T18:31:10.261Z"
+        "duration": 53,
+        "timestamp": "2026-10-04T19:43:53.386Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 51
+      "avgDuration": 53
     }
   },
   {
@@ -79566,16 +79566,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 82.47
+          "executionTimeMs": 63.99
         },
-        "duration": 90,
-        "timestamp": "2026-10-04T18:31:10.352Z"
+        "duration": 69,
+        "timestamp": "2026-10-04T19:43:53.457Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 90
+      "avgDuration": 69
     }
   },
   {
@@ -80164,16 +80164,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 86.01
+          "executionTimeMs": 83.39
         },
-        "duration": 91,
-        "timestamp": "2026-10-04T18:31:10.445Z"
+        "duration": 86,
+        "timestamp": "2026-10-04T19:43:53.545Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 91
+      "avgDuration": 86
     }
   },
   {
@@ -80845,16 +80845,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 65.55
+          "executionTimeMs": 62.46
         },
-        "duration": 71,
-        "timestamp": "2026-10-04T18:31:10.518Z"
+        "duration": 66,
+        "timestamp": "2026-10-04T19:43:53.612Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 71
+      "avgDuration": 66
     }
   },
   {
@@ -81626,16 +81626,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 95.52
+          "executionTimeMs": 94.71
         },
-        "duration": 101,
-        "timestamp": "2026-10-04T18:31:10.621Z"
+        "duration": 99,
+        "timestamp": "2026-10-04T19:43:53.713Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 101
+      "avgDuration": 99
     }
   },
   {
@@ -82099,16 +82099,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 51.82
+          "executionTimeMs": 50.56
         },
-        "duration": 57,
-        "timestamp": "2026-10-04T18:31:10.679Z"
+        "duration": 55,
+        "timestamp": "2026-10-04T19:43:53.769Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 57
+      "avgDuration": 55
     }
   },
   {
@@ -82831,16 +82831,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 54.04
+          "executionTimeMs": 46.77
         },
-        "duration": 59,
-        "timestamp": "2026-10-04T18:31:10.741Z"
+        "duration": 52,
+        "timestamp": "2026-10-04T19:43:53.823Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 59
+      "avgDuration": 52
     }
   },
   {
@@ -83179,16 +83179,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 41.62
+          "executionTimeMs": 36.09
         },
-        "duration": 47,
-        "timestamp": "2026-10-04T18:31:10.788Z"
+        "duration": 41,
+        "timestamp": "2026-10-04T19:43:53.865Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 47
+      "avgDuration": 41
     }
   },
   {
@@ -85905,16 +85905,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 43.14
+          "executionTimeMs": 39.1
         },
-        "duration": 49,
-        "timestamp": "2026-10-04T18:31:10.839Z"
+        "duration": 43,
+        "timestamp": "2026-10-04T19:43:53.910Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 49
+      "avgDuration": 43
     }
   },
   {
@@ -89854,16 +89854,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.92
+          "executionTimeMs": 66.43
         },
-        "duration": 68,
-        "timestamp": "2026-10-04T18:31:10.909Z"
+        "duration": 71,
+        "timestamp": "2026-10-04T19:43:53.983Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 68
+      "avgDuration": 71
     }
   },
   {
@@ -91002,16 +91002,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 81.79
+          "executionTimeMs": 89.96
         },
-        "duration": 85,
-        "timestamp": "2026-10-04T18:31:10.996Z"
+        "duration": 95,
+        "timestamp": "2026-10-04T19:43:54.079Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 85
+      "avgDuration": 95
     }
   }
 ]

@@ -2,6 +2,7 @@ import express from 'express';
 import { loadCorpus } from './corpus/loader.ts';
 import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
 import { initHadithEngine, searchHadith, getIndexedCounts } from './matching/hadithMatcher.ts';
+import { askQuestion } from './matching/askEngine.ts';
 
 export const app = express();
 
@@ -115,8 +116,28 @@ app.post('/api/hadith/match', (req, res) => {
   res.json(result);
 });
 
-app.post('/api/ask', (req, res) => {
-  res.json({ status: 'scaffold_ready', mode: 'ask', verdict: 'unclear' });
+app.post('/api/ask', async (req, res) => {
+  try {
+    const clientIp =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      req.socket.remoteAddress ||
+      '127.0.0.1';
+    const result = await askQuestion(req.body || {}, clientIp);
+    if (result.error && result.error.includes('تم تجاوز الحد المسموح به')) {
+      res.status(429).json(result);
+      return;
+    }
+    if (result.error && result.error.includes('GEMINI_API_KEY')) {
+      res.status(503).json(result);
+      return;
+    }
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      error: 'حدث خطأ أثناء معالجة السؤال الشرعي.',
+      details: err?.message,
+    });
+  }
 });
 
 app.post('/api/ocr', (req, res) => {

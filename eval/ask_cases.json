@@ -1,0 +1,148 @@
+[
+  {
+    "id": "ask_ar_supp_1",
+    "question": "هل صيام ستة أيام من شوال مستحب؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported",
+      "topRef": "muslim_2758"
+    },
+    "note": "Fasting 6 days of Shawwal authenticated in Sahih Muslim"
+  },
+  {
+    "id": "ask_ar_supp_2",
+    "question": "ما فضل قراءة آية الكرسي دبر الصلاة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported"
+    },
+    "note": "Virtue of Ayat al-Kursi after prayers"
+  },
+  {
+    "id": "ask_ar_supp_3",
+    "question": "هل تبسمك في وجه أخيك صدقة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported",
+      "topRef": "tirmidhi_1956"
+    },
+    "note": "Smiling in brother's face is charity in Jami at-Tirmidhi 1956"
+  },
+  {
+    "id": "ask_en_supp_1",
+    "question": "Does smiling at your brother count as charity?",
+    "language": "en",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported"
+    },
+    "note": "English translation for smiling as charity"
+  },
+  {
+    "id": "ask_en_supp_2",
+    "question": "Are actions judged by intentions in Islam?",
+    "language": "en",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported"
+    },
+    "note": "Actions by intentions (Bukhari 1)"
+  },
+  {
+    "id": "ask_synonym_1",
+    "question": "هل الابتسام في وجه الصاحب مثوبة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported"
+    },
+    "note": "Synonym expansion (ابتسام -> تبسمك، صاحب -> أخيك، مثوبة -> صدقة)"
+  },
+  {
+    "id": "ask_synonym_2",
+    "question": "ما فضل إفشاء السلام وبذل الطعام؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported"
+    },
+    "note": "Feeding food and spreading salam in Bukhari/Muslim"
+  },
+  {
+    "id": "ask_fabricated_1",
+    "question": "هل ورد حديث: اطلبوا العلم ولو بالصين؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "contradicted",
+      "isFabricated": true
+    },
+    "note": "Curated fake hadith (dorar.net/fake-hadith/38)"
+  },
+  {
+    "id": "ask_fabricated_2",
+    "question": "هل حب الوطن من الإيمان حديث نبوي؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "contradicted",
+      "isFabricated": true
+    },
+    "note": "Curated fake hadith (dorar.net/fake-hadith/74)"
+  },
+  {
+    "id": "ask_nosource_1",
+    "question": "هل شرب الشاي الأخضر في الصباح سنة مؤكدة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "unclear"
+    },
+    "note": "Fabricated concept not in scripture -> referral"
+  },
+  {
+    "id": "ask_nosource_2",
+    "question": "هل ركوب الدراجة الهوائية قبل الفجر يوجب مائة حسنة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "unclear"
+    },
+    "note": "Invented reward -> referral"
+  },
+  {
+    "id": "ask_permissibility_1",
+    "question": "ما حكم بيع التقسيط بفائدة محددة مسبقا؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "permissibility"
+    },
+    "note": "Permissibility question -> texts only, ruling banner, Call 2 skipped"
+  },
+  {
+    "id": "ask_weak_1",
+    "question": "هل ورد أن النبي صلى الله عليه وسلم بال مستقبل القبلة؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "supported",
+      "isWeakOnly": true
+    },
+    "note": "Weak hadith in Tirmidhi 10: all graders judge it Da'if / Da'if Isnaad"
+  },
+  {
+    "id": "ask_fabricated_3",
+    "question": "هل المعدة بيت الداء والحمية رأس الدواء حديث نبوي؟",
+    "language": "ar",
+    "category": "ask",
+    "expected": {
+      "verdict": "contradicted",
+      "isFabricated": true
+    },
+    "note": "Curated fake hadith (dorar.net/fake-hadith/557)"
+  }
+]
