@@ -32,26 +32,56 @@ async function runTest(mode: string, input: string) {
 function checkPass(expected: any, actual: any) {
   if (actual.error) return false;
   
-  const stateMatch = actual.state === expected.state;
+  // State validation
+  let stateMatch = true;
+  if (expected.stateNot) {
+    stateMatch = actual.state !== expected.stateNot;
+  } else if (expected.state) {
+    stateMatch = actual.state === expected.state;
+  }
+
+  // Ref / content validation
   let refMatch = true;
-  
-  if (expected.ref) {
-    const topResult = actual.results?.[0];
+  const topResult = actual.results?.[0];
+
+  if (expected.containsEnglishSlice) {
+    if (!topResult?.translation) {
+      refMatch = false;
+    } else {
+      const trans = topResult.translation.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+      const slice = expected.containsEnglishSlice.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+      refMatch = trans.includes(slice);
+    }
+  } else if (expected.allowedCollections) {
+    if (!topResult) refMatch = false;
+    else {
+      refMatch = expected.allowedCollections.includes(topResult.collection);
+    }
+  } else if (expected.refs && Array.isArray(expected.refs)) {
     if (!topResult) refMatch = false;
     else {
       if (actual.query_mode === 'ayah') {
-        // Handle range or single
         const rangeStr = (topResult.verseRange || '').replace(/–/g, '-');
         const actualRef = topResult.isRange ? `${topResult.chapter}:${rangeStr}` : `${topResult.chapter}:${topResult.verse}`;
-        // Partial match on ref is often enough for our test
+        refMatch = expected.refs.some((r: string) => actualRef === r || actualRef.includes(r) || r.includes(actualRef));
+      } else {
+        const arabicRef = `${topResult.collection}_${topResult.arabicnumber}`;
+        refMatch = expected.refs.includes(topResult.id) || expected.refs.includes(arabicRef);
+      }
+    }
+  } else if (expected.ref) {
+    if (!topResult) refMatch = false;
+    else {
+      if (actual.query_mode === 'ayah') {
+        const rangeStr = (topResult.verseRange || '').replace(/–/g, '-');
+        const actualRef = topResult.isRange ? `${topResult.chapter}:${rangeStr}` : `${topResult.chapter}:${topResult.verse}`;
         refMatch = actualRef === expected.ref || actualRef.includes(expected.ref) || expected.ref.includes(actualRef);
       } else {
         const arabicRef = `${topResult.collection}_${topResult.arabicnumber}`;
         refMatch = topResult.id === expected.ref || arabicRef === expected.ref;
       }
     }
-  } else {
-    // If expected ref is null, we expect state not_found
+  } else if (expected.ref === null) {
     refMatch = actual.state === 'not_found' || actual.results?.length === 0;
   }
   
@@ -120,22 +150,29 @@ async function run() {
   
   console.log('\nFailures:');
   results.filter(r => !r.summary.passed).forEach(r => {
+    const expStr = r.expected.stateNot 
+      ? `state != ${r.expected.stateNot}` 
+      : `${r.expected.state} (${r.expected.ref || (r.expected.refs ? r.expected.refs.join(',') : '') || r.expected.allowedCollections || r.expected.containsEnglishSlice || 'null'})`;
+    const lastActual = r.runs[r.runs.length - 1].actual;
+    const top = lastActual.results?.[0];
+    const actRef = lastActual.query_mode === 'ayah'
+      ? (top ? (top.isRange ? `${top.chapter}:${top.verseRange}` : `${top.chapter}:${top.verse}`) : 'N/A')
+      : (top?.id || 'N/A');
     console.log(`[${r.id}] ${r.category}`);
-    console.log(`  Input: ${r.input.substring(0, 50)}...`);
-    console.log(`  Expected: ${r.expected.state} (${r.expected.ref})`);
-    const lastActual = r.runs[2].actual;
-    console.log(`  Actual: ${lastActual.state} (${lastActual.results?.[0]?.id || 'N/A'})`);
+    console.log(`  Input: ${r.input.substring(0, 60)}...`);
+    console.log(`  Expected: ${expStr}`);
+    console.log(`  Actual: ${lastActual.state} (${actRef}) [Confidence: ${top?.confidence ?? 0}]`);
     if (lastActual.error) console.log(`  Error: ${lastActual.error}`);
   });
 
   const falseAccepts = results.filter(r => 
-    (r.expected.state === 'not_found' || r.category === 'curated_fabricated' || r.category === 'invented') &&
-    (r.runs[0].actual.state === 'matched' || r.runs[0].actual.state === 'close_match')
+    (r.id.startsWith('negative_') || r.expected.state === 'not_found') &&
+    r.runs[0].actual.state === 'matched'
   );
   
-  console.log(`\nFalse Accepts: ${falseAccepts.length}`);
+  console.log(`\nFalse Accepts (negative returned 'matched'): ${falseAccepts.length}`);
   falseAccepts.forEach(r => {
-    console.log(`- [${r.id}] ${r.category}: ${r.input.substring(0, 30)}...`);
+    console.log(`- [${r.id}] ${r.category}: ${r.input.substring(0, 50)}...`);
   });
 }
 

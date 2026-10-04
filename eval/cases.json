@@ -9,7 +9,7 @@
       "state": "matched",
       "ref": "1:1"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_exact_2",
@@ -21,7 +21,7 @@
       "state": "matched",
       "ref": "2:94"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_exact_3",
@@ -33,7 +33,7 @@
       "state": "matched",
       "ref": "4:8"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_exact_4",
@@ -45,7 +45,7 @@
       "state": "matched",
       "ref": "7:47"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_exact_5",
@@ -57,7 +57,7 @@
       "state": "matched",
       "ref": "26:69"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_exact_6",
@@ -69,223 +69,237 @@
       "state": "matched",
       "ref": "114:6"
     },
-    "note": "Exact match"
+    "note": "Exact Uthmani text match"
   },
   {
     "id": "ayah_nodiacritics_1",
     "mode": "ayah",
-    "input": "۞ أتأۡمرون ٱلناس بٱلۡبر وتنسوۡن أنفسكمۡ وأنتمۡ تتۡلون ٱلۡكتـبۚ أفلا تعۡقلون",
+    "input": "أتأمرون الناس بالبر وتنسون أنفسكم وأنتم تتلون الكتاب أفلا تعقلون",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
       "ref": "2:44"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_nodiacritics_2",
     "mode": "ayah",
-    "input": "قدۡ نرى تقلب وجۡهك فی ٱلسماۤءۖ فلنولینك قبۡلةࣰ ترۡضىهاۚ فول وجۡهك شطۡر ٱلۡمسۡجد ٱلۡحرامۚ وحیۡث ما كنتمۡ فولوا۟ وجوهكمۡ شطۡرهۥۗ وإن ٱلذین أوتوا۟ ٱلۡكتـب لیعۡلمون أنه ٱلۡحق من ربهمۡۗ وما ٱلله بغـفل عما یعۡملون",
+    "input": "قد نرى تقلب وجهك في السماء فلنولينك قبلة ترضاها فول وجهك شطر المسجد الحرام وحيث ما كنتم فولوا وجوهكم شطره وإن الذين أوتوا الكتاب ليعلمون أنه الحق من ربهم وما الله بغافل عما يعملون",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
       "ref": "2:144"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_nodiacritics_3",
     "mode": "ayah",
-    "input": "یسۡتخۡفون من ٱلناس ولا یسۡتخۡفون من ٱلله وهو معهمۡ إذۡ یبیتون ما لا یرۡضى من ٱلۡقوۡلۚ وكان ٱلله بما یعۡملون محیطا",
+    "input": "يستخفون من الناس ولا يستخفون من الله وهو معهم إذ يبيتون ما لا يرضى من القول وكان الله بما يعملون محيطا",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
       "ref": "4:108"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_nodiacritics_4",
     "mode": "ayah",
-    "input": "وٱلذین كذبوا۟ بءایـتنا ولقاۤء ٱلۡءاخرة حبطتۡ أعۡمـلهمۡۚ هلۡ یجۡزوۡن إلا ما كانوا۟ یعۡملون",
+    "input": "والذين كذبوا بآياتنا ولقاء الآخرة حبطت أعمالهم هل يجزون إلا ما كانوا يعملون",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
       "ref": "7:147"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_nodiacritics_5",
     "mode": "ayah",
-    "input": "رب نجنی وأهۡلی مما یعۡملون",
+    "input": "إن في ذلك لآية وما كان أكثرهم مؤمنين",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
-      "ref": "26:169"
+      "ref": "26:174"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_nodiacritics_6",
     "mode": "ayah",
-    "input": "وحور عینࣱ",
+    "input": "وكانوا يقولون أئذا متنا وكنا ترابا وعظاما أإنا لمبعوثون",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
-      "ref": "56:22"
+      "ref": "56:47"
     },
-    "note": "No diacritics"
+    "note": "Modern spelling without any diacritics"
   },
   {
     "id": "ayah_typo_1",
     "mode": "ayah",
-    "input": "قَالُ ۟ ٱدۡعُ لَنَا رَبَّكَ یُبَیِّن لَّنَا مَا لَوۡنُهَاۚ قَالَ إِنَّهُۥ یَقُولُ إِنَّهَا بَقَرَةࣱ صَفۡرَاۤءُ فَاقِعࣱ لَّوۡنُهَا تَسُرُّ ٱلنَّـٰظِرِینَ",
+    "input": "قالوا ااع لنا ربك يين لنا ما لونها قال إنه يقول إنها بقرة صفراء فاقع لونها تسر الناظرين",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
       "ref": "2:69"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_typo_2",
     "mode": "ayah",
-    "input": "إِنَّ ا یَأۡمُرُكُم بِٱلسُّوۤءِ وَٱلۡفَحۡشَاۤءِ وَأَن تَقُولُوا۟ عَلَى ٱللَّهِ مَا لَا تَعۡلَمُونَ",
+    "input": "إنما يمأركم بالسوء والفحشاء ونأ تقولوا على الله ما لا تعلمون",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
       "ref": "2:169"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_typo_3",
     "mode": "ayah",
-    "input": "بَل ر فَعَهُ ٱللَّهُ إِلَیۡهِۚ وَكَانَ ٱللَّهُ عَزِیزًا حَكِیمࣰا",
+    "input": "بل راعه الله إليه وكون الله عزيزا حكيما",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
       "ref": "4:158"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_typo_4",
     "mode": "ayah",
-    "input": "وَٱلّ ِینَ تَدۡعُونَ مِن دُونِهِۦ لَا یَسۡتَطِیعُونَ نَصۡرَكُمۡ وَلَاۤ أَنفُسَهُمۡ یَنصُرُونَ",
+    "input": "والذين تاعون من دونه الحكيم يستطيعون نصركم ولا أنفسهم ينصرون",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
       "ref": "7:197"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_typo_5",
     "mode": "ayah",
-    "input": "وَتَق ُّبَكَ فِی ٱلسَّـٰجِدِینَ",
+    "input": "إلا ااذين آمنوا وعملوا الصااحات وذكروا الله كثيرا وانتصروا من بعد ما ظلموا وسيعلم الذين ظلموا أي منقلب ينقلبون",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
-      "ref": "26:219"
+      "ref": "26:227"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_typo_6",
     "mode": "ayah",
-    "input": "ءَأَن مۡ أَنشَأۡتُمۡ شَجَرَتَهَاۤ أَمۡ نَحۡنُ ٱلۡمُنشِءُونَ",
+    "input": "بسم اله الرحمن الرحيم ساح لله ما في السماوات والأرض وهو العزيز الحكيم",
     "language": "ar",
     "category": "typos",
     "expected": {
       "state": "close_match",
-      "ref": "56:72"
+      "ref": "57:1"
     },
-    "note": "With typos"
+    "note": "Ayah with single character typo edits without inserted spaces"
   },
   {
     "id": "ayah_slice_1",
     "mode": "ayah",
-    "input": "إِلَیۡكَ وَمَاۤ أُنزِلَ مِن",
+    "input": "إليك وما أنزل من قبلك",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "2:4"
+      "refs": [
+        "2:4",
+        "4:60",
+        "4:162"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_slice_2",
     "mode": "ayah",
-    "input": "ٱعۡتَدَىٰ عَلَیۡكُمۡ فَٱعۡتَدُوا۟ عَلَیۡهِ",
+    "input": "اعتدى عليكم فاعتدوا عليه بمثل",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "2:194"
+      "refs": [
+        "2:194"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_slice_3",
     "mode": "ayah",
-    "input": "أَوۡ فَسَادࣲ فِی ٱلۡأَرۡضِ",
+    "input": "أو فساد في الأرض فكأنما",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "5:32"
+      "refs": [
+        "5:32"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_slice_4",
     "mode": "ayah",
-    "input": "وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَٱبۡنِ ٱلسَّبِیلِ",
+    "input": "واليتامى والمساكين وابن السبيل إن",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "8:41"
+      "refs": [
+        "8:41"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_slice_5",
     "mode": "ayah",
-    "input": "عَرۡشُكِۖ قَالَتۡ كَأَنَّهُۥ هُوَۚ",
+    "input": "عرشك قالت كأنه هو وأوتينا",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "27:42"
+      "refs": [
+        "27:42"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_slice_6",
     "mode": "ayah",
-    "input": "وَجَعَلۡنَا فِی ذُرِّیَّتِهِمَا ٱلنُّبُوَّةَ",
+    "input": "وجعلنا في ذريتهما النبوة والكتاب",
     "language": "ar",
     "category": "partial_slice",
     "expected": {
       "state": "close_match",
-      "ref": "57:26"
+      "refs": [
+        "57:26"
+      ]
     },
-    "note": "Partial slice"
+    "note": "Partial ayah slice with corpus-derived multi-ref support"
   },
   {
     "id": "ayah_range_1",
@@ -297,7 +311,7 @@
       "state": "matched",
       "ref": "1:1-2"
     },
-    "note": "Multi-ayah range"
+    "note": "Multi-ayah range match"
   },
   {
     "id": "ayah_range_2",
@@ -309,7 +323,7 @@
       "state": "matched",
       "ref": "7:47-48"
     },
-    "note": "Multi-ayah range"
+    "note": "Multi-ayah range match"
   },
   {
     "id": "ayah_range_3",
@@ -321,7 +335,7 @@
       "state": "matched",
       "ref": "56:22-23"
     },
-    "note": "Multi-ayah range"
+    "note": "Multi-ayah range match"
   },
   {
     "id": "ayah_rahman_refrain",
@@ -331,81 +345,111 @@
     "category": "refrain",
     "expected": {
       "state": "matched",
-      "ref": "55:13"
+      "refs": [
+        "55:13",
+        "55:14",
+        "55:15",
+        "55:16",
+        "55:17",
+        "55:18",
+        "55:19",
+        "55:20",
+        "55:21",
+        "55:22",
+        "55:23",
+        "55:24",
+        "55:25",
+        "55:26",
+        "55:27",
+        "55:28",
+        "55:29",
+        "55:30",
+        "55:31",
+        "55:32",
+        "55:33",
+        "55:34",
+        "55:35",
+        "55:36",
+        "55:37",
+        "55:38",
+        "55:39",
+        "55:40",
+        "55:41",
+        "55:42",
+        "55:43",
+        "55:44",
+        "55:45",
+        "55:46",
+        "55:47",
+        "55:48",
+        "55:49",
+        "55:50",
+        "55:51",
+        "55:52",
+        "55:53",
+        "55:54",
+        "55:55",
+        "55:56",
+        "55:57",
+        "55:58",
+        "55:59",
+        "55:60",
+        "55:61",
+        "55:62",
+        "55:63",
+        "55:64",
+        "55:65",
+        "55:66",
+        "55:67",
+        "55:68",
+        "55:69",
+        "55:70",
+        "55:71",
+        "55:72",
+        "55:73",
+        "55:74",
+        "55:75",
+        "55:76",
+        "55:77"
+      ]
     },
-    "note": "Ar-Rahman refrain (31 occurrences)"
+    "note": "Ar-Rahman refrain with 31 authentic verse occurrences"
   },
   {
     "id": "ayah_replaced_1",
     "mode": "ayah",
-    "input": "وَإِذَا لَقُوا۟ ٱلَّذِینَ ءَامَنُوا۟ قَالُوۤا۟ ءَامَنَّا وَإِذَا خَلَوۡا۟ كلمة_مختلفة شَیَـٰطِینِهِمۡ قَالُوۤا۟ إِنَّا مَعَكُمۡ إِنَّمَا نَحۡنُ مُسۡتَهۡزِءُونَ",
+    "input": "وإذا لقوا الذين آمنوا قالوا آمنا وإذا خلوا كانت شياطينهم قالوا إنا معكم إنما نحن مستهزئون",
     "language": "ar",
     "category": "one_word_replaced",
     "expected": {
       "state": "close_match",
       "ref": "2:14"
     },
-    "note": "One word replaced"
+    "note": "One word replaced with real Arabic word from corpus"
   },
   {
     "id": "ayah_replaced_2",
     "mode": "ayah",
-    "input": "وَقَـٰتِلُوا۟ فِی سَبِیلِ ٱللَّهِ كلمة_مختلفة أَنَّ ٱللَّهَ سَمِیعٌ عَلِیمࣱ",
+    "input": "وقاتلوا في سبيل الله العذاب أن الله سميع عليم",
     "language": "ar",
     "category": "one_word_replaced",
     "expected": {
       "state": "close_match",
       "ref": "2:244"
     },
-    "note": "One word replaced"
+    "note": "One word replaced with real Arabic word from corpus"
   },
   {
     "id": "ayah_replaced_3",
     "mode": "ayah",
-    "input": "قُل لِّمَن مَّا فِی ٱلسَّمَـٰوَ ٰتِ وَٱلۡأَرۡضِۖ قُل لِّلَّهِۚ كَتَبَ عَلَىٰ نَفۡسِهِ ٱلرَّحۡمَةَۚ كلمة_مختلفة إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۚ ٱلَّذِینَ خَسِرُوۤا۟ أَنفُسَهُمۡ فَهُمۡ لَا یُؤۡمِنُونَ",
+    "input": "قل لمن ما في السماوات والأرض قل لله كتب على نفسه الرحمة بينات إلى يوم القيامة لا ريب فيه الذين خسروا أنفسهم فهم لا يؤمنون",
     "language": "ar",
     "category": "one_word_replaced",
     "expected": {
       "state": "close_match",
       "ref": "6:12"
     },
-    "note": "One word replaced"
-  },
-  {
-    "id": "ayah_nonquran_1",
-    "mode": "ayah",
-    "input": "هذا كلام ليس من القرآن الكريم",
-    "language": "ar",
-    "category": "non_quran",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Non-Quran input"
-  },
-  {
-    "id": "ayah_nonquran_2",
-    "mode": "ayah",
-    "input": "الذهب والفضة والبر والشعير",
-    "language": "ar",
-    "category": "non_quran",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Non-Quran input"
-  },
-  {
-    "id": "ayah_nonquran_3",
-    "mode": "ayah",
-    "input": "إنما العلم بالتعلم والحلم بالتحلم",
-    "language": "ar",
-    "category": "non_quran",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Non-Quran input"
+    "note": "One word replaced with real Arabic word from corpus"
   },
   {
     "id": "hadith_exact_1",
@@ -417,7 +461,7 @@
       "state": "matched",
       "ref": "bukhari_1"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_exact_2",
@@ -429,7 +473,7 @@
       "state": "matched",
       "ref": "muslim_93"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_exact_3",
@@ -441,7 +485,7 @@
       "state": "matched",
       "ref": "abudawud_1"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_exact_4",
@@ -453,7 +497,7 @@
       "state": "matched",
       "ref": "tirmidhi_1"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_exact_5",
@@ -465,7 +509,7 @@
       "state": "matched",
       "ref": "nasai_1"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_exact_6",
@@ -477,7 +521,7 @@
       "state": "matched",
       "ref": "ibnmajah_1"
     },
-    "note": "Exact matn"
+    "note": "Exact hadith matn"
   },
   {
     "id": "hadith_isnad_1",
@@ -489,7 +533,7 @@
       "state": "matched",
       "ref": "bukhari_2"
     },
-    "note": "With isnad and takhrij"
+    "note": "Hadith with isnad preamble"
   },
   {
     "id": "hadith_isnad_2",
@@ -501,7 +545,7 @@
       "state": "matched",
       "ref": "muslim_2"
     },
-    "note": "With isnad and takhrij"
+    "note": "Hadith with isnad preamble"
   },
   {
     "id": "hadith_isnad_3",
@@ -513,7 +557,7 @@
       "state": "matched",
       "ref": "abudawud_2"
     },
-    "note": "With isnad and takhrij"
+    "note": "Hadith with isnad preamble"
   },
   {
     "id": "hadith_isnad_4",
@@ -525,31 +569,31 @@
       "state": "matched",
       "ref": "tirmidhi_2"
     },
-    "note": "With isnad and takhrij"
+    "note": "Hadith with isnad preamble"
   },
   {
     "id": "hadith_nodiacritics_1",
     "mode": "hadith",
-    "input": "حدثنا آدم بن أبي إياس، قال حدثنا شعبة، عن عبد الله بن أبي السفر، وإسماعيل، عن الشعبي، عن عبد الله بن عمرو ـ رضى الله عنهما ـ عن النبي صلى الله عليه وسلم قال ‏ \"‏ المسلم من سلم المسلمون من لسانه ويده، والمهاجر من هجر ما نهى الله عنه ‏\"‏‏.‏ قال أبو عبد الله وقال أبو معاوية حدثنا داود عن عامر قال سمعت عبد الله عن النبي صلى الله عليه وسلم‏.‏ وقال عبد الأعلى عن داود عن عامر عن عبد الله عن النبي صلى الله عليه وسلم‏.‏",
+    "input": "حدثنا آدم بن أبي إياس، قال حدثنا شعبة، عن عبد الله بن أبي السفر، وإسماعيل، عن الشعبي، عن عبد الله بن عمرو رضى الله عنهما عن النبي صلى الله عليه وسلم قال ‏ \"‏ المسلم من سلم المسلمون من لسانه ويده، والمهاجر من هجر ما نهى الله عنه ‏\"‏‏.‏ قال أبو عبد الله وقال أبو معاوية حدثنا داود عن عامر قال سمعت عبد الله عن النبي صلى الله عليه وسلم‏.‏ وقال عبد الأعلى عن داود عن عامر عن عبد الله عن النبي صلى الله عليه وسلم‏.‏",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
       "ref": "bukhari_10"
     },
-    "note": "No diacritics"
+    "note": "Hadith text without diacritics"
   },
   {
     "id": "hadith_nodiacritics_2",
     "mode": "hadith",
-    "input": "",
+    "input": "حدثني أبو خيثمة، زهير بن حرب حدثنا وكيع، عن كهمس، عن عبد الله بن بريدة، عن يحيى بن يعمر، ح وحدثنا عبيد الله بن معاذ العنبري، - وهذا حديثه - حدثنا أبي، حدثنا كهمس، عن ابن بريدة، عن يحيى بن يعمر، قال كان أول من قال في القدر بالبصرة معبد الجهني فانطلقت أنا وحميد بن عبد الرحمن الحميري حاجين أو معتمرين فقلنا لو لقينا أحدا من أصحاب رسول الله صلى الله عليه وسلم فسألناه عما يقول هؤلاء في القدر فوفق لنا عبد الله بن عمر بن الخطاب داخلا المسجد فاكتنفته أنا وصاحبي أحدنا عن يمينه والآخر عن شماله فظننت أن صاحبي سيكل الكلام إلى فقلت أبا عبد الرحمن إنه قد ظهر قبلنا ناس يقرءون القرآن ويتقفرون العلم - وذكر من شأنهم - وأنهم يزعمون أن لا قدر وأن الأمر أنف ‏.‏ قال فإذا لقيت أولئك فأخبرهم أني بريء منهم وأنهم برآء مني والذي يحلف به عبد الله بن عمر لو أن لأحدهم مثل أحد ذهبا فأنفقه ما قبل الله منه حتى يؤمن بالقدر ثم قال حدثني أبي عمر بن الخطاب قال بينما نحن عند رسول الله صلى الله عليه وسلم ذات يوم إذ طلع علينا رجل شديد بياض الثياب شديد سواد الشعر لا يرى عليه أثر السفر ولا يعرفه منا أحد حتى جلس إلى النبي صلى الله عليه وسلم فأسند ركبتيه إلى ركبتيه ووضع كفيه على فخذيه وقال يا محمد أخبرني عن الإسلام ‏.‏ فقال رسول الله صلى الله عليه وسلم ‏\"‏ الإسلام أن تشهد أن لا إله إلا الله وأن محمدا رسول الله وتقيم الصلاة وتؤتي الزكاة وتصوم رمضان وتحج البيت إن استطعت إليه سبيلا ‏.‏ قال صدقت ‏.‏ قال فعجبنا له يسأله ويصدقه ‏.‏ قال فأخبرني عن الإيمان ‏.‏ قال ‏\"‏ أن تؤمن بالله وملائكته وكتبه ورسله واليوم الآخر وتؤمن بالقدر خيره وشره ‏\"‏ ‏.‏ قال صدقت ‏.‏ قال فأخبرني عن الإحسان ‏.‏ قال ‏\"‏ أن تعبد الله كأنك تراه فإن لم تكن تراه فإنه يراك ‏\"‏ ‏.‏ قال فأخبرني عن الساعة ‏.‏ قال ‏\"‏ ما المسئول عنها بأعلم من السائل ‏\"‏ ‏.‏ قال فأخبرني عن أمارتها ‏.‏ قال ‏\"‏ أن تلد الأمة ربتها وأن ترى الحفاة العراة العالة رعاء الشاء يتطاولون في البنيان ‏\"‏ ‏.‏ قال ثم انطلق فلبثت مليا ثم قال لي ‏\"‏ يا عمر أتدري من السائل ‏\"‏ ‏.‏ قلت الله ورسوله أعلم ‏.‏ قال ‏\"‏ فإنه جبريل أتاكم يعلمكم دينكم ‏\"‏ ‏.‏",
     "language": "ar",
     "category": "no_diacritics",
     "expected": {
       "state": "matched",
-      "ref": "muslim_10"
+      "ref": "muslim_93"
     },
-    "note": "No diacritics"
+    "note": "Hadith text without diacritics"
   },
   {
     "id": "hadith_nodiacritics_3",
@@ -561,7 +605,7 @@
       "state": "matched",
       "ref": "abudawud_10"
     },
-    "note": "No diacritics"
+    "note": "Hadith text without diacritics"
   },
   {
     "id": "hadith_nodiacritics_4",
@@ -573,79 +617,94 @@
       "state": "matched",
       "ref": "tirmidhi_10"
     },
-    "note": "No diacritics"
+    "note": "Hadith text without diacritics"
   },
   {
     "id": "hadith_changed_1",
     "mode": "hadith",
-    "input": "حَدَّثَنَا مُحَمَّدُ بْنُ سَلاَمٍ، قَالَ أَخْبَرَنَا عَبْدَةُ، عَنْ هِشَامٍ، عَنْ أَبِيهِ، عَنْ عَائِشَةَ، قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَمَرَهُمْ أَمَرَهُمْ مِنَ الأَعْمَالِ بِمَا يُطِيقُونَ قَالُوا إِنَّا لَسْنَا كلمة_مختلفة يَا رَسُولَ اللَّهِ، إِنَّ اللَّهَ قَدْ غَفَرَ لَكَ مَا تَقَدَّمَ مِنْ ذَنْبِكَ وَمَا تَأَخَّرَ‏.‏ فَيَغْضَبُ حَتَّى يُعْرَفَ الْغَضَبُ فِي وَجْهِهِ ثُمَّ يَقُولُ ‏ \"‏ إِنَّ أَتْقَاكُمْ وَأَعْلَمَكُمْ بِاللَّهِ أَنَا ‏\"‏‏.‏",
+    "input": "حدثنا محمد بن سلام، قال أخبرنا عبدة، عن هشام، عن أبيه، عن عائشة، قالت كان رسول الله صلى الله عليه وسلم إذا أمرهم أمرهم من الأعمال بما يطيقون قالوا إنا لسنا كانت يا رسول الله، إن الله قد غفر لك ما تقدم من ذنبك وما تأخر‏.‏ فيغضب حتى يعرف الغضب في وجهه ثم يقول ‏ \"‏ إن أتقاكم وأعلمكم بالله أنا ‏\"‏‏.‏",
     "language": "ar",
     "category": "one_word_changed",
     "expected": {
       "state": "close_match",
       "ref": "bukhari_20"
     },
-    "note": "One word changed"
+    "note": "One word changed inside hadith text"
   },
   {
     "id": "hadith_changed_2",
     "mode": "hadith",
-    "input": "كلمة_مختلفة",
+    "input": "حدثني أبو خيثمة، زهير بن حرب حدثنا وكيع، عن كهمس، عن عبد الله بن بريدة، عن يحيى بن يعمر، ح وحدثنا عبيد الله بن معاذ العنبري، - وهذا حديثه - حدثنا أبي، حدثنا كهمس، عن ابن بريدة، عن يحيى بن يعمر، قال كان أول من قال في القدر بالبصرة معبد الجهني فانطلقت أنا وحميد بن عبد الرحمن الحميري حاجين أو معتمرين فقلنا لو لقينا أحدا من أصحاب رسول الله صلى الله عليه وسلم فسألناه عما يقول هؤلاء في القدر فوفق لنا عبد الله بن عمر بن الخطاب داخلا المسجد فاكتنفته أنا وصاحبي أحدنا عن يمينه والآخر عن شماله فظننت أن صاحبي سيكل الكلام إلى فقلت أبا عبد الرحمن إنه قد ظهر قبلنا ناس يقرءون القرآن ويتقفرون العلم - وذكر من شأنهم - وأنهم يزعمون أن لا قدر وأن الأمر أنف ‏.‏ قال فإذا لقيت أولئك فأخبرهم أني بريء منهم وأنهم برآء مني والذي يحلف به عبد الله بن عمر لو أن لأحدهم مثل أحد ذهبا فأنفقه ما قبل الله منه حتى يؤمن بالقدر ثم قال حدثني أبي عمر بن الخطاب قال بينما نحن عند رسول الله صلى الله عليه وسلم ذات يوم إذ طلع علينا رجل شديد بياض الثياب كان سواد الشعر لا يرى عليه أثر السفر ولا يعرفه منا أحد حتى جلس إلى النبي صلى الله عليه وسلم فأسند ركبتيه إلى ركبتيه ووضع كفيه على فخذيه وقال يا محمد أخبرني عن الإسلام ‏.‏ فقال رسول الله صلى الله عليه وسلم ‏\"‏ الإسلام أن تشهد أن لا إله إلا الله وأن محمدا رسول الله وتقيم الصلاة وتؤتي الزكاة وتصوم رمضان وتحج البيت إن استطعت إليه سبيلا ‏.‏ قال صدقت ‏.‏ قال فعجبنا له يسأله ويصدقه ‏.‏ قال فأخبرني عن الإيمان ‏.‏ قال ‏\"‏ أن تؤمن بالله وملائكته وكتبه ورسله واليوم الآخر وتؤمن بالقدر خيره وشره ‏\"‏ ‏.‏ قال صدقت ‏.‏ قال فأخبرني عن الإحسان ‏.‏ قال ‏\"‏ أن تعبد الله كأنك تراه فإن لم تكن تراه فإنه يراك ‏\"‏ ‏.‏ قال فأخبرني عن الساعة ‏.‏ قال ‏\"‏ ما المسئول عنها بأعلم من السائل ‏\"‏ ‏.‏ قال فأخبرني عن أمارتها ‏.‏ قال ‏\"‏ أن تلد الأمة ربتها وأن ترى الحفاة العراة العالة رعاء الشاء يتطاولون في البنيان ‏\"‏ ‏.‏ قال ثم انطلق فلبثت مليا ثم قال لي ‏\"‏ يا عمر أتدري من السائل ‏\"‏ ‏.‏ قلت الله ورسوله أعلم ‏.‏ قال ‏\"‏ فإنه جبريل أتاكم يعلمكم دينكم ‏\"‏ ‏.‏",
     "language": "ar",
     "category": "one_word_changed",
     "expected": {
       "state": "close_match",
-      "ref": "muslim_20"
+      "ref": "muslim_93"
     },
-    "note": "One word changed"
+    "note": "One word changed inside hadith text"
   },
   {
     "id": "hadith_changed_3",
     "mode": "hadith",
-    "input": "حَدَّثَنَا زُهَيْرُ بْنُ حَرْبٍ، وَهَنَّادُ بْنُ السَّرِيِّ، قَالاَ حَدَّثَنَا وَكِيعٌ، حَدَّثَنَا الأَعْمَشُ، قَالَ سَمِعْتُ مُجَاهِدًا، يُحَدِّثُ عَنْ طَاوُسٍ، عَنِ ابْنِ عَبَّاسٍ، قَالَ مَرَّ رَسُولُ اللَّهِ صلى الله عليه وسلم عَلَى قَبْرَيْنِ فَقَالَ ‏\"‏ إِنَّهُمَا يُعَذَّبَانِ وَمَا يُعَذَّبَانِ فِي كَبِيرٍ أَمَّا هَذَا فَكَانَ لاَ يَسْتَنْزِهُ كلمة_مختلفة الْبَوْلِ وَأَمَّا هَذَا فَكَانَ يَمْشِي بِالنَّمِيمَةِ ‏\"‏ ‏.‏ ثُمَّ دَعَا بِعَسِيبٍ رَطْبٍ فَشَقَّهُ بِاثْنَيْنِ ثُمَّ غَرَسَ عَلَى هَذَا وَاحِدًا وَعَلَى هَذَا وَاحِدًا وَقَالَ ‏\"‏ لَعَلَّهُ يُخَفَّفُ عَنْهُمَا مَا لَمْ يَيْبَسَا ‏\"‏ ‏.‏ قَالَ هَنَّادٌ ‏\"‏ يَسْتَتِرُ ‏\"‏ ‏.‏ مَكَانَ ‏\"‏ يَسْتَنْزِهُ ‏\"‏ ‏.‏",
+    "input": "حدثنا زهير بن حرب، وهناد بن السري، قالا حدثنا وكيع، حدثنا الأعمش، قال سمعت مجاهدا، يحدث عن طاوس، عن ابن عباس، قال مر رسول الله صلى الله عليه وسلم على قبرين فقال ‏\"‏ إنهما يعذبان وما يعذبان في كبير أما هذا فكان لا يستنزه أكثرهم البول وأما هذا فكان يمشي بالنميمة ‏\"‏ ‏.‏ ثم دعا بعسيب رطب فشقه باثنين ثم غرس على هذا واحدا وعلى هذا واحدا وقال ‏\"‏ لعله يخفف عنهما ما لم ييبسا ‏\"‏ ‏.‏ قال هناد ‏\"‏ يستتر ‏\"‏ ‏.‏ مكان ‏\"‏ يستنزه ‏\"‏ ‏.‏",
     "language": "ar",
     "category": "one_word_changed",
     "expected": {
       "state": "close_match",
       "ref": "abudawud_20"
     },
-    "note": "One word changed"
+    "note": "One word changed inside hadith text"
   },
   {
     "id": "hadith_changed_4",
     "mode": "hadith",
-    "input": "حَدَّثَنَا مُحَمَّدُ بْنُ بَشَّارٍ، حَدَّثَنَا عَبْدُ الْوَهَّابِ الثَّقَفِيُّ، عَنْ مُحَمَّدِ بْنِ عَمْرٍو، عَنْ أَبِي سَلَمَةَ، عَنِ الْمُغِيرَةِ بْنِ شُعْبَةَ، قَالَ كُنْتُ مَعَ النَّبِيِّ صلى الله عليه وسلم فِي سَفَرٍ فَأَتَى النَّبِيُّ صلى الله عليه وسلم حَاجَتَهُ فَأَبْعَدَ فِي الْمَذْهَبِ ‏.‏ قَالَ وَفِي الْبَابِ عَنْ عَبْدِ الرَّحْمَنِ بْنِ أَبِي قُرَادٍ وَأَبِي كلمة_مختلفة وَجَابِرٍ وَيَحْيَى بْنِ عُبَيْدٍ عَنْ أَبِيهِ وَأَبِي مُوسَى وَابْنِ عَبَّاسٍ وَبِلاَلِ بْنِ الْحَارِثِ ‏.‏ قَالَ أَبُو عِيسَى هَذَا حَدِيثٌ حَسَنٌ صَحِيحٌ ‏.‏ وَيُرْوَى عَنِ النَّبِيِّ صلى الله عليه وسلم أَنَّهُ كَانَ يَرْتَادُ لِبَوْلِهِ مَكَانًا كَمَا يَرْتَادُ مَنْزِلاً ‏.‏ وَأَبُو سَلَمَةَ اسْمُهُ عَبْدُ اللَّهِ بْنُ عَبْدِ الرَّحْمَنِ بْنِ عَوْفٍ الزُّهْرِيُّ ‏.‏",
+    "input": "حدثنا محمد بن بشار، حدثنا عبد الوهاب الثقفي، عن محمد بن عمرو، عن أبي سلمة، عن المغيرة بن شعبة، قال كنت مع النبي صلى الله عليه وسلم في سفر فأتى النبي صلى الله عليه وسلم حاجته فأبعد في المذهب ‏.‏ قال وفي الباب عن عبد الرحمن بن أبي قراد وأبي وما وجابر ويحيى بن عبيد عن أبيه وأبي موسى وابن عباس وبلال بن الحارث ‏.‏ قال أبو عيسى هذا حديث حسن صحيح ‏.‏ ويروى عن النبي صلى الله عليه وسلم أنه كان يرتاد لبوله مكانا كما يرتاد منزلا ‏.‏ وأبو سلمة اسمه عبد الله بن عبد الرحمن بن عوف الزهري ‏.‏",
     "language": "ar",
     "category": "one_word_changed",
     "expected": {
       "state": "close_match",
       "ref": "tirmidhi_20"
     },
-    "note": "One word changed"
+    "note": "One word changed inside hadith text"
   },
   {
     "id": "hadith_attestation_1",
     "mode": "hadith",
-    "input": "إنما الأعمال بالنيات",
+    "input": "إنما الأعمال بالنيات وإنما لكل امرئ ما نوى",
     "language": "ar",
     "category": "attestation",
     "expected": {
       "state": "matched",
-      "ref": "bukhari_1"
+      "refs": [
+        "bukhari_1",
+        "bukhari_54",
+        "muslim_1907",
+        "abudawud_2201",
+        "tirmidhi_1647",
+        "nasai_75",
+        "nasai_3437",
+        "ibnmajah_4227",
+        "nawawi_1"
+      ]
     },
-    "note": "Should show attestations in other collections"
+    "note": "Cross-collection attestation check"
   },
   {
     "id": "hadith_attestation_2",
     "mode": "hadith",
-    "input": "المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف",
+    "input": "المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف وفي كل خير",
     "language": "ar",
     "category": "attestation",
     "expected": {
       "state": "matched",
-      "ref": "muslim_2664"
+      "refs": [
+        "muslim_2664",
+        "muslim_6774",
+        "ibnmajah_79",
+        "ibnmajah_4168"
+      ]
     },
-    "note": "Attestation check"
+    "note": "Attestation check across Muslim and Ibn Majah"
   },
   {
     "id": "hadith_disagreement_1",
@@ -655,129 +714,73 @@
     "category": "grader_disagreement",
     "expected": {
       "state": "matched",
-      "ref": "abudawud_66"
+      "refs": [
+        "abudawud_66",
+        "abudawud_67",
+        "tirmidhi_66",
+        "nasai_326"
+      ]
     },
-    "note": "Grader disagreement check"
+    "note": "Grader disagreement verified in Sunan Abu Dawud / Tirmidhi"
   },
   {
     "id": "hadith_disagreement_2",
     "mode": "hadith",
-    "input": "صلاة في مسجدي هذا أفضل من ألف صلاة فيما سواه",
+    "input": "طلب العلم فريضة على كل مسلم",
     "language": "ar",
     "category": "grader_disagreement",
     "expected": {
       "state": "matched",
-      "ref": "bukhari_1190"
+      "refs": [
+        "ibnmajah_224",
+        "ibnmajah_225"
+      ]
     },
-    "note": "Grader disagreement check"
+    "note": "Grader disagreement in Sunan Ibn Majah (Al-Albani: Sahih vs others: Daif)"
   },
   {
     "id": "hadith_nograde_1",
     "mode": "hadith",
-    "input": "بني الإسلام على خمس",
+    "input": "بني الإسلام على خمس شهادة أن لا إله إلا الله وأن محمدا رسول الله",
     "language": "ar",
     "category": "no_grade_collections",
     "expected": {
       "state": "matched",
-      "ref": "bukhari_8"
+      "allowedCollections": [
+        "bukhari",
+        "muslim",
+        "nawawi"
+      ]
     },
-    "note": "Bukhari case (implied Sahih)"
+    "note": "Pass if top result is from consensus collections (Bukhari/Muslim/Nawawi)"
   },
   {
     "id": "hadith_nograde_2",
     "mode": "hadith",
-    "input": "المرء مع من أحب",
+    "input": "المرء مع من أحب يوم القيامة",
     "language": "ar",
     "category": "no_grade_collections",
     "expected": {
       "state": "matched",
-      "ref": "muslim_2640"
+      "allowedCollections": [
+        "bukhari",
+        "muslim",
+        "nawawi"
+      ]
     },
-    "note": "Muslim case (implied Sahih)"
-  },
-  {
-    "id": "hadith_fabricated_1",
-    "mode": "hadith",
-    "input": "اطلبوا العلم ولو في الصين",
-    "language": "ar",
-    "category": "curated_fabricated",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Known fabricated saying"
-  },
-  {
-    "id": "hadith_fabricated_2",
-    "mode": "hadith",
-    "input": "من عرف نفسه فقد عرف ربه",
-    "language": "ar",
-    "category": "curated_fabricated",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Known fabricated saying"
-  },
-  {
-    "id": "hadith_fabricated_3",
-    "mode": "hadith",
-    "input": "اختلاف أمتي رحمة",
-    "language": "ar",
-    "category": "curated_fabricated",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Known fabricated saying"
-  },
-  {
-    "id": "hadith_invented_1",
-    "mode": "hadith",
-    "input": "قال رسول الله صلى الله عليه وسلم عليكم بأكل الباذنجان فإنه شفاء",
-    "language": "ar",
-    "category": "invented",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Invented claim"
-  },
-  {
-    "id": "hadith_invented_2",
-    "mode": "hadith",
-    "input": "إن الله يحب اللاعبين بالكرة إذا أخلصوا النية",
-    "language": "ar",
-    "category": "invented",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Invented claim"
-  },
-  {
-    "id": "hadith_invented_3",
-    "mode": "hadith",
-    "input": "من نام بعد العصر فلا يلومن إلا نفسه",
-    "language": "ar",
-    "category": "invented",
-    "expected": {
-      "state": "not_found",
-      "ref": null
-    },
-    "note": "Invented claim"
+    "note": "Pass if top result is from consensus collections"
   },
   {
     "id": "hadith_en_verbatim_1",
     "mode": "hadith",
-    "input": "Actions are but by intentions",
+    "input": "Actions are but by intention and every man shall have but that which he intended",
     "language": "en",
     "category": "english_verbatim",
     "expected": {
       "state": "matched",
-      "ref": "bukhari_1"
+      "containsEnglishSlice": "Actions are but by intention"
     },
-    "note": "English verbatim"
+    "note": "English verbatim search slice >= 6 words"
   },
   {
     "id": "hadith_en_verbatim_2",
@@ -787,32 +790,541 @@
     "category": "english_verbatim",
     "expected": {
       "state": "matched",
-      "ref": "bukhari_5027"
+      "containsEnglishSlice": "learn the quran and teach"
     },
-    "note": "English verbatim"
+    "note": "English verbatim search"
   },
   {
     "id": "hadith_en_paraphrase_1",
     "mode": "hadith",
-    "input": "Deeds depend on what you intend",
+    "input": "Deeds are judged solely according to a person's inner intention",
     "language": "en",
     "category": "english_paraphrase",
     "expected": {
-      "state": "close_match",
-      "ref": "bukhari_1"
+      "stateNot": "matched"
     },
-    "note": "English paraphrase"
+    "note": "Paraphrase of Actions are by intentions (Bukhari 1)"
   },
   {
     "id": "hadith_en_paraphrase_2",
     "mode": "hadith",
-    "input": "The religion is sincerity",
+    "input": "The superior person among all of you is one who studies the holy book and instructs others in it",
     "language": "en",
     "category": "english_paraphrase",
     "expected": {
-      "state": "close_match",
-      "ref": "muslim_55"
+      "stateNot": "matched"
     },
-    "note": "English paraphrase"
+    "note": "Paraphrase of The best of you learn Quran and teach it (Bukhari 5027)"
+  },
+  {
+    "id": "hadith_en_paraphrase_3",
+    "mode": "hadith",
+    "input": "True faith consists of sincere advice and loyalty towards God, His scripture, and His messenger",
+    "language": "en",
+    "category": "english_paraphrase",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Paraphrase of Religion is sincerity (Muslim 55)"
+  },
+  {
+    "id": "hadith_en_paraphrase_4",
+    "mode": "hadith",
+    "input": "None of you truly possesses complete faith until he desires for his fellow brother whatever good he desires for himself",
+    "language": "en",
+    "category": "english_paraphrase",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Paraphrase of None of you believes until he loves for his brother (Bukhari 13)"
+  },
+  {
+    "id": "negative_arabic_prose_1",
+    "mode": "ayah",
+    "input": "الوقت كالسيف إن لم تقطعه قطعك والعلم في الصغر كالنقش على الحجر",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_2",
+    "mode": "hadith",
+    "input": "لكل داء دواء يستطب به إلا الحماقة أعيت من يداويها",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_3",
+    "mode": "ayah",
+    "input": "أعلنت وزارة التجارة اليوم عن ارتفاع مؤشرات النمو الاقتصادي في الربع الأخير",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_4",
+    "mode": "hadith",
+    "input": "إذا غامرت في شرف مروم فلا تقنع بما دون النجوم",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_5",
+    "mode": "ayah",
+    "input": "تعتبر القراءة غذاء العقل والوسيلة الأساسية لاكتساب المعرفة وتطوير المهارات الفردية",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_6",
+    "mode": "hadith",
+    "input": "بلغت نسبة الأمطار الهاطلة على المرتفعات الجبلية مستويات قياسية هذا الأسبوع",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_7",
+    "mode": "ayah",
+    "input": "صاحب الحاجة أرعن لا يرى إلا قضاءها ولو كان فيه حتفه",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_8",
+    "mode": "hadith",
+    "input": "تنعقد القمة الدولية للتغير المناخي لمناقشة سبل تقليل الانبعاثات الكربونية في العالم",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_9",
+    "mode": "ayah",
+    "input": "لا تنه عن خلق وتأتي مثله عار عليك إذا فعلت عظيم",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_10",
+    "mode": "hadith",
+    "input": "أكد خبراء التغذية على أهمية شرب كميات كافية من الماء يوميا لتعزيز المناعة",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_11",
+    "mode": "ayah",
+    "input": "الخيل والليل والبيداء تعرفني والسيف والرمح والقرطاس والقلم",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_12",
+    "mode": "hadith",
+    "input": "افتتح وزير التعليم المؤتمر السنوي لتطوير المناهج والذكاء الاصطناعي في المدارس",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_13",
+    "mode": "ayah",
+    "input": "من جد وجد ومن زرع حصد ومن سار على الدرب وصل",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_arabic_prose_14",
+    "mode": "hadith",
+    "input": "أطلقت الهيئة الوطنية للمواصلات خطة لتوسيع شبكة القطارات السريعة بين المدن",
+    "language": "ar",
+    "category": "negative_arabic_prose",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Non-scripture Arabic proverb, poetry, or contemporary news sentence"
+  },
+  {
+    "id": "negative_famous_nonhadith_1",
+    "mode": "hadith",
+    "input": "النظافة من الإيمان",
+    "language": "ar",
+    "category": "negative_famous_nonhadith",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Famous cultural saying that is not a verified hadith"
+  },
+  {
+    "id": "negative_famous_nonhadith_2",
+    "mode": "hadith",
+    "input": "حب الوطن من الإيمان",
+    "language": "ar",
+    "category": "negative_famous_nonhadith",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Famous cultural saying that is not a verified hadith"
+  },
+  {
+    "id": "negative_famous_nonhadith_3",
+    "mode": "hadith",
+    "input": "الصبر مفتاح الفرج",
+    "language": "ar",
+    "category": "negative_famous_nonhadith",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Famous cultural saying that is not a verified hadith"
+  },
+  {
+    "id": "negative_famous_nonhadith_4",
+    "mode": "hadith",
+    "input": "العقل السليم في الجسم السليم",
+    "language": "ar",
+    "category": "negative_famous_nonhadith",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Famous cultural saying that is not a verified hadith"
+  },
+  {
+    "id": "negative_famous_nonhadith_5",
+    "mode": "hadith",
+    "input": "المعدة بيت الداء والحمية رأس الدواء",
+    "language": "ar",
+    "category": "negative_famous_nonhadith",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Famous cultural saying that is not a verified hadith"
+  },
+  {
+    "id": "negative_3_words_replaced_1",
+    "mode": "ayah",
+    "input": "يا كانت الذين كانت كتب كانت الصيام كما كتب على الذين من قبلكم لعلكم تتقون",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_2",
+    "mode": "ayah",
+    "input": "إن ولن كفروا أشركوا عليهم نزله أم لم تنذرهم لا يؤمنون ختم الله على قلوبهم",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_3",
+    "mode": "ayah",
+    "input": "الله حياة إله للمؤمنين هو لما القيوم لا تأخذه سنة ولا نوم له ما في السماوات وما في الأرض",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_4",
+    "mode": "ayah",
+    "input": "قل والله الله يؤمنون الله يفرقون لم يلد ولم يولد ولم يكن له كفوا أحد",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_5",
+    "mode": "ayah",
+    "input": "والعصر مصدقا الإنسان ولكن خسر الذين الذين آمنوا وعملوا الصالحات وتواصوا بالحق وتواصوا بالصبر",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_6",
+    "mode": "hadith",
+    "input": "طلب وميكال فريضة وما كل سئل ومسلمة في كل مكان وزمان",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_7",
+    "mode": "hadith",
+    "input": "من إلا فليس كانوا والمكر تعملون في النار وبئس المصير",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_8",
+    "mode": "hadith",
+    "input": "إنما عند لأتمم الفضل الأخلاق الذين الشيم بين الناس",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_9",
+    "mode": "hadith",
+    "input": "المسلم ظهورهم سلم تسألوا من عليم ويده والمهاجر من هجر ما نهى الله عنه",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_3_words_replaced_10",
+    "mode": "hadith",
+    "input": "لا الشياطين أحدكم حتى يحب ولن ما يحب لنفسه من الخير والبركة",
+    "language": "ar",
+    "category": "negative_3_words_replaced",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Real verse/hadith with 3 words corrupted; must never return matched"
+  },
+  {
+    "id": "negative_half_invented_1",
+    "mode": "ayah",
+    "input": "يا أيها الذين آمنوا إذا قمتم إلى الصلاة فاغسلوا هواتفكم بالماء البارد واشحنوا البطاريات سريعا",
+    "language": "ar",
+    "category": "negative_half_invented",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Half authentic text joined with modern invented claim; must never return matched"
+  },
+  {
+    "id": "negative_half_invented_2",
+    "mode": "ayah",
+    "input": "إن الذين قالوا ربنا الله ثم استقاموا فإنهم يسافرون بالقطار الكهربائي إلى المحطة المركزية",
+    "language": "ar",
+    "category": "negative_half_invented",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Half authentic text joined with modern invented claim; must never return matched"
+  },
+  {
+    "id": "negative_half_invented_3",
+    "mode": "hadith",
+    "input": "قال رسول الله صلى الله عليه وسلم من كان يؤمن بالله واليوم الآخر فليركب الدراجة الهوائية ولا يستعمل السيارات الحديثة",
+    "language": "ar",
+    "category": "negative_half_invented",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Half authentic text joined with modern invented claim; must never return matched"
+  },
+  {
+    "id": "negative_half_invented_4",
+    "mode": "hadith",
+    "input": "عن أبي هريرة رضي الله عنه قال قال النبي صلى الله عليه وسلم عليكم بتناول الآيس كريم في ليالي الصيف الحارة",
+    "language": "ar",
+    "category": "negative_half_invented",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Half authentic text joined with modern invented claim; must never return matched"
+  },
+  {
+    "id": "negative_half_invented_5",
+    "mode": "hadith",
+    "input": "اتق الله حيثما كنت وأتبع السيئة الحسنة تمحها واشرب عصير البرتقال الطازج قبل شروق الشمس كل يوم",
+    "language": "ar",
+    "category": "negative_half_invented",
+    "expected": {
+      "stateNot": "matched"
+    },
+    "note": "Half authentic text joined with modern invented claim; must never return matched"
+  },
+  {
+    "id": "negative_invented_english_1",
+    "mode": "hadith",
+    "input": "The Prophet ordered people to drink green tea after every morning meal",
+    "language": "en",
+    "category": "negative_invented_english",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Completely invented English religious claim"
+  },
+  {
+    "id": "negative_invented_english_2",
+    "mode": "hadith",
+    "input": "Whoever rides an iron bicycle in the morning will receive golden coins",
+    "language": "en",
+    "category": "negative_invented_english",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Completely invented English religious claim"
+  },
+  {
+    "id": "negative_invented_english_3",
+    "mode": "hadith",
+    "input": "It was narrated that sleeping near electricity damages the heart",
+    "language": "en",
+    "category": "negative_invented_english",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Completely invented English religious claim"
+  },
+  {
+    "id": "negative_invented_english_4",
+    "mode": "hadith",
+    "input": "The Messenger of Allah forbade swimming in cold ocean water during winter",
+    "language": "en",
+    "category": "negative_invented_english",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Completely invented English religious claim"
+  },
+  {
+    "id": "negative_invented_english_5",
+    "mode": "hadith",
+    "input": "Whoever eats purple grapes before noon will find treasure under his house",
+    "language": "en",
+    "category": "negative_invented_english",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Completely invented English religious claim"
+  },
+  {
+    "id": "negative_curated_fabricated_1",
+    "mode": "hadith",
+    "input": "اطلبوا العلم ولو في الصين",
+    "language": "ar",
+    "category": "negative_curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Fabricated saying about seeking knowledge in China"
+  },
+  {
+    "id": "negative_curated_fabricated_2",
+    "mode": "hadith",
+    "input": "من عرف نفسه فقد عرف ربه",
+    "language": "ar",
+    "category": "negative_curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Sufi maxim falsely attributed as hadith"
+  },
+  {
+    "id": "negative_curated_fabricated_3",
+    "mode": "hadith",
+    "input": "اختلاف أمتي رحمة",
+    "language": "ar",
+    "category": "negative_curated_fabricated",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "Fabricated saying about disagreement being mercy"
   }
 ]

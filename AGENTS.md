@@ -57,6 +57,7 @@
 - Investigate code first -> Report proposed changes -> Build -> Test with real terminal output.
 - Never claim "100%" or "Ready" without running the evaluation harness.
 - Ask owner before adding paid services (Firestore, etc.) or changing datasets.
+- **Git & Commits**: The container environment has no local git repository. The repository owner commits and pushes to GitHub. The agent must list every changed file at the end of each task.
 
 ## Pitfalls
 - `VITE_` variables leaking secrets into client bundles.
