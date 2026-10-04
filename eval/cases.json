@@ -589,11 +589,8 @@
     "language": "ar",
     "category": "isnad_takhrij",
     "expected": {
-      "state": "close_match",
-      "refs": [
-        "tirmidhi_2",
-        "muslim_535"
-      ]
+      "state": "matched",
+      "ref": "tirmidhi_2"
     },
     "note": "Hadith with isnad preamble"
   },

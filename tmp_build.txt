@@ -1,0 +1,29 @@
+
+> bayan-quran-hadith-verifier@1.0.0 build
+> tsx server/corpus/prebuild.ts && vite build && esbuild server/server.ts --bundle --platform=node --format=esm --packages=external --outfile=dist-server/server.js
+
+====================================================
+Starting Prebuild: Data Acquisition & Index Generation
+Preprocessing records and verifying counts...
+Verification PASSED.
+Prebuild Completed successfully in 10773ms!
+Saved 34195 records to /app/applet/server/corpus/data/prebuilt_hadiths.json.gz (3655438 bytes).
+====================================================
+vite v6.4.3 building for production...
+transforming...
+✓ 1596 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.41 kB │ gzip:   0.69 kB
+dist/assets/index-MFiHiWV7.css   32.65 kB │ gzip:   6.34 kB
+dist/assets/index-BouMJ2zw.js   525.27 kB │ gzip: 147.59 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.09s
+
+  dist-server/server.js  85.3kb
+
+⚡ Done in 20ms

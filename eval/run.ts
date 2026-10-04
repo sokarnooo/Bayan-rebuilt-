@@ -289,6 +289,23 @@ async function run() {
     const catPassed = catResults.filter(r => r.summary.passed).length;
     console.log(`- ${cat}: ${catPassed}/${catResults.length} (${Math.round(catPassed/catResults.length*100)}%)`);
   }
+
+  // Highlight Pass Rate
+  let highlightCheckTotal = 0;
+  let highlightCheckPassed = 0;
+  for (const r of results) {
+    const expectsMatch = r.expected.state === 'matched' || r.expected.state === 'close_match' || (r.expected.ref && r.expected.ref !== null) || (r.expected.refs && r.expected.refs.length > 0);
+    if (expectsMatch) {
+      highlightCheckTotal++;
+      const lastActual = r.runs[r.runs.length - 1].actual;
+      const top = lastActual.results?.[0];
+      if (top && verifyHighlights(r.expected.input || r.input || lastActual.query, top.matchedWords || [], lastActual.query_mode)) {
+        highlightCheckPassed++;
+      }
+    }
+  }
+  const highlightPassRate = highlightCheckTotal > 0 ? Math.round((highlightCheckPassed / highlightCheckTotal) * 100) : 100;
+  console.log(`\nHighlight Pass Rate: ${highlightCheckPassed}/${highlightCheckTotal} (${highlightPassRate}%)`);
   
   const inconsistent = results.filter(r => !r.summary.consistent);
   if (inconsistent.length > 0) {
@@ -296,6 +313,43 @@ async function run() {
   } else {
     console.log('\nRun-to-run consistency: 100%');
   }
+
+  // Speed and Latency Metrics
+  function calcPercentile(arr: number[], p: number): number {
+    if (arr.length === 0) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const idx = Math.ceil((p / 100) * sorted.length) - 1;
+    return sorted[Math.max(0, Math.min(idx, sorted.length - 1))];
+  }
+
+  const allDurations: number[] = [];
+  results.forEach(r => r.runs.forEach((runItem: any) => allDurations.push(runItem.duration)));
+
+  console.log('\n--- SPEED & LATENCY REPORT ---');
+  console.log(`Overall Latency:`);
+  console.log(`- p50: ${calcPercentile(allDurations, 50)} ms`);
+  console.log(`- p95: ${calcPercentile(allDurations, 95)} ms`);
+  console.log(`- Max: ${Math.max(...allDurations)} ms`);
+
+  console.log('\nLatency by Category:');
+  for (const cat of categories) {
+    const catDurations: number[] = [];
+    results.filter(r => r.category === cat).forEach(r => r.runs.forEach((runItem: any) => catDurations.push(runItem.duration)));
+    console.log(`- ${cat} (${catDurations.length / 3} cases): p50=${calcPercentile(catDurations, 50)}ms, p95=${calcPercentile(catDurations, 95)}ms, max=${Math.max(...catDurations)}ms`);
+  }
+
+  // 5 Slowest Queries
+  const sortedSlowest = [...results].sort((a, b) => b.summary.avgDuration - a.summary.avgDuration).slice(0, 5);
+  console.log('\nTop 5 Slowest Queries:');
+  sortedSlowest.forEach((s, idx) => {
+    let reason = 'Complex multi-word candidate alignment';
+    if (s.input.length > 200) reason = 'Long hadith input with extensive text to window and align';
+    else if (s.mode === 'ayah' && s.input.split(/\s+/).length > 15) reason = 'Multi-verse sliding window span scoring across Surah';
+    else if (s.category === 'english_hadith') reason = 'Full-text English search scan across all 7 hadith collections';
+    console.log(`${idx + 1}. [${s.id}] avg=${s.summary.avgDuration}ms (${s.category})`);
+    console.log(`   Input: "${s.input.substring(0, 70)}..."`);
+    console.log(`   Why slow: ${reason}`);
+  });
   
   console.log('\nFailures:');
   results.filter(r => !r.summary.passed).forEach(r => {

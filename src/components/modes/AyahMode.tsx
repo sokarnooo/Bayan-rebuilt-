@@ -31,6 +31,13 @@ interface AyahBreakdownItem {
   matchedSlice?: string;
 }
 
+interface ChangedWordItem {
+  queryWord: string | null;
+  sourceWord: string | null;
+  position: number;
+  type?: 'exact' | 'approximate' | 'inserted' | 'deleted';
+}
+
 interface AyahResult {
   chapter: number;
   verse: number;
@@ -51,10 +58,13 @@ interface AyahResult {
   coverageRatio: number;
   matchedSlice?: string;
   matchedTokens: string[];
+  matchedWords?: string[];
+  matchedOriginalIndices?: number[];
   wordMatchStatus?: ('exact' | 'approx' | 'none')[];
   matchedStartWordIndex?: number;
   matchedEndWordIndex?: number;
   hasApproximateMatch?: boolean;
+  changedWords?: ChangedWordItem[];
   breakdown?: AyahBreakdownItem[];
   leadingBasmalaIgnored?: boolean;
 }
@@ -162,9 +172,11 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     wordMatchStatus?: Array<'exact' | 'approx' | 'none'>,
     startWordIndex?: number,
     endWordIndex?: number,
-    changedWords?: Array<{ queryWord: string; sourceWord: string | null; position: number }>
+    changedWords?: Array<{ queryWord: string | null; sourceWord: string | null; position: number; type?: string }>,
+    matchedOriginalIndices?: number[]
   ) => {
     const words = text.split(/\s+/).filter(Boolean);
+    const matchedSet = matchedOriginalIndices ? new Set(matchedOriginalIndices) : null;
     const changedSourceSet = new Set(
       (changedWords || [])
         .map((c) => c.sourceWord)
@@ -174,7 +186,11 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     return words.map((word, idx) => {
       let status: 'exact' | 'approx' | 'none' = 'none';
 
-      if (wordMatchStatus && wordMatchStatus.length === words.length) {
+      if (matchedSet) {
+        if (matchedSet.has(idx)) {
+          status = (wordMatchStatus && wordMatchStatus[idx]) || 'exact';
+        }
+      } else if (wordMatchStatus && wordMatchStatus.length === words.length) {
         status = wordMatchStatus[idx];
       } else if (
         startWordIndex !== undefined &&
@@ -188,10 +204,11 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
 
       const isChanged =
         (status === 'none' &&
-          startWordIndex !== undefined &&
-          endWordIndex !== undefined &&
-          idx >= startWordIndex &&
-          idx <= endWordIndex) ||
+          ((matchedSet && matchedSet.has(idx)) ||
+            (startWordIndex !== undefined &&
+              endWordIndex !== undefined &&
+              idx >= startWordIndex &&
+              idx <= endWordIndex))) ||
         (changedWords && changedWords.length > 0 && changedSourceSet.has(word));
 
       return (
@@ -496,7 +513,7 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
                     lang="ar"
                     className="font-quran text-2xl sm:text-3xl leading-[2.3] text-[#F2F4FF] select-text"
                   >
-                    « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex, item.changedWords)} »
+                    « {renderHighlightedWords(item.text, item.wordMatchStatus, item.matchedStartWordIndex, item.matchedEndWordIndex, item.changedWords, item.matchedOriginalIndices)} »
                   </p>
 
                   {/* Changed / unmatched words legend */}

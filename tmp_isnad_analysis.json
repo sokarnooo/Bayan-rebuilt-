@@ -1,0 +1,18 @@
+Hadith Engine Initialized in 2138ms: 34195 non-empty records indexed (379 empty records excluded).
+/app/applet/server/matching/hadithMatcher.ts:584
+        const dist = levenshteinDistance(qw, sw);
+                     ^
+
+ReferenceError: levenshteinDistance is not defined
+    at alignWordsDP (/app/applet/server/matching/hadithMatcher.ts:584:22)
+    at searchHadith (/app/applet/server/matching/hadithMatcher.ts:1539:21)
+    at [eval]:6:13
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_string:74:3
+
+Node.js v22.23.2

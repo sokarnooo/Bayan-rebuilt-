@@ -6,6 +6,7 @@ import { loadCorpus } from '../corpus/loader.ts';
 import {
   normalizeArabic,
   toAlefInvariant,
+  levenshteinDistance,
   levenshteinSimilarity,
   wordSimilarityCorpusDerived,
 } from './normalizer.ts';
@@ -25,9 +26,10 @@ export interface HadithGradeItem {
 }
 
 export interface ChangedWordItem {
-  queryWord: string;
+  queryWord: string | null;
   sourceWord: string | null;
   position: number;
+  type?: 'exact' | 'approximate' | 'inserted' | 'deleted';
 }
 
 export interface HadithRecord {
@@ -56,6 +58,8 @@ export interface HadithMatchResult {
   matchedStartWordIndex: number;
   matchedEndWordIndex: number;
   matchedTokens: string[];
+  matchedWords?: string[];
+  matchedOriginalIndices?: number[];
   wordMatchStatus: ('exact' | 'approximate' | 'none')[];
   hasApproximateMatch: boolean;
   changedWords?: ChangedWordItem[];
@@ -89,6 +93,8 @@ export interface HadithSearchResponse {
   totalMatches: number;
   results: HadithMatchResult[];
   referralRequired: boolean;
+  isCuratedMatched?: boolean;
+  curatedMatchedEntry?: any;
   notice?: string;
   executionTimeMs: number;
 }
@@ -406,10 +412,11 @@ export const SKIP_WORDS = new Set([
   'عليهما', 'السلام'
 ]);
 
-export interface AlignToken {
+export interface DisplayToken {
   word: string;
   normalized: string;
   originalIndex: number;
+  skip: boolean;
 }
 
 export function isPunctuationWord(word: string): boolean {
@@ -418,56 +425,366 @@ export function isPunctuationWord(word: string): boolean {
   return /^[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ\s\u200B-\u200F\uFEFF]*$/.test(norm);
 }
 
-export function tokenizeOriginal(rawText: string, queryNormSet: Set<string>): AlignToken[] {
-  const cleanedRawText = rawText.replace(/[\s\u00A0\u2000-\u200F\u2028\u2029\u202F\u205F\u3000]+/g, ' ');
-  const displayWords = cleanedRawText.split(' ').filter(Boolean);
+export function tokenizeDisplayWords(rawText: string): { displayWords: string[]; tokens: DisplayToken[]; nonSkipped: DisplayToken[] } {
+  const displayWords = rawText.split(/\s+/).filter(Boolean);
+  const tokens: DisplayToken[] = displayWords.map((word, originalIndex) => {
+    const norm = normalizeArabic(word).replace(/[\u200E\u200F]/g, '');
+    const skip = isPunctuationWord(word) || !norm;
+    return {
+      word,
+      normalized: norm,
+      originalIndex,
+      skip,
+    };
+  });
 
-  const cleanNorm = stripHonorificsAndFormulas(normalizeArabic(rawText));
-  const cleanNormWords = cleanNorm.split(/\s+/).filter(Boolean).map(w => w.replace(/[\u200E\u200F]/g, '')).filter(w => !isPunctuationWord(w));
+  const norms = tokens.map(t => t.normalized);
+  for (let i = 0; i < tokens.length; i++) {
+    if (
+      (norms[i] === 'صلي' || norms[i] === 'صلى') &&
+      norms[i + 1] === 'الله' &&
+      norms[i + 2] === 'عليه' &&
+      norms[i + 3] === 'وسلم'
+    ) {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+      tokens[i + 2].skip = true;
+      tokens[i + 3].skip = true;
+    }
+    if (
+      norms[i] === 'رضي' &&
+      norms[i + 1] === 'الله' &&
+      (norms[i + 2] === 'عنه' || norms[i + 2] === 'عنها' || norms[i + 2] === 'عنهم' || norms[i + 2] === 'عنهما' || norms[i + 2] === 'عنهن')
+    ) {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+      tokens[i + 2].skip = true;
+      tokens[i + 3].skip = true;
+    }
+    if (norms[i] === 'عليه' && norms[i + 1] === 'السلام') {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+    }
+    if (norms[i] === 'عليه' && norms[i + 1] === 'الصلاه' && norms[i + 2] === 'والسلام') {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+      tokens[i + 2].skip = true;
+    }
+    if (norms[i] === 'رحمه' && norms[i + 1] === 'الله') {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+    }
+    if (norms[i] === 'عز' && norms[i + 1] === 'وجل') {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+    }
+    if (norms[i] === 'سبحانه' && (norms[i + 1] === 'وتعالي' || norms[i + 1] === 'وتعالى')) {
+      tokens[i].skip = true;
+      tokens[i + 1].skip = true;
+    }
+  }
 
-  const normalizedDisplay = displayWords.map(w => normalizeArabic(w).replace(/[\u200E\u200F]/g, ''));
+  const nonSkipped = tokens.filter(t => !t.skip);
+  return { displayWords, tokens, nonSkipped };
+}
 
-  let displayIdx = 0;
-  const nonSkipped: AlignToken[] = [];
+export function stripIsnadTokens(tokens: DisplayToken[]): { matnTokens: DisplayToken[]; isnadStripped: boolean } {
+  if (tokens.length <= 4) {
+    return { matnTokens: tokens, isnadStripped: false };
+  }
 
-  for (let i = 0; i < cleanNormWords.length; i++) {
-    const normWord = cleanNormWords[i];
-    
-    while (displayIdx < normalizedDisplay.length && (isPunctuationWord(displayWords[displayIdx]) || normalizedDisplay[displayIdx] !== normWord)) {
-      const skippedNorm = normalizedDisplay[displayIdx];
-      if (skippedNorm !== '' && queryNormSet.has(skippedNorm)) {
-        nonSkipped.push({
-          word: displayWords[displayIdx],
-          normalized: skippedNorm,
-          originalIndex: displayIdx
-        });
+  const maxIdx = Math.max(Math.floor(tokens.length * 0.90), tokens.length - 2);
+  const attributionMarkers = [
+    ['قال', 'رسول', 'الله'],
+    ['سمعت', 'رسول', 'الله'],
+    ['ان', 'رسول', 'الله'],
+    ['عن', 'رسول', 'الله'],
+    ['ان', 'النبي'],
+    ['عن', 'النبي'],
+    ['يقول', 'رسول', 'الله'],
+    ['سمعت', 'النبي'],
+  ];
+
+  for (let i = 0; i <= maxIdx; i++) {
+    for (const m of attributionMarkers) {
+      if (i + m.length <= tokens.length) {
+        let match = true;
+        for (let j = 0; j < m.length; j++) {
+          if (tokens[i + j].normalized !== m[j]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          let after = i + m.length;
+          if (after < tokens.length && (tokens[after].normalized === 'قال' || tokens[after].normalized === 'يقول')) {
+            after++;
+          }
+          if (after < tokens.length) {
+            return { matnTokens: tokens.slice(after), isnadStripped: true };
+          }
+        }
       }
-      displayIdx++;
-    }
-    
-    if (displayIdx < normalizedDisplay.length) {
-      nonSkipped.push({
-        word: displayWords[displayIdx],
-        normalized: normWord,
-        originalIndex: displayIdx
-      });
-      displayIdx++;
     }
   }
 
-  while (displayIdx < normalizedDisplay.length) {
-    const skippedNorm = normalizedDisplay[displayIdx];
-    if (skippedNorm !== '' && queryNormSet.has(skippedNorm)) {
-      nonSkipped.push({
-        word: displayWords[displayIdx],
-        normalized: skippedNorm,
-        originalIndex: displayIdx
-      });
-    }
-    displayIdx++;
+  return { matnTokens: tokens, isnadStripped: false };
+}
+
+export interface AlignedDPResult {
+  confidence: number;
+  matchedTokens: string[];
+  matchedWords: string[];
+  matchedOriginalIndices: number[];
+  wordStatus: ('exact' | 'approximate' | 'none')[];
+  changedWords: ChangedWordItem[];
+  hasApproximateMatch: boolean;
+}
+
+export function alignWordsDP(
+  queryTokens: { word: string; normalized: string }[],
+  sourceTokens: { word: string; normalized: string; originalIndex: number }[]
+): AlignedDPResult {
+  const m = queryTokens.length;
+  const n = sourceTokens.length;
+
+  if (m === 0 || n === 0) {
+    return {
+      confidence: 0,
+      matchedTokens: [],
+      matchedWords: [],
+      matchedOriginalIndices: [],
+      wordStatus: [],
+      changedWords: [],
+      hasApproximateMatch: false,
+    };
   }
 
-  return nonSkipped;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Float64Array(n + 1) as any);
+  const back: number[][] = Array.from({ length: m + 1 }, () => new Int32Array(n + 1) as any);
+
+  dp[0][0] = 0;
+  for (let i = 1; i <= m; i++) {
+    dp[i][0] = i * 1.5;
+    back[i][0] = 2;
+  }
+  for (let j = 1; j <= n; j++) {
+    dp[0][j] = 0;
+    back[0][j] = 3;
+  }
+
+  for (let i = 1; i <= m; i++) {
+    const qw = queryTokens[i - 1].normalized;
+    for (let j = 1; j <= n; j++) {
+      const sw = sourceTokens[j - 1].normalized;
+
+      let subCost = 3.0;
+      if (qw === sw || qw.replace(/ء/g, 'ا') === sw.replace(/ء/g, 'ا')) {
+        subCost = 0;
+      } else {
+        const lenDiff = Math.abs(qw.length - sw.length);
+        if (lenDiff <= 1) {
+          const dist = levenshteinDistance(qw, sw);
+          if (dist <= 1) {
+            subCost = 0.5;
+          } else {
+            subCost = 2.5;
+          }
+        } else {
+          subCost = 2.5;
+        }
+      }
+
+      const costDiag = dp[i - 1][j - 1] + subCost;
+      const costUp = dp[i - 1][j] + 1.5;
+      const costLeft = dp[i][j - 1] + 1.0;
+
+      if (costDiag <= costUp && costDiag <= costLeft) {
+        dp[i][j] = costDiag;
+        back[i][j] = 1;
+      } else if (costUp <= costLeft) {
+        dp[i][j] = costUp;
+        back[i][j] = 2;
+      } else {
+        dp[i][j] = costLeft;
+        back[i][j] = 3;
+      }
+    }
+  }
+
+  let bestJ = n;
+  let minCost = dp[m][n];
+  const searchStart = Math.min(n, Math.max(1, m - 4));
+  for (let j = searchStart; j <= n; j++) {
+    if (dp[m][j] < minCost) {
+      minCost = dp[m][j];
+      bestJ = j;
+    }
+  }
+
+  interface AlignedStep {
+    queryWord: string | null;
+    sourceWord: string | null;
+    type: 'exact' | 'approximate' | 'inserted' | 'deleted';
+    qIdx: number;
+    sIdx: number;
+    sourceOriginalIndex?: number;
+  }
+
+  const rev: AlignedStep[] = [];
+  let currI = m;
+  let currJ = bestJ;
+
+  while (currI > 0) {
+    if (currI > 0 && currJ > 0 && back[currI][currJ] === 1) {
+      const qw = queryTokens[currI - 1];
+      const sw = sourceTokens[currJ - 1];
+      const isExact = (qw.normalized === sw.normalized || qw.normalized.replace(/ء/g, 'ا') === sw.normalized.replace(/ء/g, 'ا'));
+      const dist = isExact ? 0 : levenshteinDistance(qw.normalized, sw.normalized);
+      const type = isExact ? 'exact' : (dist <= 1 ? 'approximate' : 'deleted');
+
+      rev.push({
+        queryWord: qw.word,
+        sourceWord: sw.word,
+        type,
+        qIdx: currI - 1,
+        sIdx: currJ - 1,
+        sourceOriginalIndex: sw.originalIndex,
+      });
+      currI--;
+      currJ--;
+    } else if (currJ <= 0 || back[currI][currJ] === 2) {
+      rev.push({
+        queryWord: queryTokens[currI - 1].word,
+        sourceWord: null,
+        type: 'deleted',
+        qIdx: currI - 1,
+        sIdx: -1,
+      });
+      currI--;
+    } else {
+      rev.push({
+        queryWord: null,
+        sourceWord: sourceTokens[currJ - 1].word,
+        type: 'inserted',
+        qIdx: currI,
+        sIdx: currJ - 1,
+        sourceOriginalIndex: sourceTokens[currJ - 1].originalIndex,
+      });
+      currJ--;
+    }
+  }
+
+  const steps = rev.reverse();
+  const matchedTokens: string[] = [];
+  const matchedWords: string[] = [];
+  const matchedOriginalIndices: number[] = [];
+  const wordStatus: ('exact' | 'approximate' | 'none')[] = [];
+  const changedWords: ChangedWordItem[] = [];
+  let hasApproximateMatch = false;
+
+  for (const step of steps) {
+    if (step.type === 'exact') {
+      if (step.sourceOriginalIndex !== undefined) {
+        matchedOriginalIndices.push(step.sourceOriginalIndex);
+        matchedWords.push(step.sourceWord!);
+        matchedTokens.push(normalizeArabic(step.sourceWord!));
+      }
+      wordStatus.push('exact');
+      changedWords.push({
+        queryWord: step.queryWord,
+        sourceWord: step.sourceWord,
+        position: step.qIdx,
+        type: 'exact',
+      });
+    } else if (step.type === 'approximate') {
+      hasApproximateMatch = true;
+      if (step.sourceOriginalIndex !== undefined) {
+        matchedOriginalIndices.push(step.sourceOriginalIndex);
+        matchedWords.push(step.sourceWord!);
+        matchedTokens.push(normalizeArabic(step.sourceWord!));
+      }
+      wordStatus.push('approximate');
+      changedWords.push({
+        queryWord: step.queryWord,
+        sourceWord: step.sourceWord,
+        position: step.qIdx,
+        type: 'approximate',
+      });
+    } else if (step.type === 'inserted') {
+      changedWords.push({
+        queryWord: null,
+        sourceWord: step.sourceWord,
+        position: step.qIdx,
+        type: 'inserted',
+      });
+    } else if (step.type === 'deleted') {
+      wordStatus.push('none');
+      changedWords.push({
+        queryWord: step.queryWord,
+        sourceWord: null,
+        position: step.qIdx,
+        type: 'deleted',
+      });
+    }
+  }
+
+  let exactCount = steps.filter(s => s.type === 'exact').length;
+  let approxCount = steps.filter(s => s.type === 'approximate').length;
+  let rawScore = (exactCount * 1.0 + approxCount * 0.85) / m;
+  let confidence = Math.round(rawScore * 100);
+
+  return {
+    confidence,
+    matchedTokens,
+    matchedWords,
+    matchedOriginalIndices,
+    wordStatus,
+    changedWords,
+    hasApproximateMatch,
+  };
+}
+
+export function findBestWindow<T extends { word: string; normalized: string; originalIndex: number }>(query: { normalized: string }[], source: T[]): T[] {
+  if (source.length <= query.length + 8) return source;
+  const qWords = new Set(query.map(t => t.normalized));
+  let bestStart = 0;
+  let maxHits = -1;
+  const winLen = query.length;
+  for (let i = 0; i <= source.length - winLen; i++) {
+    let hits = 0;
+    for (let j = 0; j < winLen; j++) {
+      if (qWords.has(source[i + j].normalized)) hits++;
+    }
+    if (hits > maxHits) {
+      maxHits = hits;
+      bestStart = i;
+    }
+  }
+  const start = Math.max(0, bestStart - 4);
+  const end = Math.min(source.length, bestStart + winLen + 6);
+  return source.slice(start, end);
+}
+
+export function findBestQueryWindow(query: { word: string; normalized: string }[], source: { normalized: string }[]) {
+  if (query.length <= source.length + 8) return query;
+  const sWords = new Set(source.map(t => t.normalized));
+  let bestStart = 0;
+  let maxHits = -1;
+  const winLen = Math.min(query.length, source.length + 6);
+  for (let i = 0; i <= query.length - winLen; i++) {
+    let hits = 0;
+    for (let j = 0; j < winLen; j++) {
+      if (sWords.has(query[i + j].normalized)) hits++;
+    }
+    if (hits > maxHits) {
+      maxHits = hits;
+      bestStart = i;
+    }
+  }
+  const start = Math.max(0, bestStart - 2);
+  const end = Math.min(query.length, bestStart + winLen + 4);
+  return query.slice(start, end);
 }
 
 /**
@@ -537,7 +854,7 @@ let twoGramIndex = new Map<number, Map<number, number[]>>(); // id1 -> id2 -> ar
 let isInitialized = false;
 let sectionsCache = new Map<string, Record<string, string>>();
 
-function getWordId(word: string, add = false): number {
+export function getWordId(word: string, add = false): number {
   let id = wordToIdMap.get(word);
   if (id === undefined && add) {
     id = vocabulary.length;
@@ -720,7 +1037,7 @@ export function initHadithEngine(): { totalIndexed: number; emptyExcluded: numbe
  * between the query word i and the hadith word.
  * Tracks changedWords when a query word has no match.
  */
-function scoreContainment(
+export function scoreContainment(
   queryTokens: string[],
   recordTokenIds: number[]
 ): {
@@ -915,12 +1232,19 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
   const { corpus } = loadCorpus();
 
   // Candidate set: find records sharing 2-grams
-  const candidateIndices = new Set<number>();
+  const candHits = new Map<number, number>();
   for (let i = 0; i < Math.min(targetTokenIds.length - 1, 8); i++) {
-    const bg = `${targetTokenIds[i]} ${targetTokenIds[i + 1]}`;
-    const hits = twoGramIndex.get(bg) || [];
-    for (const h of hits) candidateIndices.add(h);
+    const hits = getIndexHits(targetTokenIds[i], targetTokenIds[i + 1]);
+    for (const h of hits) {
+      candHits.set(h, (candHits.get(h) || 0) + 1);
+    }
   }
+
+  const candidateIndices = Array.from(candHits.entries())
+    .filter(([_, count]) => count >= 2 || targetTokenIds.length <= 4)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20)
+    .map(([cIdx]) => cIdx);
 
   for (const cIdx of candidateIndices) {
     const candidate = corpusHadiths[cIdx];
@@ -959,7 +1283,7 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
         containmentRatio,
         grades,
         hasNoGrading,
-        matnSnippet: vocabulary.slice(candidate.m[0], candidate.m[0] + 20).map(id => vocabulary[id] || '').join(' ').slice(0, 100) + '...',
+        matnSnippet: candidate.m.slice(0, 20).map(id => vocabulary[id] || '').join(' ').slice(0, 100) + '...',
       });
     }
   }
@@ -978,6 +1302,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     return {
       query: rawQuery,
       normalizedQuery: '',
+      query_mode: 'hadith',
       language: 'ar',
       state: 'not_found',
       topConfidence: 0,
@@ -1133,6 +1458,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     return {
       query: rawQuery,
       normalizedQuery: cleanQuery,
+      query_mode: 'hadith',
       language: 'ar',
       state: 'not_found',
       topConfidence: 0,
@@ -1171,6 +1497,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
       return {
         query: rawQuery,
         normalizedQuery: cleanQuery,
+        query_mode: 'hadith',
         language: 'ar',
         state: 'too_short',
         topConfidence: 0,
@@ -1212,19 +1539,24 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
   if (candidateScores.size > 0) {
     candidateIndices = Array.from(candidateScores.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 120)
+      .slice(0, 25)
       .map((entry) => entry[0]);
   } else if (qIds[0] !== -1 || fullQIds[0] !== -1) {
     const targetId = qIds[0] !== -1 ? qIds[0] : fullQIds[0];
     for (let c = 0; c < corpusHadiths.length; c++) {
       if (corpusHadiths[c].f.includes(targetId)) {
         candidateIndices.push(c);
-        if (candidateIndices.length >= 60) break;
+        if (candidateIndices.length >= 25) break;
       }
     }
   }
 
   const results: HadithMatchResult[] = [];
+
+  const qTokenize = tokenizeDisplayWords(trimmed);
+  const qNonSkipped = qTokenize.nonSkipped;
+  const qStripped = stripIsnadTokens(qNonSkipped);
+  const matnQTokens = qStripped.matnTokens;
 
   for (const cIdx of candidateIndices) {
     const record = corpusHadiths[cIdx];
@@ -1235,48 +1567,28 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     const rawAr = arList.find(h => h.hadithnumber === record.n);
     const rawArabicText = rawAr?.text || '';
 
-    // Tokenize dynamically using our perfect alignment tokenizer
-    const nonSkippedTokens = tokenizeOriginal(rawArabicText, queryNormSet);
-    const normalizedWords = nonSkippedTokens.map(t => t.normalized);
-    const { isnadWordOffset } = stripIsnadFromNormalized(normalizedWords.join(' '));
-    const matnTokens = nonSkippedTokens.slice(isnadWordOffset);
+    // Tokenize the ORIGINAL text once into display words
+    const { displayWords, nonSkipped } = tokenizeDisplayWords(rawArabicText);
+    if (nonSkipped.length === 0) continue;
 
-    // Convert tokens to vocabulary IDs for scoreContainment
-    const fullTokenIds = nonSkippedTokens.map(t => getWordId(t.normalized));
-    const matnTokenIds = matnTokens.map(t => getWordId(t.normalized));
-
-    // Always score BOTH the stripped matn and the full unstripped text and keep the better
-    const resFull = scoreContainment(fullQTokens, fullTokenIds);
+    // Fast window extraction
+    const windowFull = findBestWindow(qNonSkipped, nonSkipped);
+    const qWinFull = findBestQueryWindow(qNonSkipped, windowFull);
+    const resFull = alignWordsDP(qWinFull, windowFull);
     let res = resFull;
     let usedMatn = false;
-    let matchedTokensSlice = nonSkippedTokens;
 
-    // If the query is a contiguous slice of a record's full text, that record must score 100 and rank first
-    const isFullQueryContiguous =
-      resFull.score === 100 &&
-      (!resFull.changedWords || resFull.changedWords.length === 0) &&
-      !resFull.hasApproximateMatch;
-
-    if (!isFullQueryContiguous && fullQTokens.length !== qTokens.length) {
-      const resMatn = scoreContainment(qTokens, matnTokenIds);
-      const resMatnInFull = scoreContainment(qTokens, fullTokenIds);
-      const bestMatn = resMatn.score >= resMatnInFull.score ? resMatn : resMatnInFull;
-      if (resFull.changedWords && resFull.changedWords.length > 0 && resFull.score >= 95) {
-        res = resFull;
-        usedMatn = false;
-        matchedTokensSlice = nonSkippedTokens;
-      } else if (bestMatn.score > resFull.score) {
-        res = bestMatn;
+    if (qStripped.isnadStripped && matnQTokens.length >= 3) {
+      const windowMatn = findBestWindow(matnQTokens, nonSkipped);
+      const qWinMatn = findBestQueryWindow(matnQTokens, windowMatn);
+      const resMatn = alignWordsDP(qWinMatn, windowMatn);
+      if (resMatn.confidence > resFull.confidence) {
+        res = resMatn;
         usedMatn = true;
-        if (resMatn.score >= resMatnInFull.score) {
-          matchedTokensSlice = matnTokens;
-        } else {
-          matchedTokensSlice = nonSkippedTokens;
-        }
       }
     }
 
-    if (res.score >= 70) {
+    if (res.confidence >= 70) {
       const enList = corpus.hadith.en[record.c as keyof typeof corpus.hadith.en] || [];
       const rawEn = enList.find(h => h.hadithnumber === record.n);
       const rawEnglishText = rawEn?.text;
@@ -1291,24 +1603,14 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
 
       const colMeta = COLLECTION_METADATA[record.c] || { arName: record.c, enName: record.c };
 
-      const hasUnmatchedWord = res.changedWords && res.changedWords.length > 0;
-      const isFullyMatched = !hasUnmatchedWord && !res.hasApproximateMatch && res.score >= 90;
+      const hasUnmatchedWord = res.changedWords && res.changedWords.some((w) => w.type !== 'exact');
+      const isFullyMatched = !hasUnmatchedWord && !res.hasApproximateMatch && res.confidence >= 90;
 
-      const finalConf = isFullyMatched ? res.score : Math.min(89, res.score);
+      const finalConf = isFullyMatched ? res.confidence : Math.min(89, res.confidence);
       const state: 'matched' | 'close_match' = isFullyMatched ? 'matched' : 'close_match';
 
-      // Map matched start/end indices in matchedTokensSlice directly to original display word indices
-      const finalMatchedOriginalIndices: number[] = [];
-      const finalMatchedWords: string[] = [];
-
-      for (let i = res.startWordIndex; i <= res.endWordIndex; i++) {
-        if (i >= 0 && i < matchedTokensSlice.length) {
-          const t = matchedTokensSlice[i];
-          finalMatchedOriginalIndices.push(t.originalIndex);
-          finalMatchedWords.push(t.word);
-        }
-      }
-
+      const finalMatchedOriginalIndices = res.matchedOriginalIndices;
+      const finalMatchedWords = res.matchedWords;
       const rawStart = finalMatchedOriginalIndices[0] ?? 0;
       const rawEnd = finalMatchedOriginalIndices[finalMatchedOriginalIndices.length - 1] ?? 0;
 
@@ -1347,8 +1649,8 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
 
   results.sort((a, b) => {
     // 1. Contiguous whole query slice match must rank first
-    const aWhole = a.state === 'matched' && a.confidence === 100 && (!a.changedWords || a.changedWords.length === 0) && !a.hasApproximateMatch;
-    const bWhole = b.state === 'matched' && b.confidence === 100 && (!b.changedWords || b.changedWords.length === 0) && !b.hasApproximateMatch;
+    const aWhole = a.state === 'matched' && a.confidence === 100 && (!a.changedWords || a.changedWords.filter(w => w.type !== 'exact').length === 0) && !a.hasApproximateMatch;
+    const bWhole = b.state === 'matched' && b.confidence === 100 && (!b.changedWords || b.changedWords.filter(w => w.type !== 'exact').length === 0) && !b.hasApproximateMatch;
     if (aWhole && !bWhole) return -1;
     if (bWhole && !aWhole) return 1;
 
