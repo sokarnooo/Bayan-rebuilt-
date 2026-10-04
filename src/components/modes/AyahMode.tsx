@@ -175,8 +175,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
     changedWords?: Array<{ queryWord: string | null; sourceWord: string | null; position: number; type?: string }>,
     matchedOriginalIndices?: number[]
   ) => {
-    const cleanText = text.replace(/<br\s*\/?>/gi, ' \n ');
-    const words = cleanText.split(/\s+/).filter(Boolean);
+    if (!text) return '';
+
     const matchedSet = matchedOriginalIndices ? new Set(matchedOriginalIndices) : null;
     const changedSourceSet = new Set(
       (changedWords || [])
@@ -184,63 +184,72 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
         .filter(Boolean) as string[]
     );
 
+    const segments = text.split(/<br\s*\/?>/gi);
     let displayWordIdx = 0;
-    return words.map((word, idx) => {
-      if (word === '\n') {
-        return <br key={`br-${idx}`} className="my-2" />;
-      }
-      const currentIdx = displayWordIdx++;
-      let status: 'exact' | 'approx' | 'none' = 'none';
 
-      if (matchedSet) {
-        if (matchedSet.has(currentIdx)) {
-          status = (wordMatchStatus && wordMatchStatus[currentIdx]) || 'exact';
+    return segments.map((seg, segIdx) => {
+      const words = seg.split(/\s+/).filter(Boolean);
+      const renderedWords = words.map((word, wIdx) => {
+        const currentIdx = displayWordIdx++;
+        let status: 'exact' | 'approx' | 'none' = 'none';
+
+        if (matchedSet) {
+          if (matchedSet.has(currentIdx)) {
+            status = (wordMatchStatus && wordMatchStatus[currentIdx]) || 'exact';
+          }
+        } else if (wordMatchStatus && wordMatchStatus.length === words.length) {
+          status = wordMatchStatus[currentIdx];
+        } else if (
+          startWordIndex !== undefined &&
+          endWordIndex !== undefined &&
+          startWordIndex >= 0 &&
+          currentIdx >= startWordIndex &&
+          currentIdx <= endWordIndex
+        ) {
+          status = 'exact';
         }
-      } else if (wordMatchStatus && wordMatchStatus.length === words.length) {
-        status = wordMatchStatus[currentIdx];
-      } else if (
-        startWordIndex !== undefined &&
-        endWordIndex !== undefined &&
-        startWordIndex >= 0 &&
-        currentIdx >= startWordIndex &&
-        currentIdx <= endWordIndex
-      ) {
-        status = 'exact';
-      }
 
-      const isChanged =
-        (status === 'none' &&
-          ((matchedSet && matchedSet.has(currentIdx)) ||
-            (startWordIndex !== undefined &&
-              endWordIndex !== undefined &&
-              currentIdx >= startWordIndex &&
-              currentIdx <= endWordIndex))) ||
-        (changedWords && changedWords.length > 0 && changedSourceSet.has(word));
+        const isChanged =
+          (status === 'none' &&
+            ((matchedSet && matchedSet.has(currentIdx)) ||
+              (startWordIndex !== undefined &&
+                endWordIndex !== undefined &&
+                currentIdx >= startWordIndex &&
+                currentIdx <= endWordIndex))) ||
+          (changedWords && changedWords.length > 0 && changedSourceSet.has(word));
+
+        return (
+          <React.Fragment key={`w-${segIdx}-${wIdx}`}>
+            {wIdx > 0 ? ' ' : ''}
+            {isChanged && changedWords && changedWords.length > 0 ? (
+              <span
+                title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
+                className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-bold inline-block"
+              >
+                {word}
+              </span>
+            ) : status === 'exact' ? (
+              <span className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-bold inline-block">
+                {word}
+              </span>
+            ) : status === 'approx' ? (
+              <span
+                title={isAr ? 'تطابق تقريبي / رسم عثماني' : 'Approximate / script variant match'}
+                className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded font-bold inline-block"
+              >
+                {word}
+              </span>
+            ) : (
+              <span>{word}</span>
+            )}
+          </React.Fragment>
+        );
+      });
 
       return (
-        <React.Fragment key={idx}>
-          {idx > 0 && word !== '\n' ? ' ' : ''}
-          {isChanged && changedWords && changedWords.length > 0 ? (
-            <span
-              title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
-              className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-bold inline-block"
-            >
-              {word}
-            </span>
-          ) : status === 'exact' ? (
-            <span className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-bold inline-block">
-              {word}
-            </span>
-          ) : status === 'approx' ? (
-            <span
-              title={isAr ? 'تطابق تقريبي / رسم عثماني' : 'Approximate / script variant match'}
-              className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded font-bold inline-block"
-            >
-              {word}
-            </span>
-          ) : (
-            <span>{word}</span>
-          )}
+        <React.Fragment key={`seg-${segIdx}`}>
+          {renderedWords}
+          {segIdx < segments.length - 1 && <br className="my-2" />}
         </React.Fragment>
       );
     });

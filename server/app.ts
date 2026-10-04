@@ -7,6 +7,17 @@ export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
+let requestCounter = 0;
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    requestCounter++;
+    if (requestCounter % 20 === 0 && global.gc) {
+      global.gc();
+    }
+  });
+  next();
+});
+
 export function getEngineReadiness() {
   // Engines are singletons, init calls are idempotent if we check internal state
   const h = initHadithEngine();
@@ -89,12 +100,18 @@ app.post('/api/ayah/match', (req, res) => {
 app.post('/api/hadith/search', (req, res) => {
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
+  if (result.language === 'en' && global.gc) {
+    global.gc();
+  }
   res.json(result);
 });
 
 app.post('/api/hadith/match', (req, res) => {
   const query = req.body?.query || req.body?.text || '';
   const result = searchHadith(query);
+  if (result.language === 'en' && global.gc) {
+    global.gc();
+  }
   res.json(result);
 });
 

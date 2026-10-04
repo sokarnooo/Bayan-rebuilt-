@@ -14,9 +14,17 @@ import path from "path";
 import { fileURLToPath } from "url";
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
-var DATA_DIR = fs.existsSync(path.resolve(__dirname, "./data")) ? path.resolve(__dirname, "./data") : path.resolve(process.cwd(), "server/corpus/data");
+var candidateDirs = [
+  path.resolve(__dirname, "./data"),
+  path.resolve(__dirname, "../server/corpus/data"),
+  path.resolve(__dirname, "./corpus/data"),
+  path.resolve(process.cwd(), "server/corpus/data"),
+  path.resolve(process.cwd(), "dist-server/data")
+];
+var DATA_DIR = candidateDirs.find((d) => fs.existsSync(path.join(d, "quran_ar.json"))) || path.resolve(process.cwd(), "server/corpus/data");
 var cachedCorpus = null;
 var loadDurationMs = 0;
+var hadithLookupMap = /* @__PURE__ */ new Map();
 function readJsonFile(filename) {
   const filePath = path.join(DATA_DIR, filename);
   if (!fs.existsSync(filePath)) return {};
@@ -36,6 +44,7 @@ function getQuranEn() {
   }
   return cachedQuranEn;
 }
+var EMPTY_GRADES = Object.freeze([]);
 var cachedHadithEn = {};
 function getHadithEn(col) {
   if (!cachedHadithEn[col]) {
@@ -43,9 +52,9 @@ function getHadithEn(col) {
     const list = raw.hadiths || [];
     cachedHadithEn[col] = list.map((h) => ({
       hadithnumber: h.hadithnumber,
-      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      arabicnumber: h.hadithnumber,
       text: h.text || "",
-      grades: [],
+      grades: EMPTY_GRADES,
       reference: {
         book: h.reference?.book || 0,
         hadith: h.reference?.hadith || 0
@@ -66,16 +75,20 @@ function loadCorpus() {
   for (const col of collections) {
     const raw = readJsonFile(`hadith_${col}_ar.json`);
     const list = raw.hadiths || [];
-    hadithAr[col] = list.map((h) => ({
-      hadithnumber: h.hadithnumber,
-      arabicnumber: h.arabicnumber ?? h.hadithnumber,
-      text: h.text || "",
-      grades: h.grades || [],
-      reference: {
-        book: h.reference?.book || 0,
-        hadith: h.reference?.hadith || 0
-      }
-    }));
+    hadithAr[col] = list.map((h) => {
+      const item = {
+        hadithnumber: h.hadithnumber,
+        arabicnumber: h.arabicnumber ?? h.hadithnumber,
+        text: h.text || "",
+        grades: !h.grades || h.grades.length === 0 ? EMPTY_GRADES : h.grades,
+        reference: {
+          book: h.reference?.book || 0,
+          hadith: h.reference?.hadith || 0
+        }
+      };
+      hadithLookupMap.set(`${col}_${h.hadithnumber}`, item);
+      return item;
+    });
   }
   const corpus = {
     quran: {
@@ -96,6 +109,10 @@ function loadCorpus() {
   loadDurationMs = Math.round(performance.now() - start);
   cachedCorpus = corpus;
   return { corpus: cachedCorpus, loadTimeMs: loadDurationMs };
+}
+function lookupHadithAr(collection, hadithnumber) {
+  if (!cachedCorpus) loadCorpus();
+  return hadithLookupMap.get(`${collection}_${hadithnumber}`);
 }
 
 // server/matching/ayahMatcher.ts
@@ -201,6 +218,37 @@ function levenshteinDistance(s1, s2) {
   }
   return r2[len2];
 }
+function isLevenshteinDistanceAtMostOne(s1, s2) {
+  if (s1 === s2) return true;
+  const len1 = s1.length;
+  const len2 = s2.length;
+  if (Math.abs(len1 - len2) > 1) return false;
+  if (len1 === len2) {
+    let diffs2 = 0;
+    for (let i2 = 0; i2 < len1; i2++) {
+      if (s1.charCodeAt(i2) !== s2.charCodeAt(i2)) {
+        diffs2++;
+        if (diffs2 > 1) return false;
+      }
+    }
+    return diffs2 <= 1;
+  }
+  const short = len1 < len2 ? s1 : s2;
+  const long = len1 < len2 ? s2 : s1;
+  let i = 0, j = 0;
+  let diffs = 0;
+  while (i < short.length && j < long.length) {
+    if (short.charCodeAt(i) !== long.charCodeAt(j)) {
+      diffs++;
+      if (diffs > 1) return false;
+      j++;
+    } else {
+      i++;
+      j++;
+    }
+  }
+  return true;
+}
 function levenshteinSimilarity(s1, s2) {
   const maxLen = Math.max(s1.length, s2.length);
   if (maxLen === 0) return 1;
@@ -242,7 +290,6 @@ function getQuranEnText(chapter, verse) {
 }
 var __filename2 = fileURLToPath2(import.meta.url);
 var __dirname2 = path2.dirname(__filename2);
-var DATA_DIR2 = fs2.existsSync(path2.resolve(__dirname2, "../corpus/data")) ? path2.resolve(__dirname2, "../corpus/data") : path2.resolve(process.cwd(), "server/corpus/data");
 var indexedAyat = [];
 var surahMetadata = /* @__PURE__ */ new Map();
 var surahWordStreams = /* @__PURE__ */ new Map();
@@ -257,7 +304,7 @@ function initAyahEngine() {
     return { totalIndexed: indexedAyat.length };
   }
   const infoRaw = JSON.parse(
-    fs2.readFileSync(path2.join(DATA_DIR2, "quran_info.json"), "utf8")
+    fs2.readFileSync(path2.join(DATA_DIR, "quran_info.json"), "utf8")
   );
   for (const c of infoRaw.chapters || []) {
     surahMetadata.set(c.chapter, {
@@ -358,6 +405,18 @@ function initAyahEngine() {
         twoList.push(ayah.chapter << 16 | globalIndex - 1);
       }
     }
+  }
+  for (const [k, list] of wordPositionIndex) {
+    wordPositionIndex.set(k, new Int32Array(list));
+  }
+  for (const [k, list] of twoGramIndex) {
+    twoGramIndex.set(k, new Int32Array(list));
+  }
+  for (const [k, list] of exactNormalizedMap) {
+    exactNormalizedMap.set(k, new Int32Array(list));
+  }
+  for (const [k, list] of exactAlefMap) {
+    exactAlefMap.set(k, new Int32Array(list));
   }
   isInitialized = true;
   return { totalIndexed: indexedAyat.length };
@@ -472,14 +531,14 @@ function searchAyah(rawQuery) {
       const ayah = indexedAyat[hIdx];
       const stream = surahWordStreams.get(ayah.chapter);
       if (stream) {
-        const firstW = stream.find((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
-        if (firstW) {
+        const firstWIdx = stream.findIndex((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
+        if (firstWIdx !== -1) {
           let sSet = candidateStartsBySurah.get(ayah.chapter);
           if (!sSet) {
             sSet = /* @__PURE__ */ new Set();
             candidateStartsBySurah.set(ayah.chapter, sSet);
           }
-          sSet.add(firstW.globalWordIndex);
+          sSet.add(firstWIdx);
         }
       }
     }
@@ -801,7 +860,7 @@ import zlib from "zlib";
 import { fileURLToPath as fileURLToPath3 } from "url";
 var __filename3 = fileURLToPath3(import.meta.url);
 var __dirname3 = path3.dirname(__filename3);
-var DATA_DIR3 = fs3.existsSync(path3.resolve(__dirname3, "../corpus/data")) ? path3.resolve(__dirname3, "../corpus/data") : path3.resolve(process.cwd(), "server/corpus/data");
+var DATA_DIR2 = fs3.existsSync(path3.resolve(__dirname3, "../corpus/data")) ? path3.resolve(__dirname3, "../corpus/data") : path3.resolve(process.cwd(), "server/corpus/data");
 var COLLECTION_METADATA = {
   bukhari: { arName: "\u0635\u062D\u064A\u062D \u0627\u0644\u0628\u062E\u0627\u0631\u064A", enName: "Sahih al-Bukhari" },
   muslim: { arName: "\u0635\u062D\u064A\u062D \u0645\u0633\u0644\u0645", enName: "Sahih Muslim" },
@@ -1183,6 +1242,15 @@ function stripIsnadTokens(tokens) {
   }
   return { matnTokens: tokens, isnadStripped: false };
 }
+function isWordMatchEquivalent(w1, w2) {
+  if (w1 === w2) return true;
+  if (w1.replace(/ء/g, "\u0627") === w2.replace(/ء/g, "\u0627")) return true;
+  if ((w1 === "\u0648\u062D\u062F\u062B\u0646\u064A" || w1 === "\u0648\u062D\u062F\u062B\u0646\u0627") && (w2 === "\u0648\u062D\u062F\u062B\u0646\u064A" || w2 === "\u0648\u062D\u062F\u062B\u0646\u0627")) return true;
+  if ((w1 === "\u062D\u062F\u062B\u0646\u064A" || w1 === "\u062D\u062F\u062B\u0646\u0627") && (w2 === "\u062D\u062F\u062B\u0646\u064A" || w2 === "\u062D\u062F\u062B\u0646\u0627")) return true;
+  if ((w1 === "\u0627\u062E\u0628\u0631\u0646\u064A" || w1 === "\u0627\u062E\u0628\u0631\u0646\u0627") && (w2 === "\u0627\u062E\u0628\u0631\u0646\u064A" || w2 === "\u0627\u062E\u0628\u0631\u0646\u0627")) return true;
+  if ((w1 === "\u0648\u0627\u062E\u0628\u0631\u0646\u064A" || w1 === "\u0648\u0627\u062E\u0628\u0631\u0646\u0627") && (w2 === "\u0648\u0627\u062E\u0628\u0631\u0646\u064A" || w2 === "\u0648\u0627\u062E\u0628\u0631\u0646\u0627")) return true;
+  return false;
+}
 function alignWordsDP(queryTokens, sourceTokens) {
   const m = queryTokens.length;
   const n = sourceTokens.length;
@@ -1197,58 +1265,57 @@ function alignWordsDP(queryTokens, sourceTokens) {
       hasApproximateMatch: false
     };
   }
-  const dp = Array.from({ length: m + 1 }, () => new Float64Array(n + 1));
-  const back = Array.from({ length: m + 1 }, () => new Int32Array(n + 1));
-  dp[0][0] = 0;
+  const stride = n + 1;
+  const dp = new Float64Array((m + 1) * stride);
+  const back = new Int32Array((m + 1) * stride);
+  dp[0] = 0;
   for (let i = 1; i <= m; i++) {
-    dp[i][0] = i * 1.5;
-    back[i][0] = 2;
+    dp[i * stride] = i * 1.5;
+    back[i * stride] = 2;
   }
   for (let j = 1; j <= n; j++) {
-    dp[0][j] = 0;
-    back[0][j] = 3;
+    dp[j] = 0;
+    back[j] = 3;
   }
   for (let i = 1; i <= m; i++) {
     const qw = queryTokens[i - 1].normalized;
+    const rowOffset = i * stride;
+    const prevRowOffset = (i - 1) * stride;
     for (let j = 1; j <= n; j++) {
       const sw = sourceTokens[j - 1].normalized;
       let subCost = 3;
-      if (qw === sw || qw.replace(/ء/g, "\u0627") === sw.replace(/ء/g, "\u0627")) {
+      if (isWordMatchEquivalent(qw, sw)) {
         subCost = 0;
       } else {
         const lenDiff = Math.abs(qw.length - sw.length);
-        if (lenDiff <= 1) {
-          const dist = levenshteinDistance(qw, sw);
-          if (dist <= 1) {
-            subCost = 0.5;
-          } else {
-            subCost = 2.5;
-          }
+        if (lenDiff <= 1 && isLevenshteinDistanceAtMostOne(qw, sw)) {
+          subCost = 0.5;
         } else {
           subCost = 2.5;
         }
       }
-      const costDiag = dp[i - 1][j - 1] + subCost;
-      const costUp = dp[i - 1][j] + 1.5;
-      const costLeft = dp[i][j - 1] + 1;
+      const costDiag = dp[prevRowOffset + j - 1] + subCost;
+      const costUp = dp[prevRowOffset + j] + 1.5;
+      const costLeft = dp[rowOffset + j - 1] + 1;
       if (costDiag <= costUp && costDiag <= costLeft) {
-        dp[i][j] = costDiag;
-        back[i][j] = 1;
+        dp[rowOffset + j] = costDiag;
+        back[rowOffset + j] = 1;
       } else if (costUp <= costLeft) {
-        dp[i][j] = costUp;
-        back[i][j] = 2;
+        dp[rowOffset + j] = costUp;
+        back[rowOffset + j] = 2;
       } else {
-        dp[i][j] = costLeft;
-        back[i][j] = 3;
+        dp[rowOffset + j] = costLeft;
+        back[rowOffset + j] = 3;
       }
     }
   }
   let bestJ = n;
-  let minCost = dp[m][n];
+  let minCost = dp[m * stride + n];
   const searchStart = Math.min(n, Math.max(1, m - 4));
   for (let j = searchStart; j <= n; j++) {
-    if (dp[m][j] < minCost) {
-      minCost = dp[m][j];
+    const val = dp[m * stride + j];
+    if (val < minCost) {
+      minCost = val;
       bestJ = j;
     }
   }
@@ -1256,12 +1323,12 @@ function alignWordsDP(queryTokens, sourceTokens) {
   let currI = m;
   let currJ = bestJ;
   while (currI > 0) {
-    if (currI > 0 && currJ > 0 && back[currI][currJ] === 1) {
+    const cellIdx = currI * stride + currJ;
+    if (currI > 0 && currJ > 0 && back[cellIdx] === 1) {
       const qw = queryTokens[currI - 1];
       const sw = sourceTokens[currJ - 1];
-      const isExact = qw.normalized === sw.normalized || qw.normalized.replace(/ء/g, "\u0627") === sw.normalized.replace(/ء/g, "\u0627");
-      const dist = isExact ? 0 : levenshteinDistance(qw.normalized, sw.normalized);
-      const type = isExact ? "exact" : dist <= 1 ? "approximate" : "deleted";
+      const isExact = isWordMatchEquivalent(qw.normalized, sw.normalized);
+      const type = isExact ? "exact" : isLevenshteinDistanceAtMostOne(qw.normalized, sw.normalized) ? "approximate" : "deleted";
       rev.push({
         queryWord: qw.word,
         sourceWord: sw.word,
@@ -1272,7 +1339,7 @@ function alignWordsDP(queryTokens, sourceTokens) {
       });
       currI--;
       currJ--;
-    } else if (currJ <= 0 || back[currI][currJ] === 2) {
+    } else if (currJ <= 0 || back[cellIdx] === 2) {
       rev.push({
         queryWord: queryTokens[currI - 1].word,
         sourceWord: null,
@@ -1362,16 +1429,18 @@ function alignWordsDP(queryTokens, sourceTokens) {
 function findBestWindow(query, source) {
   if (source.length <= query.length + 8) return source;
   const qWords = new Set(query.map((t) => t.normalized));
-  let bestStart = 0;
-  let maxHits = -1;
   const winLen = query.length;
-  for (let i = 0; i <= source.length - winLen; i++) {
-    let hits = 0;
-    for (let j = 0; j < winLen; j++) {
-      if (qWords.has(source[i + j].normalized)) hits++;
-    }
-    if (hits > maxHits) {
-      maxHits = hits;
+  let currentHits = 0;
+  for (let j = 0; j < winLen; j++) {
+    if (qWords.has(source[j].normalized)) currentHits++;
+  }
+  let bestStart = 0;
+  let maxHits = currentHits;
+  for (let i = 1; i <= source.length - winLen; i++) {
+    if (qWords.has(source[i - 1].normalized)) currentHits--;
+    if (qWords.has(source[i + winLen - 1].normalized)) currentHits++;
+    if (currentHits > maxHits) {
+      maxHits = currentHits;
       bestStart = i;
     }
   }
@@ -1476,7 +1545,7 @@ function preprocessAllRawHadiths() {
   wordToIdMap.clear();
   let emptyCount = 0;
   for (const col of collections) {
-    const arPath = path3.join(DATA_DIR3, `hadith_${col}_ar.json`);
+    const arPath = path3.join(DATA_DIR2, `hadith_${col}_ar.json`);
     if (!fs3.existsSync(arPath)) continue;
     const arData = JSON.parse(fs3.readFileSync(arPath, "utf8"));
     sections[col] = arData.metadata?.sections || {};
@@ -1513,8 +1582,8 @@ function initHadithEngine() {
     };
   }
   const startTime = performance.now();
-  const prebuiltPathGz = path3.join(DATA_DIR3, "prebuilt_hadiths.json.gz");
-  const prebuiltPathPlain = path3.join(DATA_DIR3, "prebuilt_hadiths.json");
+  const prebuiltPathGz = path3.join(DATA_DIR2, "prebuilt_hadiths.json.gz");
+  const prebuiltPathPlain = path3.join(DATA_DIR2, "prebuilt_hadiths.json");
   corpusHadiths = [];
   twoGramKeyIndexMap.clear();
   let emptyCount = 379;
@@ -1837,7 +1906,8 @@ function findAttestationCluster(targetRecord) {
       candHits.set(h, (candHits.get(h) || 0) + 1);
     }
   }
-  const candidateIndices = Array.from(candHits.entries()).filter(([_, count]) => count >= 2 || targetTokenIds.length <= 4).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([cIdx]) => cIdx);
+  const minCount = targetTokenIds.length <= 10 ? 2 : Math.max(2, Math.floor(targetTokenIds.length * 0.15));
+  const candidateIndices = Array.from(candHits.entries()).filter(([_, count]) => count >= minCount || targetTokenIds.length <= 4).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([cIdx]) => cIdx);
   for (const cIdx of candidateIndices) {
     const candidate = corpusHadiths[cIdx];
     if (candidate.c === targetRecord.c && candidate.n === targetRecord.n) continue;
@@ -1849,8 +1919,7 @@ function findAttestationCluster(targetRecord) {
     const res = scoreContainment(shorterStrings, longer);
     const containmentRatio = Math.round(res.score / 100 * 100) / 100;
     if (containmentRatio >= 0.8) {
-      const arList = corpus.hadith.ar[candidate.c] || [];
-      const rawAr = arList.find((h) => h.hadithnumber === candidate.n);
+      const rawAr = lookupHadithAr(candidate.c, candidate.n);
       const grades = (rawAr?.grades || []).map(parseGrade);
       const hasNoGrading = grades.length === 0;
       const bookNum = rawAr?.reference?.book ?? 0;
@@ -1899,11 +1968,11 @@ function searchHadith(rawQuery) {
     const stopWords = /* @__PURE__ */ new Set(["are", "to", "be", "only", "by", "the", "a", "of", "and", "in", "for", "that"]);
     const qContent = qTokens2.filter((t) => !stopWords.has(t));
     const matches = [];
-    const { corpus } = loadCorpus();
+    const { corpus: corpus2 } = loadCorpus();
     const cols = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "nawawi"];
     for (const col of cols) {
-      const enList = corpus.hadith.en[col] || [];
-      const arList = corpus.hadith.ar[col] || [];
+      const enList = corpus2.hadith.en[col] || [];
+      const arList = corpus2.hadith.ar[col] || [];
       const colMeta = COLLECTION_METADATA[col] || { arName: col, enName: col };
       for (const enH of enList) {
         if (!enH.text) continue;
@@ -1927,7 +1996,7 @@ function searchHadith(rawQuery) {
           }
         }
         if (score >= 70) {
-          const rawAr = arList.find((x) => x.hadithnumber === enH.hadithnumber);
+          const rawAr = lookupHadithAr(col, enH.hadithnumber);
           const grades = (rawAr?.grades || []).map(parseGrade);
           const bookNum = rawAr?.reference?.book ?? 0;
           const hadithInBook = rawAr?.reference?.hadith ?? 0;
@@ -2097,13 +2166,13 @@ function searchHadith(rawQuery) {
   }
   let candidateIndices = [];
   if (candidateScores.size > 0) {
-    candidateIndices = Array.from(candidateScores.entries()).sort((a, b) => b[1] - a[1]).slice(0, 25).map((entry) => entry[0]);
+    candidateIndices = Array.from(candidateScores.entries()).sort((a, b) => b[1] - a[1]).slice(0, 12).map((entry) => entry[0]);
   } else if (qIds[0] !== -1 || fullQIds[0] !== -1) {
     const targetId = qIds[0] !== -1 ? qIds[0] : fullQIds[0];
     for (let c = 0; c < corpusHadiths.length; c++) {
       if (corpusHadiths[c].f.includes(targetId)) {
         candidateIndices.push(c);
-        if (candidateIndices.length >= 25) break;
+        if (candidateIndices.length >= 12) break;
       }
     }
   }
@@ -2112,11 +2181,18 @@ function searchHadith(rawQuery) {
   const qNonSkipped = qTokenize.nonSkipped;
   const qStripped = stripIsnadTokens(qNonSkipped);
   const matnQTokens = qStripped.matnTokens;
+  const { corpus } = loadCorpus();
   for (const cIdx of candidateIndices) {
+    const score = candidateScores.get(cIdx) || 0;
+    const maxScore = candidateScores.get(candidateIndices[0]) || 0;
+    if (maxScore >= 10 && score < 3) {
+      continue;
+    }
+    if (maxScore >= 15 && score < maxScore * 0.25) {
+      continue;
+    }
     const record = corpusHadiths[cIdx];
-    const { corpus } = loadCorpus();
-    const arList = corpus.hadith.ar[record.c] || [];
-    const rawAr = arList.find((h) => h.hadithnumber === record.n);
+    const rawAr = lookupHadithAr(record.c, record.n);
     const rawArabicText = rawAr?.text || "";
     const { displayWords, nonSkipped } = tokenizeDisplayWords(rawArabicText);
     if (nonSkipped.length === 0) continue;
@@ -2124,7 +2200,7 @@ function searchHadith(rawQuery) {
     const resFull = alignWordsDP(qNonSkipped, windowFull);
     let res = resFull;
     let usedMatn = false;
-    if (qStripped.isnadStripped && matnQTokens.length >= 3) {
+    if (resFull.confidence < 95 && qStripped.isnadStripped && matnQTokens.length >= 3) {
       const windowMatn = findBestWindow(matnQTokens, nonSkipped);
       const resMatn = alignWordsDP(matnQTokens, windowMatn);
       if (resMatn.confidence > resFull.confidence) {
@@ -2179,7 +2255,8 @@ function searchHadith(rawQuery) {
         grades,
         hasNoGrading,
         isnadStripped: qStripped.isnadStripped || usedMatn,
-        isnadChecked: !(qStripped.isnadStripped || usedMatn)
+        isnadChecked: !(qStripped.isnadStripped || usedMatn),
+        record
       });
     }
   }
@@ -2209,10 +2286,13 @@ function searchHadith(rawQuery) {
     return a.hadithnumber - b.hadithnumber;
   });
   if (results.length > 0) {
-    const topRecord = corpusHadiths.find((h) => `${h.c}_${h.n}` === results[0].id);
+    const topRecord = results[0].record;
     if (topRecord) {
       results[0].attestations = findAttestationCluster(topRecord);
     }
+  }
+  for (const r of results) {
+    delete r.record;
   }
   const topConfidence = results.length > 0 ? results[0].confidence : 0;
   const overallState = results.length === 0 || topConfidence < 70 ? "not_found" : results.some((r) => r.state === "matched") ? "matched" : "close_match";
@@ -2234,6 +2314,16 @@ function searchHadith(rawQuery) {
 // server/app.ts
 var app = express();
 app.use(express.json({ limit: "10mb" }));
+var requestCounter = 0;
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    requestCounter++;
+    if (requestCounter % 20 === 0 && global.gc) {
+      global.gc();
+    }
+  });
+  next();
+});
 function getEngineReadiness() {
   const h = initHadithEngine();
   const a = initAyahEngine();
@@ -2307,11 +2397,17 @@ app.post("/api/ayah/match", (req, res) => {
 app.post("/api/hadith/search", (req, res) => {
   const query = req.body?.query || req.body?.text || "";
   const result = searchHadith(query);
+  if (result.language === "en" && global.gc) {
+    global.gc();
+  }
   res.json(result);
 });
 app.post("/api/hadith/match", (req, res) => {
   const query = req.body?.query || req.body?.text || "";
   const result = searchHadith(query);
+  if (result.language === "en" && global.gc) {
+    global.gc();
+  }
   res.json(result);
 });
 app.post("/api/ask", (req, res) => {
@@ -2328,7 +2424,7 @@ import zlib2 from "zlib";
 import { fileURLToPath as fileURLToPath4 } from "url";
 var __filename4 = fileURLToPath4(import.meta.url);
 var __dirname4 = path4.dirname(__filename4);
-var DATA_DIR4 = path4.resolve(__dirname4, "./data");
+var DATA_DIR3 = path4.resolve(__dirname4, "./data");
 var EXPECTED_COUNTS = {
   bukhari: 7580,
   muslim: 7360,
@@ -2351,13 +2447,13 @@ async function runPrebuild() {
   console.log("====================================================");
   console.log("Starting Prebuild: Data Acquisition & Index Generation");
   const startTime = performance.now();
-  if (!fs4.existsSync(DATA_DIR4)) {
-    fs4.mkdirSync(DATA_DIR4, { recursive: true });
+  if (!fs4.existsSync(DATA_DIR3)) {
+    fs4.mkdirSync(DATA_DIR3, { recursive: true });
   }
   try {
     for (const col of COLLECTIONS) {
-      const arPath = path4.join(DATA_DIR4, `hadith_${col}_ar.json`);
-      const enPath = path4.join(DATA_DIR4, `hadith_${col}_en.json`);
+      const arPath = path4.join(DATA_DIR3, `hadith_${col}_ar.json`);
+      const enPath = path4.join(DATA_DIR3, `hadith_${col}_en.json`);
       if (!fs4.existsSync(arPath)) {
         await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/ara-${col}.json`, arPath);
       }
@@ -2365,14 +2461,14 @@ async function runPrebuild() {
         await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/eng-${col}.json`, enPath);
       }
     }
-    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_info.json"))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path4.join(DATA_DIR4, "quran_info.json"));
+    if (!fs4.existsSync(path4.join(DATA_DIR3, "quran_info.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path4.join(DATA_DIR3, "quran_info.json"));
     }
-    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_ar.json"))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path4.join(DATA_DIR4, "quran_ar.json"));
+    if (!fs4.existsSync(path4.join(DATA_DIR3, "quran_ar.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path4.join(DATA_DIR3, "quran_ar.json"));
     }
-    if (!fs4.existsSync(path4.join(DATA_DIR4, "quran_en.json"))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-abdullahyusufal.json`, path4.join(DATA_DIR4, "quran_en.json"));
+    if (!fs4.existsSync(path4.join(DATA_DIR3, "quran_en.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-abdullahyusufal.json`, path4.join(DATA_DIR3, "quran_en.json"));
     }
   } catch (err) {
     console.error("CRITICAL: Download failed. Prebuild aborted.");
@@ -2392,7 +2488,7 @@ async function runPrebuild() {
       mismatch = true;
     }
   }
-  const quranAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR4, "quran_ar.json"), "utf8"));
+  const quranAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_ar.json"), "utf8"));
   const quranList = quranAr.quran || quranAr[Object.keys(quranAr)[0]];
   if (quranList.length !== QURAN_EXPECTED) {
     console.error(`ERROR: Quran count mismatch! Expected ${QURAN_EXPECTED}, got ${quranList.length}`);
@@ -2403,7 +2499,7 @@ async function runPrebuild() {
     process.exit(1);
   }
   console.log("Verification PASSED.");
-  const outPathGz = path4.join(DATA_DIR4, "prebuilt_hadiths.json.gz");
+  const outPathGz = path4.join(DATA_DIR3, "prebuilt_hadiths.json.gz");
   const serializedRecords = records.map((r) => ({
     c: r.c,
     n: r.n,
@@ -2449,7 +2545,7 @@ async function startServer() {
     });
   }
   console.log("Initializing Search Engines...");
-  const corpusDir = fs5.existsSync(path5.resolve(__dirname5, "./corpus/data")) ? path5.resolve(__dirname5, "./corpus/data") : fs5.existsSync(path5.resolve(__dirname5, "../server/corpus/data")) ? path5.resolve(__dirname5, "../server/corpus/data") : path5.resolve(process.cwd(), "server/corpus/data");
+  const corpusDir = DATA_DIR;
   const quranArFile = path5.join(corpusDir, "quran_ar.json");
   if (!fs5.existsSync(quranArFile)) {
     console.log("Corpus data missing, running prebuild data acquisition...");

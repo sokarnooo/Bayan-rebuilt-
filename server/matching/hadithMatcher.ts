@@ -2,13 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 import { fileURLToPath } from 'url';
-import { loadCorpus } from '../corpus/loader.ts';
+import { loadCorpus, lookupHadithAr } from '../corpus/loader.ts';
 import {
   normalizeArabic,
   toAlefInvariant,
   levenshteinDistance,
   levenshteinSimilarity,
   wordSimilarityCorpusDerived,
+  isLevenshteinDistanceAtMostOne,
 } from './normalizer.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -70,6 +71,7 @@ export interface HadithMatchResult {
   isnadStripped: boolean;
   isnadChecked?: boolean;
   attestations?: HadithAttestationItem[];
+  record?: HadithRecord;
 }
 
 export interface HadithAttestationItem {
@@ -544,6 +546,16 @@ export interface AlignedDPResult {
   hasApproximateMatch: boolean;
 }
 
+function isWordMatchEquivalent(w1: string, w2: string): boolean {
+  if (w1 === w2) return true;
+  if (w1.replace(/ء/g, 'ا') === w2.replace(/ء/g, 'ا')) return true;
+  if ((w1 === 'وحدثني' || w1 === 'وحدثنا') && (w2 === 'وحدثني' || w2 === 'وحدثنا')) return true;
+  if ((w1 === 'حدثني' || w1 === 'حدثنا') && (w2 === 'حدثني' || w2 === 'حدثنا')) return true;
+  if ((w1 === 'اخبرني' || w1 === 'اخبرنا') && (w2 === 'اخبرني' || w2 === 'اخبرنا')) return true;
+  if ((w1 === 'واخبرني' || w1 === 'واخبرنا') && (w2 === 'واخبرني' || w2 === 'واخبرنا')) return true;
+  return false;
+}
+
 export function alignWordsDP(
   queryTokens: { word: string; normalized: string }[],
   sourceTokens: { word: string; normalized: string; originalIndex: number }[]
@@ -563,64 +575,63 @@ export function alignWordsDP(
     };
   }
 
-  const dp: number[][] = Array.from({ length: m + 1 }, () => new Float64Array(n + 1) as any);
-  const back: number[][] = Array.from({ length: m + 1 }, () => new Int32Array(n + 1) as any);
+  const stride = n + 1;
+  const dp = new Float64Array((m + 1) * stride);
+  const back = new Int32Array((m + 1) * stride);
 
-  dp[0][0] = 0;
+  dp[0] = 0;
   for (let i = 1; i <= m; i++) {
-    dp[i][0] = i * 1.5;
-    back[i][0] = 2;
+    dp[i * stride] = i * 1.5;
+    back[i * stride] = 2;
   }
   for (let j = 1; j <= n; j++) {
-    dp[0][j] = 0;
-    back[0][j] = 3;
+    dp[j] = 0;
+    back[j] = 3;
   }
 
   for (let i = 1; i <= m; i++) {
     const qw = queryTokens[i - 1].normalized;
+    const rowOffset = i * stride;
+    const prevRowOffset = (i - 1) * stride;
     for (let j = 1; j <= n; j++) {
       const sw = sourceTokens[j - 1].normalized;
 
       let subCost = 3.0;
-      if (qw === sw || qw.replace(/ء/g, 'ا') === sw.replace(/ء/g, 'ا')) {
+      if (isWordMatchEquivalent(qw, sw)) {
         subCost = 0;
       } else {
         const lenDiff = Math.abs(qw.length - sw.length);
-        if (lenDiff <= 1) {
-          const dist = levenshteinDistance(qw, sw);
-          if (dist <= 1) {
-            subCost = 0.5;
-          } else {
-            subCost = 2.5;
-          }
+        if (lenDiff <= 1 && isLevenshteinDistanceAtMostOne(qw, sw)) {
+          subCost = 0.5;
         } else {
           subCost = 2.5;
         }
       }
 
-      const costDiag = dp[i - 1][j - 1] + subCost;
-      const costUp = dp[i - 1][j] + 1.5;
-      const costLeft = dp[i][j - 1] + 1.0;
+      const costDiag = dp[prevRowOffset + j - 1] + subCost;
+      const costUp = dp[prevRowOffset + j] + 1.5;
+      const costLeft = dp[rowOffset + j - 1] + 1.0;
 
       if (costDiag <= costUp && costDiag <= costLeft) {
-        dp[i][j] = costDiag;
-        back[i][j] = 1;
+        dp[rowOffset + j] = costDiag;
+        back[rowOffset + j] = 1;
       } else if (costUp <= costLeft) {
-        dp[i][j] = costUp;
-        back[i][j] = 2;
+        dp[rowOffset + j] = costUp;
+        back[rowOffset + j] = 2;
       } else {
-        dp[i][j] = costLeft;
-        back[i][j] = 3;
+        dp[rowOffset + j] = costLeft;
+        back[rowOffset + j] = 3;
       }
     }
   }
 
   let bestJ = n;
-  let minCost = dp[m][n];
+  let minCost = dp[m * stride + n];
   const searchStart = Math.min(n, Math.max(1, m - 4));
   for (let j = searchStart; j <= n; j++) {
-    if (dp[m][j] < minCost) {
-      minCost = dp[m][j];
+    const val = dp[m * stride + j];
+    if (val < minCost) {
+      minCost = val;
       bestJ = j;
     }
   }
@@ -639,12 +650,12 @@ export function alignWordsDP(
   let currJ = bestJ;
 
   while (currI > 0) {
-    if (currI > 0 && currJ > 0 && back[currI][currJ] === 1) {
+    const cellIdx = currI * stride + currJ;
+    if (currI > 0 && currJ > 0 && back[cellIdx] === 1) {
       const qw = queryTokens[currI - 1];
       const sw = sourceTokens[currJ - 1];
-      const isExact = (qw.normalized === sw.normalized || qw.normalized.replace(/ء/g, 'ا') === sw.normalized.replace(/ء/g, 'ا'));
-      const dist = isExact ? 0 : levenshteinDistance(qw.normalized, sw.normalized);
-      const type = isExact ? 'exact' : (dist <= 1 ? 'approximate' : 'deleted');
+      const isExact = isWordMatchEquivalent(qw.normalized, sw.normalized);
+      const type = isExact ? 'exact' : (isLevenshteinDistanceAtMostOne(qw.normalized, sw.normalized) ? 'approximate' : 'deleted');
 
       rev.push({
         queryWord: qw.word,
@@ -656,7 +667,7 @@ export function alignWordsDP(
       });
       currI--;
       currJ--;
-    } else if (currJ <= 0 || back[currI][currJ] === 2) {
+    } else if (currJ <= 0 || back[cellIdx] === 2) {
       rev.push({
         queryWord: queryTokens[currI - 1].word,
         sourceWord: null,
@@ -751,19 +762,25 @@ export function alignWordsDP(
 export function findBestWindow<T extends { word: string; normalized: string; originalIndex: number }>(query: { normalized: string }[], source: T[]): T[] {
   if (source.length <= query.length + 8) return source;
   const qWords = new Set(query.map(t => t.normalized));
-  let bestStart = 0;
-  let maxHits = -1;
   const winLen = query.length;
-  for (let i = 0; i <= source.length - winLen; i++) {
-    let hits = 0;
-    for (let j = 0; j < winLen; j++) {
-      if (qWords.has(source[i + j].normalized)) hits++;
-    }
-    if (hits > maxHits) {
-      maxHits = hits;
+
+  let currentHits = 0;
+  for (let j = 0; j < winLen; j++) {
+    if (qWords.has(source[j].normalized)) currentHits++;
+  }
+
+  let bestStart = 0;
+  let maxHits = currentHits;
+
+  for (let i = 1; i <= source.length - winLen; i++) {
+    if (qWords.has(source[i - 1].normalized)) currentHits--;
+    if (qWords.has(source[i + winLen - 1].normalized)) currentHits++;
+    if (currentHits > maxHits) {
+      maxHits = currentHits;
       bestStart = i;
     }
   }
+
   const start = Math.max(0, bestStart - 4);
   const end = Math.min(source.length, bestStart + winLen + 6);
   return source.slice(start, end);
@@ -772,19 +789,25 @@ export function findBestWindow<T extends { word: string; normalized: string; ori
 export function findBestQueryWindow(query: { word: string; normalized: string }[], source: { normalized: string }[]) {
   if (query.length <= source.length + 8) return query;
   const sWords = new Set(source.map(t => t.normalized));
-  let bestStart = 0;
-  let maxHits = -1;
   const winLen = Math.min(query.length, source.length + 6);
-  for (let i = 0; i <= query.length - winLen; i++) {
-    let hits = 0;
-    for (let j = 0; j < winLen; j++) {
-      if (sWords.has(query[i + j].normalized)) hits++;
-    }
-    if (hits > maxHits) {
-      maxHits = hits;
+
+  let currentHits = 0;
+  for (let j = 0; j < winLen; j++) {
+    if (sWords.has(query[j].normalized)) currentHits++;
+  }
+
+  let bestStart = 0;
+  let maxHits = currentHits;
+
+  for (let i = 1; i <= query.length - winLen; i++) {
+    if (sWords.has(query[i - 1].normalized)) currentHits--;
+    if (sWords.has(query[i + winLen - 1].normalized)) currentHits++;
+    if (currentHits > maxHits) {
+      maxHits = currentHits;
       bestStart = i;
     }
   }
+
   const start = Math.max(0, bestStart - 2);
   const end = Math.min(query.length, bestStart + winLen + 4);
   return query.slice(start, end);
@@ -1349,8 +1372,9 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
     }
   }
 
+  const minCount = targetTokenIds.length <= 10 ? 2 : Math.max(2, Math.floor(targetTokenIds.length * 0.15));
   const candidateIndices = Array.from(candHits.entries())
-    .filter(([_, count]) => count >= 2 || targetTokenIds.length <= 4)
+    .filter(([_, count]) => count >= minCount || targetTokenIds.length <= 4)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 20)
     .map(([cIdx]) => cIdx);
@@ -1371,8 +1395,7 @@ function findAttestationCluster(targetRecord: HadithRecord): HadithAttestationIt
     const containmentRatio = Math.round((res.score / 100) * 100) / 100;
 
     if (containmentRatio >= 0.80) {
-      const arList = corpus.hadith.ar[candidate.c as keyof typeof corpus.hadith.ar] || [];
-      const rawAr = arList.find(h => h.hadithnumber === candidate.n);
+      const rawAr = lookupHadithAr(candidate.c, candidate.n);
       const grades: HadithGradeItem[] = (rawAr?.grades || []).map(parseGrade);
       const hasNoGrading = grades.length === 0;
 
@@ -1463,7 +1486,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
         }
 
         if (score >= 70) {
-          const rawAr = arList.find((x) => x.hadithnumber === enH.hadithnumber);
+          const rawAr = lookupHadithAr(col, enH.hadithnumber);
           const grades: HadithGradeItem[] = (rawAr?.grades || []).map(parseGrade);
           const bookNum = rawAr?.reference?.book ?? 0;
           const hadithInBook = rawAr?.reference?.hadith ?? 0;
@@ -1647,14 +1670,14 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
   if (candidateScores.size > 0) {
     candidateIndices = Array.from(candidateScores.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 25)
+      .slice(0, 12)
       .map((entry) => entry[0]);
   } else if (qIds[0] !== -1 || fullQIds[0] !== -1) {
     const targetId = qIds[0] !== -1 ? qIds[0] : fullQIds[0];
     for (let c = 0; c < corpusHadiths.length; c++) {
       if (corpusHadiths[c].f.includes(targetId)) {
         candidateIndices.push(c);
-        if (candidateIndices.length >= 25) break;
+        if (candidateIndices.length >= 12) break;
       }
     }
   }
@@ -1666,13 +1689,21 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
   const qStripped = stripIsnadTokens(qNonSkipped);
   const matnQTokens = qStripped.matnTokens;
 
+  const { corpus } = loadCorpus();
+
   for (const cIdx of candidateIndices) {
+    const score = candidateScores.get(cIdx) || 0;
+    const maxScore = candidateScores.get(candidateIndices[0]) || 0;
+    if (maxScore >= 10 && score < 3) {
+      continue;
+    }
+    if (maxScore >= 15 && score < maxScore * 0.25) {
+      continue;
+    }
+
     const record = corpusHadiths[cIdx];
 
-    // Reconstruct raw details from the LoadedCorpus on demand
-    const { corpus } = loadCorpus();
-    const arList = corpus.hadith.ar[record.c as keyof typeof corpus.hadith.ar] || [];
-    const rawAr = arList.find(h => h.hadithnumber === record.n);
+    const rawAr = lookupHadithAr(record.c, record.n);
     const rawArabicText = rawAr?.text || '';
 
     // Tokenize the ORIGINAL text once into display words
@@ -1685,7 +1716,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
     let res = resFull;
     let usedMatn = false;
 
-    if (qStripped.isnadStripped && matnQTokens.length >= 3) {
+    if (resFull.confidence < 95 && qStripped.isnadStripped && matnQTokens.length >= 3) {
       const windowMatn = findBestWindow(matnQTokens, nonSkipped);
       const resMatn = alignWordsDP(matnQTokens, windowMatn);
       if (resMatn.confidence > resFull.confidence) {
@@ -1749,6 +1780,7 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
         hasNoGrading,
         isnadStripped: qStripped.isnadStripped || usedMatn,
         isnadChecked: !(qStripped.isnadStripped || usedMatn),
+        record,
       });
     }
   }
@@ -1786,10 +1818,15 @@ export function searchHadith(rawQuery: string): HadithSearchResponse {
 
   // Attach attestation cluster to top result
   if (results.length > 0) {
-    const topRecord = corpusHadiths.find((h) => `${h.c}_${h.n}` === results[0].id);
+    const topRecord = results[0].record;
     if (topRecord) {
       results[0].attestations = findAttestationCluster(topRecord);
     }
+  }
+
+  // Clean up internal references before serialization
+  for (const r of results) {
+    delete r.record;
   }
 
   const topConfidence = results.length > 0 ? results[0].confidence : 0;

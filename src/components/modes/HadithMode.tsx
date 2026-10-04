@@ -154,11 +154,7 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
     changedWords?: Array<{ queryWord: string | null; sourceWord: string | null; position: number; type?: string }>,
     matchedOriginalIndices?: number[]
   ) => {
-    const cleanText = fullText.replace(/<br\s*\/?>/gi, ' \n ');
-    const words = cleanText.split(/\s+/).filter(Boolean);
-    if (!words.length) {
-      return fullText;
-    }
+    if (!fullText) return '';
 
     const matchedSet = matchedOriginalIndices ? new Set(matchedOriginalIndices) : null;
     const changedSourceSet = new Set(
@@ -168,51 +164,60 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
         .filter(Boolean) as string[]
     );
 
+    const segments = fullText.split(/<br\s*\/?>/gi);
     let displayWordIdx = 0;
-    return words.map((w, idx) => {
-      if (w === '\n') {
-        return <br key={`br-${idx}`} className="my-2" />;
-      }
-      const currentIdx = displayWordIdx++;
-      const isMatched = matchedSet ? matchedSet.has(currentIdx) : (currentIdx >= startIdx && currentIdx <= endIdx);
-      if (isMatched) {
-        const statusIdx = currentIdx - startIdx;
-        const status = wordStatus?.[statusIdx] || 'exact';
 
-        if (status === 'none' || (changedWords && changedWords.length > 0 && changedSourceSet.has(w))) {
-          return (
-            <span
-              key={idx}
-              title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
-              className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-semibold transition inline-block"
-            >
-              {w}{' '}
-            </span>
-          );
+    return segments.map((segment, segIdx) => {
+      const words = segment.split(/\s+/).filter(Boolean);
+      const renderedWords = words.map((w, wIdx) => {
+        const currentIdx = displayWordIdx++;
+        const isMatched = matchedSet ? matchedSet.has(currentIdx) : (currentIdx >= startIdx && currentIdx <= endIdx);
+        if (isMatched) {
+          const statusIdx = currentIdx - startIdx;
+          const status = wordStatus?.[statusIdx] || 'exact';
+
+          if (status === 'none' || (changedWords && changedWords.length > 0 && changedSourceSet.has(w))) {
+            return (
+              <span
+                key={`w-${segIdx}-${wIdx}`}
+                title={isAr ? 'كلمة مختلفة عن النص الأصلي' : 'Word differs from original text'}
+                className="text-red-400 bg-red-500/15 border-b-2 border-dashed border-red-500 px-1 py-0.5 rounded font-semibold transition inline-block"
+              >
+                {w}{' '}
+              </span>
+            );
+          }
+          if (status === 'exact') {
+            return (
+              <span
+                key={`w-${segIdx}-${wIdx}`}
+                className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-semibold transition inline-block"
+              >
+                {w}{' '}
+              </span>
+            );
+          }
+          if (status === 'approximate') {
+            return (
+              <span
+                key={`w-${segIdx}-${wIdx}`}
+                title={isAr ? 'تطابق تقريبي' : 'Approximate match'}
+                className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded transition inline-block"
+              >
+                {w}{' '}
+              </span>
+            );
+          }
         }
-        if (status === 'exact') {
-          return (
-            <span
-              key={idx}
-              className="text-[#2EF2C2] bg-[#2EF2C2]/15 px-1 py-0.5 rounded font-semibold transition inline-block"
-            >
-              {w}{' '}
-            </span>
-          );
-        }
-        if (status === 'approximate') {
-          return (
-            <span
-              key={idx}
-              title={isAr ? 'تطابق تقريبي' : 'Approximate match'}
-              className="text-amber-300 bg-amber-400/15 border-b-2 border-dashed border-amber-400 px-1 py-0.5 rounded transition inline-block"
-            >
-              {w}{' '}
-            </span>
-          );
-        }
-      }
-      return <span key={idx}>{w} </span>;
+        return <span key={`w-${segIdx}-${wIdx}`}>{w} </span>;
+      });
+
+      return (
+        <React.Fragment key={`seg-${segIdx}`}>
+          {renderedWords}
+          {segIdx < segments.length - 1 && <br className="my-2" />}
+        </React.Fragment>
+      );
     });
   };
 

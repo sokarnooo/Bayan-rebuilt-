@@ -164,6 +164,40 @@ export function levenshteinDistance(s1: string, s2: string): number {
   return r2[len2];
 }
 
+export function isLevenshteinDistanceAtMostOne(s1: string, s2: string): boolean {
+  if (s1 === s2) return true;
+  const len1 = s1.length;
+  const len2 = s2.length;
+  if (Math.abs(len1 - len2) > 1) return false;
+
+  if (len1 === len2) {
+    let diffs = 0;
+    for (let i = 0; i < len1; i++) {
+      if (s1.charCodeAt(i) !== s2.charCodeAt(i)) {
+        diffs++;
+        if (diffs > 1) return false;
+      }
+    }
+    return diffs <= 1;
+  }
+
+  const short = len1 < len2 ? s1 : s2;
+  const long = len1 < len2 ? s2 : s1;
+  let i = 0, j = 0;
+  let diffs = 0;
+  while (i < short.length && j < long.length) {
+    if (short.charCodeAt(i) !== long.charCodeAt(j)) {
+      diffs++;
+      if (diffs > 1) return false;
+      j++;
+    } else {
+      i++;
+      j++;
+    }
+  }
+  return true;
+}
+
 export function levenshteinSimilarity(s1: string, s2: string): number {
   const maxLen = Math.max(s1.length, s2.length);
   if (maxLen === 0) return 1;

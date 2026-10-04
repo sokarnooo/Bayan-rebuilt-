@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { app, REGISTERED_ROUTES } from './app.ts';
-import { loadCorpus } from './corpus/loader.ts';
+import { loadCorpus, DATA_DIR } from './corpus/loader.ts';
 import { runPrebuild } from './corpus/prebuild.ts';
 import { initHadithEngine, getIndexedCounts } from './matching/hadithMatcher.ts';
 import { initAyahEngine } from './matching/ayahMatcher.ts';
@@ -34,11 +34,7 @@ async function startServer() {
 
   // Initialize Engines
   console.log('Initializing Search Engines...');
-  const corpusDir = fs.existsSync(path.resolve(__dirname, './corpus/data'))
-    ? path.resolve(__dirname, './corpus/data')
-    : (fs.existsSync(path.resolve(__dirname, '../server/corpus/data'))
-        ? path.resolve(__dirname, '../server/corpus/data')
-        : path.resolve(process.cwd(), 'server/corpus/data'));
+  const corpusDir = DATA_DIR;
   const quranArFile = path.join(corpusDir, 'quran_ar.json');
   if (!fs.existsSync(quranArFile)) {
     console.log('Corpus data missing, running prebuild data acquisition...');

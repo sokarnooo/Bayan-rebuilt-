@@ -5,9 +5,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = fs.existsSync(path.resolve(__dirname, './data'))
-  ? path.resolve(__dirname, './data')
-  : path.resolve(process.cwd(), 'server/corpus/data');
+const candidateDirs = [
+  path.resolve(__dirname, './data'),
+  path.resolve(__dirname, '../server/corpus/data'),
+  path.resolve(__dirname, './corpus/data'),
+  path.resolve(process.cwd(), 'server/corpus/data'),
+  path.resolve(process.cwd(), 'dist-server/data'),
+];
+export const DATA_DIR = candidateDirs.find((d) => fs.existsSync(path.join(d, 'quran_ar.json'))) || path.resolve(process.cwd(), 'server/corpus/data');
 
 export interface QuranVerse {
   chapter: number;
@@ -60,6 +65,7 @@ export interface LoadedCorpus {
 
 let cachedCorpus: LoadedCorpus | null = null;
 let loadDurationMs = 0;
+const hadithLookupMap = new Map<string, HadithRecord>();
 
 function readJsonFile(filename: string): any {
   const filePath = path.join(DATA_DIR, filename);
@@ -83,6 +89,8 @@ export function getQuranEn(): QuranVerse[] {
   return cachedQuranEn!;
 }
 
+const EMPTY_GRADES: any[] = Object.freeze([]);
+
 const cachedHadithEn: Partial<Record<string, HadithRecord[]>> = {};
 export function getHadithEn(col: string): HadithRecord[] {
   if (!cachedHadithEn[col]) {
@@ -90,9 +98,9 @@ export function getHadithEn(col: string): HadithRecord[] {
     const list = raw.hadiths || [];
     cachedHadithEn[col] = list.map((h: any) => ({
       hadithnumber: h.hadithnumber,
-      arabicnumber: h.arabicnumber ?? h.hadithnumber,
+      arabicnumber: h.hadithnumber,
       text: h.text || '',
-      grades: [],
+      grades: EMPTY_GRADES,
       reference: {
         book: h.reference?.book || 0,
         hadith: h.reference?.hadith || 0,
@@ -118,16 +126,20 @@ export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
   for (const col of collections) {
     const raw = readJsonFile(`hadith_${col}_ar.json`);
     const list = raw.hadiths || [];
-    hadithAr[col] = list.map((h: any) => ({
-      hadithnumber: h.hadithnumber,
-      arabicnumber: h.arabicnumber ?? h.hadithnumber,
-      text: h.text || '',
-      grades: h.grades || [],
-      reference: {
-        book: h.reference?.book || 0,
-        hadith: h.reference?.hadith || 0,
-      },
-    }));
+    hadithAr[col] = list.map((h: any) => {
+      const item = {
+        hadithnumber: h.hadithnumber,
+        arabicnumber: h.arabicnumber ?? h.hadithnumber,
+        text: h.text || '',
+        grades: (!h.grades || h.grades.length === 0) ? EMPTY_GRADES : h.grades,
+        reference: {
+          book: h.reference?.book || 0,
+          hadith: h.reference?.hadith || 0,
+        },
+      };
+      hadithLookupMap.set(`${col}_${h.hadithnumber}`, item);
+      return item;
+    });
   }
 
   const corpus: LoadedCorpus = {
@@ -151,5 +163,10 @@ export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
   cachedCorpus = corpus;
 
   return { corpus: cachedCorpus, loadTimeMs: loadDurationMs };
+}
+
+export function lookupHadithAr(collection: string, hadithnumber: number): HadithRecord | undefined {
+  if (!cachedCorpus) loadCorpus();
+  return hadithLookupMap.get(`${collection}_${hadithnumber}`);
 }
 

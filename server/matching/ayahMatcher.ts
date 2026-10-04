@@ -7,7 +7,7 @@ import {
   cleanWhitespaceBeforeCombiningMarks,
   wordSimilarityCorpusDerived,
 } from './normalizer.ts';
-import { loadCorpus, getQuranEn } from '../corpus/loader.ts';
+import { loadCorpus, getQuranEn, DATA_DIR } from '../corpus/loader.ts';
 
 let quranEnMap: Map<string, string> | null = null;
 export function getQuranEnText(chapter: number, verse: number): string {
@@ -125,10 +125,6 @@ export interface AyahSearchResponse {
   notice?: string;
   executionTimeMs: number;
 }
-
-const DATA_DIR = fs.existsSync(path.resolve(__dirname, '../corpus/data'))
-  ? path.resolve(__dirname, '../corpus/data')
-  : path.resolve(process.cwd(), 'server/corpus/data');
 
 let indexedAyat: IndexedAyah[] = [];
 let surahMetadata: Map<number, SurahMeta> = new Map();
@@ -268,6 +264,20 @@ export function initAyahEngine(): { totalIndexed: number } {
         twoList.push((ayah.chapter << 16) | (globalIndex - 1));
       }
     }
+  }
+
+  // Convert inverted index arrays to compact Int32Array to save heap
+  for (const [k, list] of wordPositionIndex) {
+    wordPositionIndex.set(k, new Int32Array(list) as any);
+  }
+  for (const [k, list] of twoGramIndex) {
+    twoGramIndex.set(k, new Int32Array(list) as any);
+  }
+  for (const [k, list] of exactNormalizedMap) {
+    exactNormalizedMap.set(k, new Int32Array(list) as any);
+  }
+  for (const [k, list] of exactAlefMap) {
+    exactAlefMap.set(k, new Int32Array(list) as any);
   }
 
   isInitialized = true;
@@ -421,14 +431,14 @@ export function searchAyah(rawQuery: string): AyahSearchResponse {
       const ayah = indexedAyat[hIdx];
       const stream = surahWordStreams.get(ayah.chapter);
       if (stream) {
-        const firstW = stream.find((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
-        if (firstW) {
+        const firstWIdx = stream.findIndex((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
+        if (firstWIdx !== -1) {
           let sSet = candidateStartsBySurah.get(ayah.chapter);
           if (!sSet) {
             sSet = new Set();
             candidateStartsBySurah.set(ayah.chapter, sSet);
           }
-          sSet.add(firstW.globalWordIndex);
+          sSet.add(firstWIdx);
         }
       }
     }
