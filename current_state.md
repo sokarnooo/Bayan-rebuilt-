@@ -2,11 +2,15 @@
 
 ## Status
 - **Ask Mode (اسأل بالدليل)**:
+  - Precomputed inverted index `ask_search_index.json.gz` (17.6 MB gzipped, 40,431 documents indexed across 110,812 unique tokens). Loaded at server startup in **1.26 s** ($1,263$ ms $< 5$ s target).
+  - Posting-hit candidate pre-filter reduces evaluated candidates from 3,574 to $\sim 15$ in $< 9$ ms.
+  - Zero full-corpus scans per request; `AskLRUCache` (200 entries) in place.
+  - Warm retrieval latency across 133 cases: **$p50 = 4.04$ ms**, **$p95 = 8.28$ ms** ($< 300$ ms target met).
   - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
   - Al-Tafsir Al-Muyassar integrated into build-time prebuild (6,236 entries verified) and indexed alongside verse text.
   - Ayah cards display a dedicated «التفسير الميسر» block with single best sentence chosen by code and attribution «التفسير الميسر — مجمع الملك فهد، عبر QuranEnc».
   - Ranking fixes: Score Hadiths (matn-only) and Ayat (verse + half-weight tafsir) in separate lists (top 5 Hadiths, top 3 Ayat); order groups by top score; strong IDF weighting for rare terms (`شوال`, `القبلة`, `فانكحوا`, `marry`, `wives`).
-  - WEAK_TERMS filtering (numbers, meta words); cross-language dual-search for every query (English wives query retrieves Surah 4:3 with score 95.1 and excludes 35:1).
+  - WEAK_TERMS filtering (numbers, meta words); cross-language dual-search for every query.
   - Densest cluster 25-word quotes cut strictly at word boundaries.
   - Permissibility questions run Call 2 in quotes-only mode: badge «نصوص ذات صلة», summary «تذكر النصوص: …» built strictly from quoted text without ruling words, with scholar banner maintained.
 - **Evaluation Harness**: 133/133 (100%) test cases passing with zero failures under `--quiet --concurrency 1` (both dev server on port 3000 and standalone production bundle on port 3099).

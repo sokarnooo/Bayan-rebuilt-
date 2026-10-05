@@ -51,7 +51,7 @@ interface AskResponse {
   question: string;
   language: 'ar' | 'en';
   category: 'textual' | 'permissibility' | 'personal' | 'other';
-  verdict: 'supported' | 'contradicted' | 'unclear' | 'permissibility';
+  verdict: 'supported' | 'contradicted' | 'unclear' | 'permissibility' | 'pending';
   verdictBadgeLabel: string;
   verdictBadgeSubline?: string;
   isWeakOnly?: boolean;
@@ -70,6 +70,7 @@ interface AskResponse {
   topRetrievedIds: string[];
   executionTimeMs: number;
   error?: string;
+  verdictPending?: boolean;
 }
 
 export const AskMode: React.FC<AskModeProps> = ({ language }) => {

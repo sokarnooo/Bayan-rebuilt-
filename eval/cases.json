@@ -1759,5 +1759,145 @@
       "requireChangedWords": true
     },
     "note": "Replaced \"لَهُ\" with \"النهر\""
+  },
+  {
+    "id": "ask_wives_en_relevance",
+    "mode": "ask",
+    "input": "Is it permissible to marry four wives?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "permissibility",
+      "ref": "ayah_4_3"
+    },
+    "note": "Polygyny English question retrieves Surah 4:3 as top 1 and excludes off-topic verses"
+  },
+  {
+    "id": "ask_wives_ar_relevance",
+    "mode": "ask",
+    "input": "كم عدد الزوجات المباح للرجل؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "permissibility",
+      "ref": "ayah_4_3"
+    },
+    "note": "Polygyny Arabic question retrieves Surah 4:3 as top 1"
+  },
+  {
+    "id": "ask_smiling_en",
+    "mode": "ask",
+    "input": "Is smiling at your brother charity?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "tirmidhi_1956"
+    },
+    "note": "Smiling at brother English question retrieves Tirmidhi 1956"
+  },
+  {
+    "id": "ask_smiling_ar",
+    "mode": "ask",
+    "input": "هل تبسمك في وجه أخيك صدقة؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "tirmidhi_1956"
+    },
+    "note": "Smiling at brother Arabic question retrieves Tirmidhi 1956"
+  },
+  {
+    "id": "ask_qibla_en",
+    "mode": "ask",
+    "input": "Did the Prophet forbid facing the qibla while urinating?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394"
+    },
+    "note": "Qibla English question retrieves relevant facing Qibla narration"
+  },
+  {
+    "id": "ask_qibla_ar",
+    "mode": "ask",
+    "input": "هل ورد أن النبي نهى عن استقبال القبلة ببول؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394"
+    },
+    "note": "Qibla Arabic question retrieves relevant facing Qibla narration"
+  },
+  {
+    "id": "ask_green_tea_en",
+    "mode": "ask",
+    "input": "The Prophet ordered people to drink green tea",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "unclear"
+    },
+    "note": "Green tea English claim gets unclear verdict"
+  },
+  {
+    "id": "ask_green_tea_ar",
+    "mode": "ask",
+    "input": "هل أمر النبي بشرب الشاي الأخضر؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "unclear"
+    },
+    "note": "Green tea Arabic claim gets unclear verdict"
+  },
+  {
+    "id": "ask_shawwal_ar",
+    "mode": "ask",
+    "input": "هل صيام ستة أيام من شوال مستحب؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_2758"
+    },
+    "note": "Shawwal six fasts Arabic question retrieves Muslim 2758"
+  },
+  {
+    "id": "ask_purification_en",
+    "mode": "ask",
+    "input": "Allah does not accept prayer without purification",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_224"
+    },
+    "note": "Purification English question retrieves Muslim 224"
+  },
+  {
+    "id": "ask_fabricated_saying",
+    "mode": "ask",
+    "input": "المعدة بيت الداء",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "contradicted"
+    },
+    "note": "Matched curated fake saying gets contradicted"
+  },
+  {
+    "id": "ask_fabricated_saying_en",
+    "mode": "ask",
+    "input": "the stomach is the home of disease",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "contradicted"
+    },
+    "note": "Matched curated fake saying English gets contradicted"
   }
 ]

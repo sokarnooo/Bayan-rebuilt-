@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { app, REGISTERED_ROUTES } from './app.ts';
-import { loadCorpus, DATA_DIR } from './corpus/loader.ts';
+import { loadCorpus, DATA_DIR, loadAskSearchIndex } from './corpus/loader.ts';
 import { runPrebuild } from './corpus/prebuild.ts';
 import { initHadithEngine, getIndexedCounts } from './matching/hadithMatcher.ts';
 import { initAyahEngine } from './matching/ayahMatcher.ts';
@@ -43,6 +43,7 @@ async function startServer() {
   const { corpus, loadTimeMs: corpusTime } = loadCorpus();
   const { totalIndexed: hadithCount, indexMemoryBytes: hadithMem } = initHadithEngine();
   const { totalIndexed: ayahCount } = initAyahEngine();
+  const askIndex = loadAskSearchIndex();
   const counts = getIndexedCounts();
 
   if (global.gc) {

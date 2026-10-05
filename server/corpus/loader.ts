@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import zlib from 'zlib';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -106,25 +107,36 @@ export function getQuranTafsirForAyah(chapter: number, verse: number): string {
   return getQuranTafsirMap().get(`${chapter}:${verse}`) || '';
 }
 
-const EMPTY_GRADES: any[] = Object.freeze([]);
+const EMPTY_GRADES: any[] = Object.freeze([]) as unknown as any[];
 
 const cachedHadithEn: Partial<Record<string, HadithRecord[]>> = {};
+const hadithEnLookupMap = new Map<string, HadithRecord>();
+
 export function getHadithEn(col: string): HadithRecord[] {
   if (!cachedHadithEn[col]) {
     const raw = readJsonFile(`hadith_${col}_en.json`);
     const list = raw.hadiths || [];
-    cachedHadithEn[col] = list.map((h: any) => ({
-      hadithnumber: h.hadithnumber,
-      arabicnumber: h.hadithnumber,
-      text: h.text || '',
-      grades: EMPTY_GRADES,
-      reference: {
-        book: h.reference?.book || 0,
-        hadith: h.reference?.hadith || 0,
-      },
-    }));
+    cachedHadithEn[col] = list.map((h: any) => {
+      const item = {
+        hadithnumber: h.hadithnumber,
+        arabicnumber: h.hadithnumber,
+        text: h.text || '',
+        grades: EMPTY_GRADES,
+        reference: {
+          book: h.reference?.book || 0,
+          hadith: h.reference?.hadith || 0,
+        },
+      };
+      hadithEnLookupMap.set(`${col}_${h.hadithnumber}`, item);
+      return item;
+    });
   }
   return cachedHadithEn[col]!;
+}
+
+export function lookupHadithEn(collection: string, hadithnumber: number): HadithRecord | undefined {
+  if (!cachedHadithEn[collection]) getHadithEn(collection);
+  return hadithEnLookupMap.get(`${collection}_${hadithnumber}`);
 }
 
 export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
@@ -185,5 +197,55 @@ export function loadCorpus(): { corpus: LoadedCorpus; loadTimeMs: number } {
 export function lookupHadithAr(collection: string, hadithnumber: number): HadithRecord | undefined {
   if (!cachedCorpus) loadCorpus();
   return hadithLookupMap.get(`${collection}_${hadithnumber}`);
+}
+
+export interface AskSearchDoc {
+  id: string;
+  type: 'ayah' | 'hadith';
+  ch?: number;
+  v?: number;
+  col?: string;
+  num?: number;
+  normAr: string;
+  normEn: string;
+  normTafsir?: string;
+}
+
+export interface AskSearchIndexData {
+  docs: AskSearchDoc[];
+  postings: Record<string, number[]>;
+  loadTimeMs: number;
+  fileSizeBytes: number;
+}
+
+let cachedAskIndex: AskSearchIndexData | null = null;
+
+export function loadAskSearchIndex(): AskSearchIndexData {
+  if (cachedAskIndex) return cachedAskIndex;
+
+  const start = performance.now();
+  const gzPath = path.join(DATA_DIR, 'ask_search_index.json.gz');
+
+  if (!fs.existsSync(gzPath)) {
+    console.warn(`[AskSearchIndex] ${gzPath} not found!`);
+    return { docs: [], postings: {}, loadTimeMs: 0, fileSizeBytes: 0 };
+  }
+
+  const stat = fs.statSync(gzPath);
+  const compressed = fs.readFileSync(gzPath);
+  const decompressed = zlib.gunzipSync(compressed);
+  const parsed = JSON.parse(decompressed.toString('utf8'));
+
+  const elapsed = Math.round(performance.now() - start);
+  console.log(`[AskSearchIndex] Loaded ${parsed.docs.length} docs & ${Object.keys(parsed.postings).length} tokens in ${elapsed}ms (${stat.size} bytes).`);
+
+  cachedAskIndex = {
+    docs: parsed.docs,
+    postings: parsed.postings,
+    loadTimeMs: elapsed,
+    fileSizeBytes: stat.size,
+  };
+
+  return cachedAskIndex;
 }
 

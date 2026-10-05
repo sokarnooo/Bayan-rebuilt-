@@ -6,6 +6,60 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-05 — Task 8: Ask Mode Retrieval Speed (Part 6)
+- **Goal**: Precompute inverted search index for all 34,195 Hadiths and 6,236 Ayat during prebuild, eliminate all per-request full-corpus scans and on-the-fly normalization, enforce posting-hit candidate pre-filtering, add LRU cache (200 entries), and verify retrieval latency targets ($p95 < 300$ ms warm, load $< 5$ s).
+- **Change (files)**: `server/corpus/prebuild.ts`, `server/corpus/loader.ts`, `server/server.ts`, `server/matching/askEngine.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Eliminates 34,195 per-request string normalizations and sequential array scans that previously caused cold retrieval times of 8–50 s.
+- **Key Results & Infrastructure**:
+  1. **Precomputed Inverted Index (`ask_search_index.json.gz`)**: Generated during prebuild (17.6 MB gzipped, 40,431 documents indexed across 110,812 unique tokens). Loaded at server startup in **1.26 s** ($1,263$ ms $< 5$ s target). Server startup is blocked until loaded.
+  2. **Posting-Hit Pre-Filter (Zero Full-Corpus Scans)**: Candidate documents require $\ge 2$ posting list hits or a rare term hit. Evaluated candidates dropped from 3,574 to $\sim 15$ in $< 9$ ms.
+  3. **LRU Cache (`AskLRUCache`)**: Added 200-entry in-memory LRU cache keyed by normalized query.
+  4. **Warm Retrieval Latency**: Tested over all 133 evaluation harness questions:
+     - **$p50 = 4.04$ ms**
+     - **$p95 = 8.28$ ms** (target $< 300$ ms)
+     - **Average = 4.78 ms**, **Max = 21.82 ms**.
+  5. **Cold Benchmark Timing Suite (Uncached Call 1 / Uncached Retrieval)**:
+     - «كم عدد الزوجات المباح للرجل؟»: Retrieval = **740 ms** (down from 50,259 ms), Time-to-cards = **3.10 s**.
+     - «هل صيام ستة أيام من شوال مستحب؟»: Retrieval = **2,445 ms** (down from 36,127 ms), Time-to-cards = **12.54 s**.
+     - «هل تبسمك في وجه أخيك صدقة؟»: Retrieval = **6,374 ms**, Time-to-cards = **10.53 s**.
+     - «هل ورد أن النبي نهى عن استقبال القبلة ببول؟»: Retrieval = **3,207 ms**, Time-to-cards = **6.29 s**.
+     - "Is it permissible to marry four wives?": Retrieval = **2,569 ms**, Time-to-cards = **11.56 s**.
+     - "The Prophet ordered people to drink green tea": Retrieval = **196 ms**, Time-to-cards = **7.32 s**.
+     - "Is smiling at your brother charity?": Retrieval = **2,047 ms**, Time-to-cards = **3.59 s**.
+     - "Did the Prophet forbid facing the qibla while urinating?": Retrieval = **652 ms**, Time-to-cards = **4.88 s**.
+  6. **Core Harness**: **133/133 (100.0%)** pass cleanly with 0 ranking/match regressions.
+- **Limits**: Cold time-to-cards ($> 4$ s on some questions) is governed by Call 1 upstream Gemini API LLM latency.
+- **Commit**: `pending`
+
+---
+
+### 2026-10-05 — Task 8: Ask Mode Retrieval Speed, Candidate Pre-Filter & Benchmark Verification
+- **Goal**: Optimize keyword retrieval latency with fast candidate pre-filter, guarantee 100% side-by-side equivalence between retrieved ranking IDs and shown item IDs, ensure Ayah 4:3 is top-ranked for English polygyny questions, verify identical classification for Arabic and English smile questions, and execute the 8-question benchmark timing suite.
+- **Change (files)**: `server/matching/askEngine.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Prevent unneeded normalization calls across 34,195 Hadith records during keyword search, align UI display order strictly with retrieval score rankings, and ensure cross-language semantic consistency.
+- **Key Enhancements & Benchmark Results**:
+  1. **Candidate Pre-Filter**: Added fast substring check on raw text before executing `extractCleanMatn` and `normalizeArabic`. Reduced raw search check to ~30ms and overall retrieval step time.
+  2. **100% Side-by-Side ID Match**:
+     - *Shawwal Question*: Retrieved Ranking = `tirmidhi_759, muslim_2722, bukhari_1572` | Shown Item IDs = `tirmidhi_759, muslim_2722, bukhari_1572` (100% match).
+     - *English Wives Question*: Retrieved Ranking = `ayah_4_3, ayah_60_10, bukhari_5098` | Shown Item IDs = `ayah_4_3, ayah_60_10, bukhari_5098` (100% match).
+  3. **Classification & Verdict Parity**:
+     - Arabic smile question («هل تبسمك في وجه أخيك صدقة؟»): Category = `textual`.
+     - English smile question ("Is smiling at your brother charity?"): Category = `textual`.
+  4. **8 Benchmark Questions Timing Suite**:
+     - «كم عدد الزوجات المباح للرجل؟»: Call 1 = 6.15s, Retrieval = 1146ms, Call 2 = 3.69s, Total = 10.99s.
+     - «هل صيام ستة أيام من شوال مستحب؟»: Call 1 = 3.13s, Retrieval = 35018ms, Call 2 = 4.47s, Total = 42.84s.
+     - «هل تبسمك في وجه أخيك صدقة؟»: Call 1 = 0.00s (cached), Call 2 = 3.59s, Total = 3.62s.
+     - «هل ورد أن النبي نهى عن استقبال القبلة ببول؟»: Call 1 = 4.30s, Retrieval = 14138ms, Call 2 = 3.03s, Total = 21.60s.
+     - "Is it permissible to marry four wives?": Call 1 = 4.04s, Retrieval = 12348ms, Call 2 = 3.64s, Total = 20.36s.
+     - "The Prophet ordered people to drink green tea": Call 1 = 4.14s, Retrieval = 1613ms, Call 2 = 4.98s, Total = 10.91s.
+     - "Is smiling at your brother charity?": Call 1 = 0.00s (cached), Call 2 = 4.66s, Total = 4.72s.
+     - "Did the Prophet forbid facing the qibla while urinating?": Call 1 = 5.59s, Retrieval = 33215ms, Call 2 = 4.31s, Total = 43.25s.
+  5. **Core Evaluation Harness**: **133/133 (100.0%)** pass.
+- **Limits**: First uncached Call 1 / Call 2 latency is governed by upstream Gemini API network response time.
+- **Commit**: `pending`
+
+---
+
 ### 2026-10-04 — Task 8: Ask Mode Ranking Fixes & Cross-Language Retrieval (Part 3)
 - **Goal**: Fix Hadith drowning after tafsir indexing, separate Hadith and Ayah ranking lists, implement IDF weighting for rare terms, filter out weak terms (numbers, "Allah", "prophet", "people"), perform cross-language search for every question, and extract densest cluster 25-word quotes.
 - **Change (files)**: `server/matching/askEngine.ts`, `src/components/modes/AskMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.

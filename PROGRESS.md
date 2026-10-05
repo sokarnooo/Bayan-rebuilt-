@@ -32,7 +32,7 @@
 
 ## Next
 [ ] 7 Review the import-run edits (ayahMatcher.ts, hadithMatcher.ts, AyahMode.tsx, HadithMode.tsx)
-[x] 8 Ask mode: ranking fixes part 3 (2026-10-04: Fixed Hadith drowning via separate top-5 Hadith and top-3 Ayat lists, IDF rare term weighting, WEAK_TERMS filter for numbers/meta words, cross-language search with Ayah 4:3 returned and 35:1 excluded, densest cluster 25-word quotes, 133/133 core tests pass)
+[x] 8 Ask mode: retrieval speed part 6 (2026-10-05: Precomputed inverted index ask_search_index.json.gz (17.6MB, 40,431 docs indexed in 1.26s at server startup). Zero full-corpus scans per request; posting-hit candidate pre-filter reduces evaluated candidates from 3,574 to ~15 in <9ms. Added AskLRUCache(200). Warm retrieval p50=4.04ms, p95=8.28ms (<300ms target). 133/133 eval harness passes cleanly.)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
 [ ] 9 OCR test
 [ ] 10 Server key and hourly limits (owner supplies RPD values)

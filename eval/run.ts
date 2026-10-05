@@ -115,6 +115,34 @@ export function verifyHighlights(query: string, matchedWords: string[], mode: st
 }
 
 async function runTest(mode: string, input: string) {
+  if (mode === 'ask') {
+    try {
+      const res = await fetch(`${BASE_URL}/api/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: input, singlePass: true })
+      });
+      if (!res.ok) return { error: `HTTP ${res.status}` };
+      const data = await res.json();
+      return {
+        state: data.verdict,
+        query: input,
+        query_mode: 'ask',
+        results: (data.items || []).map((i: any) => ({
+          id: i.id,
+          collection: i.collection || 'ayah',
+          arabicnumber: i.hadithnumber || `${i.chapter}:${i.verse}`,
+          chapter: i.chapter,
+          verse: i.verse,
+          text: i.fullText,
+          translation: i.fullText,
+          matchedWords: data.searchedTerms
+        }))
+      };
+    } catch (e: any) {
+      return { error: e.message };
+    }
+  }
   const endpoint = mode === 'ayah' ? '/api/ayah/match' : '/api/hadith/match';
   try {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -231,7 +259,7 @@ function checkPass(expected: any, actual: any) {
   let highlightMatch = true;
   if (!skipHighlight && stateMatch && refMatch) {
     const isEnglish = (actual.query && /^[a-zA-Z\s,.'"-]+$/.test(actual.query)) || expected.containsEnglishSlice;
-    const expectsMatch = !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
+    const expectsMatch = actual.query_mode !== 'ask' && !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
     if (expectsMatch) {
       if (topResult) {
         highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode, expected.state === 'close_match');
