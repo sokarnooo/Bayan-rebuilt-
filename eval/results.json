@@ -36,7 +36,7 @@
                 "revelation": "Mecca"
               },
               "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
-              "translation": "In the name of Allah, Most Gracious, Most Merciful",
+              "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -74,7 +74,7 @@
                 {
                   "verse": 1,
                   "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
-                  "translation": "In the name of Allah, Most Gracious, Most Merciful",
+                  "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -106,7 +106,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّهُۥ مِن سُلَیۡمَـٰنَ وَإِنَّهُۥ بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
-              "translation": "It is from Solomon, and is (as follows): 'In the name of Allah, Most Gracious, Most Merciful",
+              "translation": "Indeed, it is from Solomon, and indeed, it reads: 'In the name of Allah, the Entirely Merciful, the Especially Merciful",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -148,7 +148,7 @@
                 {
                   "verse": 30,
                   "text": "إِنَّهُۥ مِن سُلَیۡمَـٰنَ وَإِنَّهُۥ بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
-                  "translation": "It is from Solomon, and is (as follows): 'In the name of Allah, Most Gracious, Most Merciful",
+                  "translation": "Indeed, it is from Solomon, and indeed, it reads: 'In the name of Allah, the Entirely Merciful, the Especially Merciful",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.5,
@@ -173,16 +173,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 19.74
+          "executionTimeMs": 23.48
         },
-        "duration": 92,
-        "timestamp": "2026-10-04T20:48:33.719Z"
+        "duration": 130,
+        "timestamp": "2026-10-05T04:43:04.518Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 92
+      "avgDuration": 130
     }
   },
   {
@@ -222,7 +222,7 @@
                 "revelation": "Madina"
               },
               "text": "قُلۡ إِن كَانَتۡ لَكُمُ ٱلدَّارُ ٱلۡءَاخِرَةُ عِندَ ٱللَّهِ خَالِصَةࣰ مِّن دُونِ ٱلنَّاسِ فَتَمَنَّوُا۟ ٱلۡمَوۡتَ إِن كُنتُمۡ صَـٰدِقِینَ",
-              "translation": "Say: \"If the last Home, with Allah, be for you specially, and not for anyone else, then seek ye for death, if ye are sincere\"",
+              "translation": "Say, [O Muhammad], \"If the home of the Hereafter with Allah is for you alone and not the [other] people, then wish for death, if you should be truthful\"",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -312,7 +312,7 @@
                 {
                   "verse": 94,
                   "text": "قُلۡ إِن كَانَتۡ لَكُمُ ٱلدَّارُ ٱلۡءَاخِرَةُ عِندَ ٱللَّهِ خَالِصَةࣰ مِّن دُونِ ٱلنَّاسِ فَتَمَنَّوُا۟ ٱلۡمَوۡتَ إِن كُنتُمۡ صَـٰدِقِینَ",
-                  "translation": "Say: \"If the last Home, with Allah, be for you specially, and not for anyone else, then seek ye for death, if ye are sincere",
+                  "translation": "Say, [O Muhammad], \"If the home of the Hereafter with Allah is for you alone and not the [other] people, then wish for death, if you should be truthful",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -346,10 +346,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 69
+          "executionTimeMs": 67.41
         },
         "duration": 75,
-        "timestamp": "2026-10-04T20:48:33.797Z"
+        "timestamp": "2026-10-05T04:43:04.594Z"
       }
     ],
     "summary": {
@@ -395,7 +395,7 @@
                 "revelation": "Madina"
               },
               "text": "وَإِذَا حَضَرَ ٱلۡقِسۡمَةَ أُو۟لُوا۟ ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینُ فَٱرۡزُقُوهُم مِّنۡهُ وَقُولُوا۟ لَهُمۡ قَوۡلࣰا مَّعۡرُوفࣰا",
-              "translation": "But if at the time of division other relatives, or orphans or poor, are present, feed them out of the (property), and speak to them words of kindness and justice",
+              "translation": "And when [other] relatives and orphans and the needy are present at the [time of] division, then provide for them [something] out of the estate and speak to them words of appropriate kindness",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -469,7 +469,7 @@
                 {
                   "verse": 8,
                   "text": "وَإِذَا حَضَرَ ٱلۡقِسۡمَةَ أُو۟لُوا۟ ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینُ فَٱرۡزُقُوهُم مِّنۡهُ وَقُولُوا۟ لَهُمۡ قَوۡلࣰا مَّعۡرُوفࣰا",
-                  "translation": "But if at the time of division other relatives, or orphans or poor, are present, feed them out of the (property), and speak to them words of kindness and justice",
+                  "translation": "And when [other] relatives and orphans and the needy are present at the [time of] division, then provide for them [something] out of the estate and speak to them words of appropriate kindness",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -499,16 +499,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 6.97
+          "executionTimeMs": 5.39
         },
-        "duration": 13,
-        "timestamp": "2026-10-04T20:48:33.810Z"
+        "duration": 10,
+        "timestamp": "2026-10-05T04:43:04.605Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 13
+      "avgDuration": 10
     }
   },
   {
@@ -548,7 +548,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ",
-              "translation": "When their eyes shall be turned towards the Companions of the Fire, they will say: \"Our Lord! send us not to the company of the wrong-doers\"",
+              "translation": "And when their eyes are turned toward the companions of the Fire, they say, \"Our Lord, do not place us with the wrongdoing people\"",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -622,7 +622,7 @@
                 {
                   "verse": 47,
                   "text": "وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ",
-                  "translation": "When their eyes shall be turned towards the Companions of the Fire, they will say: \"Our Lord! send us not to the company of the wrong-doers",
+                  "translation": "And when their eyes are turned toward the companions of the Fire, they say, \"Our Lord, do not place us with the wrongdoing people",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -652,16 +652,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.49
+          "executionTimeMs": 8.42
         },
-        "duration": 15,
-        "timestamp": "2026-10-04T20:48:33.826Z"
+        "duration": 23,
+        "timestamp": "2026-10-05T04:43:04.628Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 15
+      "avgDuration": 23
     }
   },
   {
@@ -701,7 +701,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَٱتۡلُ عَلَیۡهِمۡ نَبَأَ إِبۡرَٰهِیمَ",
-              "translation": "And rehearse to them (something of) Abraham's story",
+              "translation": "And recite to them the news of Abraham",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -739,7 +739,7 @@
                 {
                   "verse": 69,
                   "text": "وَٱتۡلُ عَلَیۡهِمۡ نَبَأَ إِبۡرَٰهِیمَ",
-                  "translation": "And rehearse to them (something of) Abraham's story",
+                  "translation": "And recite to them the news of Abraham",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -760,16 +760,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 1.27
+          "executionTimeMs": 2.29
         },
-        "duration": 14,
-        "timestamp": "2026-10-04T20:48:33.840Z"
+        "duration": 11,
+        "timestamp": "2026-10-05T04:43:04.639Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 14
+      "avgDuration": 11
     }
   },
   {
@@ -809,7 +809,7 @@
                 "revelation": "Mecca"
               },
               "text": "مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ",
-              "translation": "Among Jinns and among men",
+              "translation": "From among the jinn and mankind",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -843,7 +843,7 @@
                 {
                   "verse": 6,
                   "text": "مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ",
-                  "translation": "Among Jinns and among men",
+                  "translation": "From among the jinn and mankind",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -874,7 +874,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِلَّا مَن رَّحِمَ رَبُّكَۚ وَلِذَٰلِكَ خَلَقَهُمۡۗ وَتَمَّتۡ كَلِمَةُ رَبِّكَ لَأَمۡلَأَنَّ جَهَنَّمَ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ أَجۡمَعِینَ",
-              "translation": "Except those on whom thy Lord hath bestowed His Mercy: and for this did He create them: and the Word of thy Lord shall be fulfilled: \"I will fill Hell with jinns and men all together\"",
+              "translation": "Except whom your Lord has given mercy, and for that He created them. But the word of your Lord is to be fulfilled that, \"I will surely fill Hell with jinn and men all together\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -920,7 +920,7 @@
                 {
                   "verse": 119,
                   "text": "إِلَّا مَن رَّحِمَ رَبُّكَۚ وَلِذَٰلِكَ خَلَقَهُمۡۗ وَتَمَّتۡ كَلِمَةُ رَبِّكَ لَأَمۡلَأَنَّ جَهَنَّمَ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ أَجۡمَعِینَ",
-                  "translation": "Except those on whom thy Lord hath bestowed His Mercy: and for this did He create them: and the Word of thy Lord shall be fulfilled: \"I will fill Hell with jinns and men all together",
+                  "translation": "Except whom your Lord has given mercy, and for that He created them. But the word of your Lord is to be fulfilled that, \"I will surely fill Hell with jinn and men all together",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.2,
@@ -963,7 +963,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَلَوۡ شِئۡنَا لَءَاتَیۡنَا كُلَّ نَفۡسٍ هُدَىٰهَا وَلَـٰكِنۡ حَقَّ ٱلۡقَوۡلُ مِنِّی لَأَمۡلَأَنَّ جَهَنَّمَ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ أَجۡمَعِینَ",
-              "translation": "If We had so willed, We could certainly have brought every soul its true guidance: but the Word from Me will come true, \"I will fill Hell with Jinns and men all together\"",
+              "translation": "And if We had willed, We could have given every soul its guidance, but the word from Me will come into effect [that] \"I will surely fill Hell with jinn and people all together\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -1010,7 +1010,7 @@
                 {
                   "verse": 13,
                   "text": "وَلَوۡ شِئۡنَا لَءَاتَیۡنَا كُلَّ نَفۡسٍ هُدَىٰهَا وَلَـٰكِنۡ حَقَّ ٱلۡقَوۡلُ مِنِّی لَأَمۡلَأَنَّ جَهَنَّمَ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ أَجۡمَعِینَ",
-                  "translation": "If We had so willed, We could certainly have brought every soul its true guidance: but the Word from Me will come true, \"I will fill Hell with Jinns and men all together",
+                  "translation": "And if We had willed, We could have given every soul its guidance, but the word from Me will come into effect [that] \"I will surely fill Hell with jinn and people all together",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.19,
@@ -1043,16 +1043,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 50.77
+          "executionTimeMs": 79.63
         },
-        "duration": 57,
-        "timestamp": "2026-10-04T20:48:33.898Z"
+        "duration": 93,
+        "timestamp": "2026-10-05T04:43:04.733Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 57
+      "avgDuration": 93
     }
   },
   {
@@ -1092,7 +1092,7 @@
                 "revelation": "Madina"
               },
               "text": "أَتَأۡمُرُونَ ٱلنَّاسَ بِٱلۡبِرِّ وَتَنسَوۡنَ أَنفُسَكُمۡ وَأَنتُمۡ تَتۡلُونَ ٱلۡكِتَـٰبَۚ أَفَلَا تَعۡقِلُونَ",
-              "translation": "Do ye enjoin right conduct on the people, and forget (To practise it) yourselves, and yet ye study the Scripture? Will ye not understand",
+              "translation": "Do you order righteousness of the people and forget yourselves while you recite the Scripture? Then will you not reason",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1154,7 +1154,7 @@
                 {
                   "verse": 44,
                   "text": "أَتَأۡمُرُونَ ٱلنَّاسَ بِٱلۡبِرِّ وَتَنسَوۡنَ أَنفُسَكُمۡ وَأَنتُمۡ تَتۡلُونَ ٱلۡكِتَـٰبَۚ أَفَلَا تَعۡقِلُونَ",
-                  "translation": "Do ye enjoin right conduct on the people, and forget (To practise it) yourselves, and yet ye study the Scripture? Will ye not understand",
+                  "translation": "Do you order righteousness of the people and forget yourselves while you recite the Scripture? Then will you not reason",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -1181,16 +1181,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 5.04
+          "executionTimeMs": 4.05
         },
-        "duration": 11,
-        "timestamp": "2026-10-04T20:48:33.909Z"
+        "duration": 79,
+        "timestamp": "2026-10-05T04:43:04.813Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 11
+      "avgDuration": 79
     }
   },
   {
@@ -1230,7 +1230,7 @@
                 "revelation": "Madina"
               },
               "text": "قَدۡ نَرَىٰ تَقَلُّبَ وَجۡهِكَ فِی ٱلسَّمَاۤءِۖ فَلَنُوَلِّیَنَّكَ قِبۡلَةࣰ تَرۡضَىٰهَاۚ فَوَلِّ وَجۡهَكَ شَطۡرَ ٱلۡمَسۡجِدِ ٱلۡحَرَامِۚ وَحَیۡثُ مَا كُنتُمۡ فَوَلُّوا۟ وُجُوهَكُمۡ شَطۡرَهُۥۗ وَإِنَّ ٱلَّذِینَ أُوتُوا۟ ٱلۡكِتَـٰبَ لَیَعۡلَمُونَ أَنَّهُ ٱلۡحَقُّ مِن رَّبِّهِمۡۗ وَمَا ٱللَّهُ بِغَـٰفِلٍ عَمَّا یَعۡمَلُونَ",
-              "translation": "We see the turning of thy face (for guidance to the heavens: now Shall We turn thee to a Qibla that shall please thee. Turn then Thy face in the direction of the sacred Mosque: Wherever ye are, turn your faces in that direction. The people of the Book know well that that is the truth from their Lord. Nor is Allah unmindful of what they do)",
+              "translation": "We have certainly seen the turning of your face, [O Muhammad], toward the heaven, and We will surely turn you to a qiblah with which you will be pleased. So turn your face toward al-Masjid al-Haram. And wherever you [believers] are, turn your faces toward it [in prayer]. Indeed, those who have been given the Scripture well know that it is the truth from their Lord. And Allah is not unaware of what they do",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1388,7 +1388,7 @@
                 {
                   "verse": 144,
                   "text": "قَدۡ نَرَىٰ تَقَلُّبَ وَجۡهِكَ فِی ٱلسَّمَاۤءِۖ فَلَنُوَلِّیَنَّكَ قِبۡلَةࣰ تَرۡضَىٰهَاۚ فَوَلِّ وَجۡهَكَ شَطۡرَ ٱلۡمَسۡجِدِ ٱلۡحَرَامِۚ وَحَیۡثُ مَا كُنتُمۡ فَوَلُّوا۟ وُجُوهَكُمۡ شَطۡرَهُۥۗ وَإِنَّ ٱلَّذِینَ أُوتُوا۟ ٱلۡكِتَـٰبَ لَیَعۡلَمُونَ أَنَّهُ ٱلۡحَقُّ مِن رَّبِّهِمۡۗ وَمَا ٱللَّهُ بِغَـٰفِلٍ عَمَّا یَعۡمَلُونَ",
-                  "translation": "We see the turning of thy face (for guidance to the heavens: now Shall We turn thee to a Qibla that shall please thee. Turn then Thy face in the direction of the sacred Mosque: Wherever ye are, turn your faces in that direction. The people of the Book know well that that is the truth from their Lord. Nor is Allah unmindful of what they do)",
+                  "translation": "We have certainly seen the turning of your face, [O Muhammad], toward the heaven, and We will surely turn you to a qiblah with which you will be pleased. So turn your face toward al-Masjid al-Haram. And wherever you [believers] are, turn your faces toward it [in prayer]. Indeed, those who have been given the Scripture well know that it is the truth from their Lord. And Allah is not unaware of what they do",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -1439,16 +1439,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 11.85
+          "executionTimeMs": 10.62
         },
-        "duration": 18,
-        "timestamp": "2026-10-04T20:48:33.929Z"
+        "duration": 17,
+        "timestamp": "2026-10-05T04:43:04.831Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 18
+      "avgDuration": 17
     }
   },
   {
@@ -1488,7 +1488,7 @@
                 "revelation": "Madina"
               },
               "text": "یَسۡتَخۡفُونَ مِنَ ٱلنَّاسِ وَلَا یَسۡتَخۡفُونَ مِنَ ٱللَّهِ وَهُوَ مَعَهُمۡ إِذۡ یُبَیِّتُونَ مَا لَا یَرۡضَىٰ مِنَ ٱلۡقَوۡلِۚ وَكَانَ ٱللَّهُ بِمَا یَعۡمَلُونَ مُحِیطًا",
-              "translation": "They may hide (Their crimes) from men, but they cannot hide (Them) from Allah, seeing that He is in their midst when they plot by night, in words that He cannot approve: And Allah Doth compass round all that they do",
+              "translation": "They conceal [their evil intentions and deeds] from the people, but they cannot conceal [them] from Allah, and He is with them [in His knowledge] when they spend the night in such as He does not accept of speech. And ever is Allah, of what they do, encompassing",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1594,7 +1594,7 @@
                 {
                   "verse": 108,
                   "text": "یَسۡتَخۡفُونَ مِنَ ٱلنَّاسِ وَلَا یَسۡتَخۡفُونَ مِنَ ٱللَّهِ وَهُوَ مَعَهُمۡ إِذۡ یُبَیِّتُونَ مَا لَا یَرۡضَىٰ مِنَ ٱلۡقَوۡلِۚ وَكَانَ ٱللَّهُ بِمَا یَعۡمَلُونَ مُحِیطًا",
-                  "translation": "They may hide (Their crimes) from men, but they cannot hide (Them) from Allah, seeing that He is in their midst when they plot by night, in words that He cannot approve: And Allah Doth compass round all that they do",
+                  "translation": "They conceal [their evil intentions and deeds] from the people, but they cannot conceal [them] from Allah, and He is with them [in His knowledge] when they spend the night in such as He does not accept of speech. And ever is Allah, of what they do, encompassing",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -1632,16 +1632,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 57.74
+          "executionTimeMs": 66.83
         },
-        "duration": 65,
-        "timestamp": "2026-10-04T20:48:33.995Z"
+        "duration": 74,
+        "timestamp": "2026-10-05T04:43:04.906Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 65
+      "avgDuration": 74
     }
   },
   {
@@ -1681,7 +1681,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَٱلَّذِینَ كَذَّبُوا۟ بِءَایَـٰتِنَا وَلِقَاۤءِ ٱلۡءَاخِرَةِ حَبِطَتۡ أَعۡمَـٰلُهُمۡۚ هَلۡ یُجۡزَوۡنَ إِلَّا مَا كَانُوا۟ یَعۡمَلُونَ",
-              "translation": "Those who reject Our signs and the meeting in the Hereafter,- vain are their deeds: Can they expect to be rewarded except as they have wrought",
+              "translation": "Those who denied Our signs and the meeting of the Hereafter - their deeds have become worthless. Are they recompensed except for what they used to do",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1755,7 +1755,7 @@
                 {
                   "verse": 147,
                   "text": "وَٱلَّذِینَ كَذَّبُوا۟ بِءَایَـٰتِنَا وَلِقَاۤءِ ٱلۡءَاخِرَةِ حَبِطَتۡ أَعۡمَـٰلُهُمۡۚ هَلۡ یُجۡزَوۡنَ إِلَّا مَا كَانُوا۟ یَعۡمَلُونَ",
-                  "translation": "Those who reject Our signs and the meeting in the Hereafter,- vain are their deeds: Can they expect to be rewarded except as they have wrought",
+                  "translation": "Those who denied Our signs and the meeting of the Hereafter - their deeds have become worthless. Are they recompensed except for what they used to do",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -1785,16 +1785,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.75
+          "executionTimeMs": 5.22
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T20:48:34.007Z"
+        "duration": 8,
+        "timestamp": "2026-10-05T04:43:04.915Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 8
     }
   },
   {
@@ -1834,7 +1834,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily, in this is a Sign: but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1888,7 +1888,7 @@
                 {
                   "verse": 8,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily, in this is a Sign: but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -1924,7 +1924,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily in this is a Sign: but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -1978,7 +1978,7 @@
                 {
                   "verse": 67,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily in this is a Sign: but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2014,7 +2014,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily in this is a Sign but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -2068,7 +2068,7 @@
                 {
                   "verse": 103,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily in this is a Sign but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2104,7 +2104,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily in this is a Sign: but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -2158,7 +2158,7 @@
                 {
                   "verse": 121,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily in this is a Sign: but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2194,7 +2194,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily in this is a Sign: but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -2248,7 +2248,7 @@
                 {
                   "verse": 174,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily in this is a Sign: but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2284,7 +2284,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "Verily in that is a Sign: but most of them do not believe",
+              "translation": "Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -2338,7 +2338,7 @@
                 {
                   "verse": 190,
                   "text": "إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "Verily in that is a Sign: but most of them do not believe",
+                  "translation": "Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2374,7 +2374,7 @@
                 "revelation": "Mecca"
               },
               "text": "فَكَذَّبُوهُ فَأَهۡلَكۡنَـٰهُمۡۚ إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "So they rejected him, and We destroyed them. Verily in this is a Sign: but most of them do not believe",
+              "translation": "And they denied him, so We destroyed them. Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -2430,7 +2430,7 @@
                 {
                   "verse": 139,
                   "text": "فَكَذَّبُوهُ فَأَهۡلَكۡنَـٰهُمۡۚ إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "So they rejected him, and We destroyed them. Verily in this is a Sign: but most of them do not believe",
+                  "translation": "And they denied him, so We destroyed them. Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.8,
@@ -2468,7 +2468,7 @@
                 "revelation": "Mecca"
               },
               "text": "فَأَخَذَهُمُ ٱلۡعَذَابُۚ إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-              "translation": "But the Penalty seized them. Verily in this is a Sign: but most of them do not believe",
+              "translation": "And the punishment seized them. Indeed in that is a sign, but most of them were not to be believers",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -2524,7 +2524,7 @@
                 {
                   "verse": 158,
                   "text": "فَأَخَذَهُمُ ٱلۡعَذَابُۚ إِنَّ فِی ذَٰلِكَ لَءَایَةࣰۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِینَ",
-                  "translation": "But the Penalty seized them. Verily in this is a Sign: but most of them do not believe",
+                  "translation": "And the punishment seized them. Indeed in that is a sign, but most of them were not to be believers",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.8,
@@ -2551,10 +2551,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 25.61
+          "executionTimeMs": 27.87
         },
         "duration": 31,
-        "timestamp": "2026-10-04T20:48:34.038Z"
+        "timestamp": "2026-10-05T04:43:04.947Z"
       }
     ],
     "summary": {
@@ -2600,7 +2600,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَكَانُوا۟ یَقُولُونَ أَئِذَا مِتۡنَا وَكُنَّا تُرَابࣰا وَعِظَـٰمًا أَءِنَّا لَمَبۡعُوثُونَ",
-              "translation": "And they used to say, \"What! when we die and become dust and bones, shall we then indeed be raised up again\"",
+              "translation": "And they used to say, \"When we die and become dust and bones, are we indeed to be resurrected\"",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -2658,7 +2658,7 @@
                 {
                   "verse": 47,
                   "text": "وَكَانُوا۟ یَقُولُونَ أَئِذَا مِتۡنَا وَكُنَّا تُرَابࣰا وَعِظَـٰمًا أَءِنَّا لَمَبۡعُوثُونَ",
-                  "translation": "And they used to say, \"What! when we die and become dust and bones, shall we then indeed be raised up again",
+                  "translation": "And they used to say, \"When we die and become dust and bones, are we indeed to be resurrected",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2684,16 +2684,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 1.29
+          "executionTimeMs": 1.32
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:34.043Z"
+        "duration": 5,
+        "timestamp": "2026-10-05T04:43:04.952Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 5
     }
   },
   {
@@ -2733,7 +2733,7 @@
                 "revelation": "Madina"
               },
               "text": "قَالُوا۟ ٱدۡعُ لَنَا رَبَّكَ یُبَیِّن لَّنَا مَا لَوۡنُهَاۚ قَالَ إِنَّهُۥ یَقُولُ إِنَّهَا بَقَرَةࣱ صَفۡرَاۤءُ فَاقِعࣱ لَّوۡنُهَا تَسُرُّ ٱلنَّـٰظِرِینَ",
-              "translation": "They said: \"Beseech on our behalf Thy Lord to make plain to us Her colour.\" He said: \"He says: A fawn-coloured heifer, pure and rich in tone, the admiration of beholders\"",
+              "translation": "They said, \"Call upon your Lord to show us what is her color.\" He said, \"He says, 'It is a yellow cow, bright in color - pleasing to the observers\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -2827,7 +2827,7 @@
                 {
                   "verse": 69,
                   "text": "قَالُوا۟ ٱدۡعُ لَنَا رَبَّكَ یُبَیِّن لَّنَا مَا لَوۡنُهَاۚ قَالَ إِنَّهُۥ یَقُولُ إِنَّهَا بَقَرَةࣱ صَفۡرَاۤءُ فَاقِعࣱ لَّوۡنُهَا تَسُرُّ ٱلنَّـٰظِرِینَ",
-                  "translation": "They said: \"Beseech on our behalf Thy Lord to make plain to us Her colour.\" He said: \"He says: A fawn-coloured heifer, pure and rich in tone, the admiration of beholders",
+                  "translation": "They said, \"Call upon your Lord to show us what is her color.\" He said, \"He says, 'It is a yellow cow, bright in color - pleasing to the observers",
                   "confidence": 97,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -2862,10 +2862,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 6.69
+          "executionTimeMs": 6.15
         },
         "duration": 10,
-        "timestamp": "2026-10-04T20:48:34.054Z"
+        "timestamp": "2026-10-05T04:43:04.962Z"
       }
     ],
     "summary": {
@@ -2911,7 +2911,7 @@
                 "revelation": "Madina"
               },
               "text": "إِنَّمَا یَأۡمُرُكُم بِٱلسُّوۤءِ وَٱلۡفَحۡشَاۤءِ وَأَن تَقُولُوا۟ عَلَى ٱللَّهِ مَا لَا تَعۡلَمُونَ",
-              "translation": "For he commands you what is evil and shameful, and that ye should say of Allah that of which ye have no knowledge",
+              "translation": "He only orders you to evil and immorality and to say about Allah what you do not know",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -2977,7 +2977,7 @@
                 {
                   "verse": 169,
                   "text": "إِنَّمَا یَأۡمُرُكُم بِٱلسُّوۤءِ وَٱلۡفَحۡشَاۤءِ وَأَن تَقُولُوا۟ عَلَى ٱللَّهِ مَا لَا تَعۡلَمُونَ",
-                  "translation": "For he commands you what is evil and shameful, and that ye should say of Allah that of which ye have no knowledge",
+                  "translation": "He only orders you to evil and immorality and to say about Allah what you do not know",
                   "confidence": 89,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -3005,16 +3005,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 5.08
+          "executionTimeMs": 4
         },
-        "duration": 10,
-        "timestamp": "2026-10-04T20:48:34.065Z"
+        "duration": 7,
+        "timestamp": "2026-10-05T04:43:04.970Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 10
+      "avgDuration": 7
     }
   },
   {
@@ -3054,7 +3054,7 @@
                 "revelation": "Madina"
               },
               "text": "بَل رَّفَعَهُ ٱللَّهُ إِلَیۡهِۚ وَكَانَ ٱللَّهُ عَزِیزًا حَكِیمࣰا",
-              "translation": "Nay, Allah raised him up unto Himself; and Allah is Exalted in Power, Wise",
+              "translation": "Rather, Allah raised him to Himself. And ever is Allah Exalted in Might and Wise",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -3108,7 +3108,7 @@
                 {
                   "verse": 158,
                   "text": "بَل رَّفَعَهُ ٱللَّهُ إِلَیۡهِۚ وَكَانَ ٱللَّهُ عَزِیزًا حَكِیمࣰا",
-                  "translation": "Nay, Allah raised him up unto Himself; and Allah is Exalted in Power, Wise",
+                  "translation": "Rather, Allah raised him to Himself. And ever is Allah Exalted in Might and Wise",
                   "confidence": 94,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -3133,16 +3133,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 3.67
+          "executionTimeMs": 3.31
         },
-        "duration": 8,
-        "timestamp": "2026-10-04T20:48:34.074Z"
+        "duration": 6,
+        "timestamp": "2026-10-05T04:43:04.977Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 8
+      "avgDuration": 6
     }
   },
   {
@@ -3182,7 +3182,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَٱلَّذِینَ تَدۡعُونَ مِن دُونِهِۦ لَا یَسۡتَطِیعُونَ نَصۡرَكُمۡ وَلَاۤ أَنفُسَهُمۡ یَنصُرُونَ",
-              "translation": "But those ye call upon besides Him, are unable to help you, and indeed to help themselves",
+              "translation": "And those you call upon besides Him are unable to help you, nor can they help themselves",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [
@@ -3249,7 +3249,7 @@
                 {
                   "verse": 197,
                   "text": "وَٱلَّذِینَ تَدۡعُونَ مِن دُونِهِۦ لَا یَسۡتَطِیعُونَ نَصۡرَكُمۡ وَلَاۤ أَنفُسَهُمۡ یَنصُرُونَ",
-                  "translation": "But those ye call upon besides Him, are unable to help you, and indeed to help themselves",
+                  "translation": "And those you call upon besides Him are unable to help you, nor can they help themselves",
                   "confidence": 90,
                   "coverage": "full",
                   "coverageRatio": 0.9,
@@ -3276,16 +3276,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 3.38
+          "executionTimeMs": 4.22
         },
-        "duration": 8,
-        "timestamp": "2026-10-04T20:48:34.082Z"
+        "duration": 6,
+        "timestamp": "2026-10-05T04:43:04.983Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 8
+      "avgDuration": 6
     }
   },
   {
@@ -3325,7 +3325,7 @@
                 "revelation": "Mecca"
               },
               "text": "إِلَّا ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَذَكَرُوا۟ ٱللَّهَ كَثِیرࣰا وَٱنتَصَرُوا۟ مِنۢ بَعۡدِ مَا ظُلِمُوا۟ۗ وَسَیَعۡلَمُ ٱلَّذِینَ ظَلَمُوۤا۟ أَیَّ مُنقَلَبࣲ یَنقَلِبُونَ",
-              "translation": "Except those who believe, work righteousness, engage much in the remembrance of Allah, and defend themselves only after they are unjustly attacked. And soon will the unjust assailants know what vicissitudes their affairs will take",
+              "translation": "Except those [poets] who believe and do righteous deeds and remember Allah often and defend [the Muslims] after they were wronged. And those who have wronged are going to know to what [kind of] return they will be returned",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -3420,7 +3420,7 @@
                 {
                   "verse": 227,
                   "text": "إِلَّا ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَذَكَرُوا۟ ٱللَّهَ كَثِیرࣰا وَٱنتَصَرُوا۟ مِنۢ بَعۡدِ مَا ظُلِمُوا۟ۗ وَسَیَعۡلَمُ ٱلَّذِینَ ظَلَمُوۤا۟ أَیَّ مُنقَلَبࣲ یَنقَلِبُونَ",
-                  "translation": "Except those who believe, work righteousness, engage much in the remembrance of Allah, and defend themselves only after they are unjustly attacked. And soon will the unjust assailants know what vicissitudes their affairs will take",
+                  "translation": "Except those [poets] who believe and do righteous deeds and remember Allah often and defend [the Muslims] after they were wronged. And those who have wronged are going to know to what [kind of] return they will be returned",
                   "confidence": 98,
                   "coverage": "full",
                   "coverageRatio": 0.95,
@@ -3456,16 +3456,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 37.14
+          "executionTimeMs": 36.99
         },
-        "duration": 42,
-        "timestamp": "2026-10-04T20:48:34.125Z"
+        "duration": 40,
+        "timestamp": "2026-10-05T04:43:05.024Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 42
+      "avgDuration": 40
     }
   },
   {
@@ -3508,7 +3508,7 @@
                 "revelation": "Madina"
               },
               "text": "هُوَ ٱللَّهُ ٱلۡخَـٰلِقُ ٱلۡبَارِئُ ٱلۡمُصَوِّرُۖ لَهُ ٱلۡأَسۡمَاۤءُ ٱلۡحُسۡنَىٰۚ یُسَبِّحُ لَهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ وَهُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
-              "translation": "He is Allah, the Creator, the Evolver, the Bestower of Forms (or Colours). To Him belong the Most Beautiful Names: whatever is in the heavens and on earth, doth declare His Praises and Glory: and He is the Exalted in Might, the Wise",
+              "translation": "He is Allah, the Creator, the Inventor, the Fashioner; to Him belong the best names. Whatever is in the heavens and earth is exalting Him. And He is the Exalted in Might, the Wise",
               "confidence": 73,
               "state": "close_match",
               "changedWords": [
@@ -3595,7 +3595,7 @@
                 {
                   "verse": 24,
                   "text": "هُوَ ٱللَّهُ ٱلۡخَـٰلِقُ ٱلۡبَارِئُ ٱلۡمُصَوِّرُۖ لَهُ ٱلۡأَسۡمَاۤءُ ٱلۡحُسۡنَىٰۚ یُسَبِّحُ لَهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ وَهُوَ ٱلۡعَزِیزُ ٱلۡحَكِیمُ",
-                  "translation": "He is Allah, the Creator, the Evolver, the Bestower of Forms (or Colours). To Him belong the Most Beautiful Names: whatever is in the heavens and on earth, doth declare His Praises and Glory: and He is the Exalted in Might, the Wise",
+                  "translation": "He is Allah, the Creator, the Inventor, the Fashioner; to Him belong the best names. Whatever is in the heavens and earth is exalting Him. And He is the Exalted in Might, the Wise",
                   "confidence": 73,
                   "coverage": "fragment",
                   "coverageRatio": 0.65,
@@ -3629,16 +3629,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.46
+          "executionTimeMs": 6.47
         },
-        "duration": 14,
-        "timestamp": "2026-10-04T20:48:34.140Z"
+        "duration": 9,
+        "timestamp": "2026-10-05T04:43:05.034Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 14
+      "avgDuration": 9
     }
   },
   {
@@ -3682,7 +3682,7 @@
                 "revelation": "Madina"
               },
               "text": "وَٱلَّذِینَ یُؤۡمِنُونَ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَ وَبِٱلۡءَاخِرَةِ هُمۡ یُوقِنُونَ",
-              "translation": "And who believe in the Revelation sent to thee, and sent before thy time, and (in their hearts) have the assurance of the Hereafter",
+              "translation": "And who believe in what has been revealed to you, [O Muhammad], and what was revealed before you, and of the Hereafter they are certain [in faith]",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -3731,7 +3731,7 @@
                 {
                   "verse": 4,
                   "text": "وَٱلَّذِینَ یُؤۡمِنُونَ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَ وَبِٱلۡءَاخِرَةِ هُمۡ یُوقِنُونَ",
-                  "translation": "And who believe in the Revelation sent to thee, and sent before thy time, and (in their hearts) have the assurance of the Hereafter",
+                  "translation": "And who believe in what has been revealed to you, [O Muhammad], and what was revealed before you, and of the Hereafter they are certain [in faith]",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.42,
@@ -3771,7 +3771,7 @@
                 "revelation": "Madina"
               },
               "text": "أَلَمۡ تَرَ إِلَى ٱلَّذِینَ یَزۡعُمُونَ أَنَّهُمۡ ءَامَنُوا۟ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَ یُرِیدُونَ أَن یَتَحَاكَمُوۤا۟ إِلَى ٱلطَّـٰغُوتِ وَقَدۡ أُمِرُوۤا۟ أَن یَكۡفُرُوا۟ بِهِۦۖ وَیُرِیدُ ٱلشَّیۡطَـٰنُ أَن یُضِلَّهُمۡ ضَلَـٰلَۢا بَعِیدࣰا",
-              "translation": "Hast thou not turned Thy vision to those who declare that they believe in the revelations that have come to thee and to those before thee? Their (real) wish is to resort together for judgment (in their disputes) to the Evil One, though they were ordered to reject him. But Satan's wish is to lead them astray far away (from the right)",
+              "translation": "Have you not seen those who claim to have believed in what was revealed to you, [O Muhammad], and what was revealed before you? They wish to refer legislation to Taghut, while they were commanded to reject it; and Satan wishes to lead them far astray",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -3838,7 +3838,7 @@
                 {
                   "verse": 60,
                   "text": "أَلَمۡ تَرَ إِلَى ٱلَّذِینَ یَزۡعُمُونَ أَنَّهُمۡ ءَامَنُوا۟ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَ یُرِیدُونَ أَن یَتَحَاكَمُوۤا۟ إِلَى ٱلطَّـٰغُوتِ وَقَدۡ أُمِرُوۤا۟ أَن یَكۡفُرُوا۟ بِهِۦۖ وَیُرِیدُ ٱلشَّیۡطَـٰنُ أَن یُضِلَّهُمۡ ضَلَـٰلَۢا بَعِیدࣰا",
-                  "translation": "Hast thou not turned Thy vision to those who declare that they believe in the revelations that have come to thee and to those before thee? Their (real) wish is to resort together for judgment (in their disputes) to the Evil One, though they were ordered to reject him. But Satan's wish is to lead them astray far away (from the right)",
+                  "translation": "Have you not seen those who claim to have believed in what was revealed to you, [O Muhammad], and what was revealed before you? They wish to refer legislation to Taghut, while they were commanded to reject it; and Satan wishes to lead them far astray",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.17,
@@ -3896,7 +3896,7 @@
                 "revelation": "Madina"
               },
               "text": "لَّـٰكِنِ ٱلرَّٰسِخُونَ فِی ٱلۡعِلۡمِ مِنۡهُمۡ وَٱلۡمُؤۡمِنُونَ یُؤۡمِنُونَ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَۚ وَٱلۡمُقِیمِینَ ٱلصَّلَوٰةَۚ وَٱلۡمُؤۡتُونَ ٱلزَّكَوٰةَ وَٱلۡمُؤۡمِنُونَ بِٱللَّهِ وَٱلۡیَوۡمِ ٱلۡءَاخِرِ أُو۟لَـٰۤئِكَ سَنُؤۡتِیهِمۡ أَجۡرًا عَظِیمًا",
-              "translation": "But those among them who are well-grounded in knowledge, and the believers, believe in what hath been revealed to thee and what was revealed before thee: And (especially) those who establish regular prayer and practise regular charity and believe in Allah and in the Last Day: To them shall We soon give a great reward",
+              "translation": "But those firm in knowledge among them and the believers believe in what has been revealed to you, [O Muhammad], and what was revealed before you. And the establishers of prayer [especially] and the givers of zakah and the believers in Allah and the Last Day - those We will give a great reward",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -3959,7 +3959,7 @@
                 {
                   "verse": 162,
                   "text": "لَّـٰكِنِ ٱلرَّٰسِخُونَ فِی ٱلۡعِلۡمِ مِنۡهُمۡ وَٱلۡمُؤۡمِنُونَ یُؤۡمِنُونَ بِمَاۤ أُنزِلَ إِلَیۡكَ وَمَاۤ أُنزِلَ مِن قَبۡلِكَۚ وَٱلۡمُقِیمِینَ ٱلصَّلَوٰةَۚ وَٱلۡمُؤۡتُونَ ٱلزَّكَوٰةَ وَٱلۡمُؤۡمِنُونَ بِٱللَّهِ وَٱلۡیَوۡمِ ٱلۡءَاخِرِ أُو۟لَـٰۤئِكَ سَنُؤۡتِیهِمۡ أَجۡرًا عَظِیمًا",
-                  "translation": "But those among them who are well-grounded in knowledge, and the believers, believe in what hath been revealed to thee and what was revealed before thee: And (especially) those who establish regular prayer and practise regular charity and believe in Allah and in the Last Day: To them shall We soon give a great reward",
+                  "translation": "But those firm in knowledge among them and the believers believe in what has been revealed to you, [O Muhammad], and what was revealed before you. And the establishers of prayer [especially] and the givers of zakah and the believers in Allah and the Last Day - those We will give a great reward",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.19,
@@ -4002,16 +4002,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 10.24
+          "executionTimeMs": 12.37
         },
-        "duration": 14,
-        "timestamp": "2026-10-04T20:48:34.153Z"
+        "duration": 15,
+        "timestamp": "2026-10-05T04:43:05.050Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 14
+      "avgDuration": 15
     }
   },
   {
@@ -4053,7 +4053,7 @@
                 "revelation": "Madina"
               },
               "text": "ٱلشَّهۡرُ ٱلۡحَرَامُ بِٱلشَّهۡرِ ٱلۡحَرَامِ وَٱلۡحُرُمَـٰتُ قِصَاصࣱۚ فَمَنِ ٱعۡتَدَىٰ عَلَیۡكُمۡ فَٱعۡتَدُوا۟ عَلَیۡهِ بِمِثۡلِ مَا ٱعۡتَدَىٰ عَلَیۡكُمۡۚ وَٱتَّقُوا۟ ٱللَّهَ وَٱعۡلَمُوۤا۟ أَنَّ ٱللَّهَ مَعَ ٱلۡمُتَّقِینَ",
-              "translation": "The prohibited month for the prohibited month,- and so for all things prohibited,- there is the law of equality. If then any one transgresses the prohibition against you, Transgress ye likewise against him. But fear Allah, and know that Allah is with those who restrain themselves",
+              "translation": "[Fighting in] the sacred month is for [aggression committed in] the sacred month, and for [all] violations is legal retribution. So whoever has assaulted you, then assault him in the same way that he has assaulted you. And fear Allah and know that Allah is with those who fear Him",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4112,7 +4112,7 @@
                 {
                   "verse": 194,
                   "text": "ٱلشَّهۡرُ ٱلۡحَرَامُ بِٱلشَّهۡرِ ٱلۡحَرَامِ وَٱلۡحُرُمَـٰتُ قِصَاصࣱۚ فَمَنِ ٱعۡتَدَىٰ عَلَیۡكُمۡ فَٱعۡتَدُوا۟ عَلَیۡهِ بِمِثۡلِ مَا ٱعۡتَدَىٰ عَلَیۡكُمۡۚ وَٱتَّقُوا۟ ٱللَّهَ وَٱعۡلَمُوۤا۟ أَنَّ ٱللَّهَ مَعَ ٱلۡمُتَّقِینَ",
-                  "translation": "The prohibited month for the prohibited month,- and so for all things prohibited,- there is the law of equality. If then any one transgresses the prohibition against you, Transgress ye likewise against him. But fear Allah, and know that Allah is with those who restrain themselves",
+                  "translation": "[Fighting in] the sacred month is for [aggression committed in] the sacred month, and for [all] violations is legal retribution. So whoever has assaulted you, then assault him in the same way that he has assaulted you. And fear Allah and know that Allah is with those who fear Him",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.23,
@@ -4151,10 +4151,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.38
+          "executionTimeMs": 6.25
         },
         "duration": 9,
-        "timestamp": "2026-10-04T20:48:34.163Z"
+        "timestamp": "2026-10-05T04:43:05.059Z"
       }
     ],
     "summary": {
@@ -4202,7 +4202,7 @@
                 "revelation": "Madina"
               },
               "text": "مِنۡ أَجۡلِ ذَٰلِكَ كَتَبۡنَا عَلَىٰ بَنِیۤ إِسۡرَٰۤءِیلَ أَنَّهُۥ مَن قَتَلَ نَفۡسَۢا بِغَیۡرِ نَفۡسٍ أَوۡ فَسَادࣲ فِی ٱلۡأَرۡضِ فَكَأَنَّمَا قَتَلَ ٱلنَّاسَ جَمِیعࣰا وَمَنۡ أَحۡیَاهَا فَكَأَنَّمَاۤ أَحۡیَا ٱلنَّاسَ جَمِیعࣰاۚ وَلَقَدۡ جَاۤءَتۡهُمۡ رُسُلُنَا بِٱلۡبَیِّنَـٰتِ ثُمَّ إِنَّ كَثِیرࣰا مِّنۡهُم بَعۡدَ ذَٰلِكَ فِی ٱلۡأَرۡضِ لَمُسۡرِفُونَ",
-              "translation": "On that account: We ordained for the Children of Israel that if any one slew a person - unless it be for murder or for spreading mischief in the land - it would be as if he slew the whole people: and if any one saved a life, it would be as if he saved the life of the whole people. Then although there came to them Our messengers with clear signs, yet, even after that, many of them continued to commit excesses in the land",
+              "translation": "Because of that, We decreed upon the Children of Israel that whoever kills a soul unless for a soul or for corruption [done] in the land - it is as if he had slain mankind entirely. And whoever saves one - it is as if he had saved mankind entirely. And our messengers had certainly come to them with clear proofs. Then indeed many of them, [even] after that, throughout the land, were transgressors",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4279,7 +4279,7 @@
                 {
                   "verse": 32,
                   "text": "مِنۡ أَجۡلِ ذَٰلِكَ كَتَبۡنَا عَلَىٰ بَنِیۤ إِسۡرَٰۤءِیلَ أَنَّهُۥ مَن قَتَلَ نَفۡسَۢا بِغَیۡرِ نَفۡسٍ أَوۡ فَسَادࣲ فِی ٱلۡأَرۡضِ فَكَأَنَّمَا قَتَلَ ٱلنَّاسَ جَمِیعࣰا وَمَنۡ أَحۡیَاهَا فَكَأَنَّمَاۤ أَحۡیَا ٱلنَّاسَ جَمِیعࣰاۚ وَلَقَدۡ جَاۤءَتۡهُمۡ رُسُلُنَا بِٱلۡبَیِّنَـٰتِ ثُمَّ إِنَّ كَثِیرࣰا مِّنۡهُم بَعۡدَ ذَٰلِكَ فِی ٱلۡأَرۡضِ لَمُسۡرِفُونَ",
-                  "translation": "On that account: We ordained for the Children of Israel that if any one slew a person - unless it be for murder or for spreading mischief in the land - it would be as if he slew the whole people: and if any one saved a life, it would be as if he saved the life of the whole people. Then although there came to them Our messengers with clear signs, yet, even after that, many of them continued to commit excesses in the land",
+                  "translation": "Because of that, We decreed upon the Children of Israel that whoever kills a soul unless for a soul or for corruption [done] in the land - it is as if he had slain mankind entirely. And whoever saves one - it is as if he had saved mankind entirely. And our messengers had certainly come to them with clear proofs. Then indeed many of them, [even] after that, throughout the land, were transgressors",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.13,
@@ -4336,16 +4336,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 4.45
+          "executionTimeMs": 4.65
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T20:48:34.172Z"
+        "duration": 7,
+        "timestamp": "2026-10-05T04:43:05.066Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 7
     }
   },
   {
@@ -4387,7 +4387,7 @@
                 "revelation": "Madina"
               },
               "text": "وَٱعۡلَمُوۤا۟ أَنَّمَا غَنِمۡتُم مِّن شَیۡءࣲ فَأَنَّ لِلَّهِ خُمُسَهُۥ وَلِلرَّسُولِ وَلِذِی ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَٱبۡنِ ٱلسَّبِیلِ إِن كُنتُمۡ ءَامَنتُم بِٱللَّهِ وَمَاۤ أَنزَلۡنَا عَلَىٰ عَبۡدِنَا یَوۡمَ ٱلۡفُرۡقَانِ یَوۡمَ ٱلۡتَقَى ٱلۡجَمۡعَانِۗ وَٱللَّهُ عَلَىٰ كُلِّ شَیۡءࣲ قَدِیرٌ",
-              "translation": "And know that out of all the booty that ye may acquire (in war), a fifth share is assigned to Allah,- and to the Messenger, and to near relatives, orphans, the needy, and the wayfarer,- if ye do believe in Allah and in the revelation We sent down to Our servant on the Day of Testing,- the Day of the meeting of the two forces. For Allah hath power over all things",
+              "translation": "And know that anything you obtain of war booty - then indeed, for Allah is one fifth of it and for the Messenger and for [his] near relatives and the orphans, the needy, and the [stranded] traveler, if you have believed in Allah and in that which We sent down to Our Servant on the day of criterion - the day when the two armies met. And Allah, over all things, is competent",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4457,7 +4457,7 @@
                 {
                   "verse": 41,
                   "text": "وَٱعۡلَمُوۤا۟ أَنَّمَا غَنِمۡتُم مِّن شَیۡءࣲ فَأَنَّ لِلَّهِ خُمُسَهُۥ وَلِلرَّسُولِ وَلِذِی ٱلۡقُرۡبَىٰ وَٱلۡیَتَـٰمَىٰ وَٱلۡمَسَـٰكِینِ وَٱبۡنِ ٱلسَّبِیلِ إِن كُنتُمۡ ءَامَنتُم بِٱللَّهِ وَمَاۤ أَنزَلۡنَا عَلَىٰ عَبۡدِنَا یَوۡمَ ٱلۡفُرۡقَانِ یَوۡمَ ٱلۡتَقَى ٱلۡجَمۡعَانِۗ وَٱللَّهُ عَلَىٰ كُلِّ شَیۡءࣲ قَدِیرٌ",
-                  "translation": "And know that out of all the booty that ye may acquire (in war), a fifth share is assigned to Allah,- and to the Messenger, and to near relatives, orphans, the needy, and the wayfarer,- if ye do believe in Allah and in the revelation We sent down to Our servant on the Day of Testing,- the Day of the meeting of the two forces. For Allah hath power over all things",
+                  "translation": "And know that anything you obtain of war booty - then indeed, for Allah is one fifth of it and for the Messenger and for [his] near relatives and the orphans, the needy, and the [stranded] traveler, if you have believed in Allah and in that which We sent down to Our Servant on the day of criterion - the day when the two armies met. And Allah, over all things, is competent",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.15,
@@ -4507,16 +4507,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 1.1
+          "executionTimeMs": 1.49
         },
-        "duration": 6,
-        "timestamp": "2026-10-04T20:48:34.178Z"
+        "duration": 4,
+        "timestamp": "2026-10-05T04:43:05.071Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 6
+      "avgDuration": 4
     }
   },
   {
@@ -4558,7 +4558,7 @@
                 "revelation": "Mecca"
               },
               "text": "فَلَمَّا جَاۤءَتۡ قِیلَ أَهَـٰكَذَا عَرۡشُكِۖ قَالَتۡ كَأَنَّهُۥ هُوَۚ وَأُوتِینَا ٱلۡعِلۡمَ مِن قَبۡلِهَا وَكُنَّا مُسۡلِمِینَ",
-              "translation": "So when she arrived, she was asked, \"Is this thy throne?\" She said, \"It was just like this; and knowledge was bestowed on us in advance of this, and we have submitted to Allah (in Islam)\"",
+              "translation": "So when she arrived, it was said [to her], \"Is your throne like this?\" She said, \"[It is] as though it was it.\" [Solomon said], \"And we were given knowledge before her, and we have been Muslims [in submission to Allah]\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4609,7 +4609,7 @@
                 {
                   "verse": 42,
                   "text": "فَلَمَّا جَاۤءَتۡ قِیلَ أَهَـٰكَذَا عَرۡشُكِۖ قَالَتۡ كَأَنَّهُۥ هُوَۚ وَأُوتِینَا ٱلۡعِلۡمَ مِن قَبۡلِهَا وَكُنَّا مُسۡلِمِینَ",
-                  "translation": "So when she arrived, she was asked, \"Is this thy throne?\" She said, \"It was just like this; and knowledge was bestowed on us in advance of this, and we have submitted to Allah (in Islam)",
+                  "translation": "So when she arrived, it was said [to her], \"Is your throne like this?\" She said, \"[It is] as though it was it.\" [Solomon said], \"And we were given knowledge before her, and we have been Muslims [in submission to Allah]",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.36,
@@ -4640,10 +4640,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.75
+          "executionTimeMs": 0.9
         },
         "duration": 4,
-        "timestamp": "2026-10-04T20:48:34.182Z"
+        "timestamp": "2026-10-05T04:43:05.075Z"
       }
     ],
     "summary": {
@@ -4691,7 +4691,7 @@
                 "revelation": "Madina"
               },
               "text": "وَلَقَدۡ أَرۡسَلۡنَا نُوحࣰا وَإِبۡرَٰهِیمَ وَجَعَلۡنَا فِی ذُرِّیَّتِهِمَا ٱلنُّبُوَّةَ وَٱلۡكِتَـٰبَۖ فَمِنۡهُم مُّهۡتَدࣲۖ وَكَثِیرࣱ مِّنۡهُمۡ فَـٰسِقُونَ",
-              "translation": "And We sent Noah and Abraham, and established in their line Prophethood and Revelation: and some of them were on right guidance. But many of them became rebellious transgressors",
+              "translation": "And We have already sent Noah and Abraham and placed in their descendants prophethood and scripture; and among them is he who is guided, but many of them are defiantly disobedient",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4742,7 +4742,7 @@
                 {
                   "verse": 26,
                   "text": "وَلَقَدۡ أَرۡسَلۡنَا نُوحࣰا وَإِبۡرَٰهِیمَ وَجَعَلۡنَا فِی ذُرِّیَّتِهِمَا ٱلنُّبُوَّةَ وَٱلۡكِتَـٰبَۖ فَمِنۡهُم مُّهۡتَدࣲۖ وَكَثِیرࣱ مِّنۡهُمۡ فَـٰسِقُونَ",
-                  "translation": "And We sent Noah and Abraham, and established in their line Prophethood and Revelation: and some of them were on right guidance. But many of them became rebellious transgressors",
+                  "translation": "And We have already sent Noah and Abraham and placed in their descendants prophethood and scripture; and among them is he who is guided, but many of them are defiantly disobedient",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.36,
@@ -4773,16 +4773,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 9.23
+          "executionTimeMs": 7.76
         },
-        "duration": 14,
-        "timestamp": "2026-10-04T20:48:34.196Z"
+        "duration": 9,
+        "timestamp": "2026-10-05T04:43:05.085Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 14
+      "avgDuration": 9
     }
   },
   {
@@ -4822,7 +4822,7 @@
                 "revelation": "Mecca"
               },
               "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-              "translation": "In the name of Allah, Most Gracious, Most Merciful, Praise be to Allah, the Cherisher and Sustainer of the worlds.",
+              "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful, [All] praise is [due] to Allah, Lord of the worlds.",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -4876,7 +4876,7 @@
                 {
                   "verse": 1,
                   "text": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ",
-                  "translation": "In the name of Allah, Most Gracious, Most Merciful",
+                  "translation": "In the name of Allah, the Entirely Merciful, the Especially Merciful",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -4895,7 +4895,7 @@
                 {
                   "verse": 2,
                   "text": "ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-                  "translation": "Praise be to Allah, the Cherisher and Sustainer of the worlds",
+                  "translation": "[All] praise is [due] to Allah, Lord of the worlds",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -4927,7 +4927,7 @@
                 "revelation": "Mecca"
               },
               "text": "دَعۡوَىٰهُمۡ فِیهَا سُبۡحَـٰنَكَ ٱللَّهُمَّ وَتَحِیَّتُهُمۡ فِیهَا سَلَـٰمࣱۚ وَءَاخِرُ دَعۡوَىٰهُمۡ أَنِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-              "translation": "(This will be) their cry therein: \"Glory to Thee, O Allah!\" And \"Peace\" will be their greeting therein! and the close of their cry will be: \"Praise be to Allah, the Cherisher and Sustainer of the worlds\"",
+              "translation": "Their call therein will be, \"Exalted are You, O Allah,\" and their greeting therein will be, \"Peace.\" And the last of their call will be, \"Praise to Allah, Lord of the worlds\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -4975,7 +4975,7 @@
                 {
                   "verse": 10,
                   "text": "دَعۡوَىٰهُمۡ فِیهَا سُبۡحَـٰنَكَ ٱللَّهُمَّ وَتَحِیَّتُهُمۡ فِیهَا سَلَـٰمࣱۚ وَءَاخِرُ دَعۡوَىٰهُمۡ أَنِ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-                  "translation": "(This will be) their cry therein: \"Glory to Thee, O Allah!\" And \"Peace\" will be their greeting therein! and the close of their cry will be: \"Praise be to Allah, the Cherisher and Sustainer of the worlds",
+                  "translation": "Their call therein will be, \"Exalted are You, O Allah,\" and their greeting therein will be, \"Peace.\" And the last of their call will be, \"Praise to Allah, Lord of the worlds",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.29,
@@ -5017,7 +5017,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَتَرَى ٱلۡمَلَـٰۤئِكَةَ حَاۤفِّینَ مِنۡ حَوۡلِ ٱلۡعَرۡشِ یُسَبِّحُونَ بِحَمۡدِ رَبِّهِمۡۚ وَقُضِیَ بَیۡنَهُم بِٱلۡحَقِّۚ وَقِیلَ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-              "translation": "And thou wilt see the angels surrounding the Throne (Divine) on all sides, singing Glory and Praise to their Lord. The Decision between them (at Judgment) will be in (perfect) justice, and the cry (on all sides) will be, \"Praise be to Allah, the Lord of the Worlds\"",
+              "translation": "And you will see the angels surrounding the Throne, exalting [Allah] with praise of their Lord. And it will be judged between them in truth, and it will be said, \"[All] praise to Allah, Lord of the worlds\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -5068,7 +5068,7 @@
                 {
                   "verse": 75,
                   "text": "وَتَرَى ٱلۡمَلَـٰۤئِكَةَ حَاۤفِّینَ مِنۡ حَوۡلِ ٱلۡعَرۡشِ یُسَبِّحُونَ بِحَمۡدِ رَبِّهِمۡۚ وَقُضِیَ بَیۡنَهُم بِٱلۡحَقِّۚ وَقِیلَ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-                  "translation": "And thou wilt see the angels surrounding the Throne (Divine) on all sides, singing Glory and Praise to their Lord. The Decision between them (at Judgment) will be in (perfect) justice, and the cry (on all sides) will be, \"Praise be to Allah, the Lord of the Worlds",
+                  "translation": "And you will see the angels surrounding the Throne, exalting [Allah] with praise of their Lord. And it will be judged between them in truth, and it will be said, \"[All] praise to Allah, Lord of the worlds",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.24,
@@ -5113,7 +5113,7 @@
                 "revelation": "Mecca"
               },
               "text": "هُوَ ٱلۡحَیُّ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱدۡعُوهُ مُخۡلِصِینَ لَهُ ٱلدِّینَۗ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-              "translation": "He is the Living (One): There is no god but He: Call upon Him, giving Him sincere devotion. Praise be to Allah, Lord of the Worlds",
+              "translation": "He is the Ever-Living; there is no deity except Him, so call upon Him, [being] sincere to Him in religion. [All] praise is [due] to Allah, Lord of the worlds",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [],
@@ -5161,7 +5161,7 @@
                 {
                   "verse": 65,
                   "text": "هُوَ ٱلۡحَیُّ لَاۤ إِلَـٰهَ إِلَّا هُوَ فَٱدۡعُوهُ مُخۡلِصِینَ لَهُ ٱلدِّینَۗ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ",
-                  "translation": "He is the Living (One): There is no god but He: Call upon Him, giving Him sincere devotion. Praise be to Allah, Lord of the Worlds",
+                  "translation": "He is the Ever-Living; there is no deity except Him, so call upon Him, [being] sincere to Him in religion. [All] praise is [due] to Allah, Lord of the worlds",
                   "confidence": 100,
                   "coverage": "fragment",
                   "coverageRatio": 0.29,
@@ -5193,16 +5193,16 @@
           ],
           "referralRequired": false,
           "notice": "تم تجاهل البسملة في بداية السورة أثناء المطابقة لأنها ليست جزءاً من الآية الأولى في هذه السورة",
-          "executionTimeMs": 35.45
+          "executionTimeMs": 34.07
         },
-        "duration": 40,
-        "timestamp": "2026-10-04T20:48:34.236Z"
+        "duration": 38,
+        "timestamp": "2026-10-05T04:43:05.123Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 40
+      "avgDuration": 38
     }
   },
   {
@@ -5242,7 +5242,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ وَنَادَىٰۤ أَصۡحَـٰبُ ٱلۡأَعۡرَافِ رِجَالࣰا یَعۡرِفُونَهُم بِسِیمَىٰهُمۡ قَالُوا۟ مَاۤ أَغۡنَىٰ عَنكُمۡ جَمۡعُكُمۡ وَمَا كُنتُمۡ تَسۡتَكۡبِرُونَ",
-              "translation": "When their eyes shall be turned towards the Companions of the Fire, they will say: \"Our Lord! send us not to the company of the wrong-doers, The men on the heights will call to certain men whom they will know from their marks, saying: \"Of what profit to you were your hoards and your arrogant ways.",
+              "translation": "And when their eyes are turned toward the companions of the Fire, they say, \"Our Lord, do not place us with the wrongdoing people, And the companions of the Elevations will call to men [within Hell] whom they recognize by their mark, saying, \"Of no avail to you was your gathering and [the fact] that you were arrogant.",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5372,7 +5372,7 @@
                 {
                   "verse": 47,
                   "text": "وَإِذَا صُرِفَتۡ أَبۡصَـٰرُهُمۡ تِلۡقَاۤءَ أَصۡحَـٰبِ ٱلنَّارِ قَالُوا۟ رَبَّنَا لَا تَجۡعَلۡنَا مَعَ ٱلۡقَوۡمِ ٱلظَّـٰلِمِینَ",
-                  "translation": "When their eyes shall be turned towards the Companions of the Fire, they will say: \"Our Lord! send us not to the company of the wrong-doers",
+                  "translation": "And when their eyes are turned toward the companions of the Fire, they say, \"Our Lord, do not place us with the wrongdoing people",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5400,7 +5400,7 @@
                 {
                   "verse": 48,
                   "text": "وَنَادَىٰۤ أَصۡحَـٰبُ ٱلۡأَعۡرَافِ رِجَالࣰا یَعۡرِفُونَهُم بِسِیمَىٰهُمۡ قَالُوا۟ مَاۤ أَغۡنَىٰ عَنكُمۡ جَمۡعُكُمۡ وَمَا كُنتُمۡ تَسۡتَكۡبِرُونَ",
-                  "translation": "The men on the heights will call to certain men whom they will know from their marks, saying: \"Of what profit to you were your hoards and your arrogant ways",
+                  "translation": "And the companions of the Elevations will call to men [within Hell] whom they recognize by their mark, saying, \"Of no avail to you was your gathering and [the fact] that you were arrogant",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5431,10 +5431,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.84
+          "executionTimeMs": 9.21
         },
         "duration": 12,
-        "timestamp": "2026-10-04T20:48:34.250Z"
+        "timestamp": "2026-10-05T04:43:05.137Z"
       }
     ],
     "summary": {
@@ -5480,7 +5480,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَحُورٌ عِینࣱ كَأَمۡثَـٰلِ ٱللُّؤۡلُؤِ ٱلۡمَكۡنُونِ",
-              "translation": "And (there will be) Companions with beautiful, big, and lustrous eyes, Like unto Pearls well-guarded.",
+              "translation": "And [for them are] fair women with large, [beautiful] eyes, The likenesses of pearls well-protected.",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5522,7 +5522,7 @@
                 {
                   "verse": 22,
                   "text": "وَحُورٌ عِینࣱ",
-                  "translation": "And (there will be) Companions with beautiful, big, and lustrous eyes",
+                  "translation": "And [for them are] fair women with large, [beautiful] eyes",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5539,7 +5539,7 @@
                 {
                   "verse": 23,
                   "text": "كَأَمۡثَـٰلِ ٱللُّؤۡلُؤِ ٱلۡمَكۡنُونِ",
-                  "translation": "Like unto Pearls well-guarded",
+                  "translation": "The likenesses of pearls well-protected",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5559,16 +5559,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.37
+          "executionTimeMs": 0.46
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:34.254Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:05.141Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -5674,7 +5674,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5712,7 +5712,7 @@
                 {
                   "verse": 13,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5744,7 +5744,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5782,7 +5782,7 @@
                 {
                   "verse": 16,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5814,7 +5814,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5852,7 +5852,7 @@
                 {
                   "verse": 18,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5884,7 +5884,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5922,7 +5922,7 @@
                 {
                   "verse": 21,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -5954,7 +5954,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -5992,7 +5992,7 @@
                 {
                   "verse": 23,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6024,7 +6024,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6062,7 +6062,7 @@
                 {
                   "verse": 25,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6094,7 +6094,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6132,7 +6132,7 @@
                 {
                   "verse": 28,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6164,7 +6164,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6202,7 +6202,7 @@
                 {
                   "verse": 30,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6234,7 +6234,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6272,7 +6272,7 @@
                 {
                   "verse": 32,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6304,7 +6304,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6342,7 +6342,7 @@
                 {
                   "verse": 34,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6374,7 +6374,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6412,7 +6412,7 @@
                 {
                   "verse": 36,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6444,7 +6444,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6482,7 +6482,7 @@
                 {
                   "verse": 38,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6514,7 +6514,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6552,7 +6552,7 @@
                 {
                   "verse": 40,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6584,7 +6584,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6622,7 +6622,7 @@
                 {
                   "verse": 42,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6654,7 +6654,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6692,7 +6692,7 @@
                 {
                   "verse": 45,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6724,7 +6724,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6762,7 +6762,7 @@
                 {
                   "verse": 47,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6794,7 +6794,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6832,7 +6832,7 @@
                 {
                   "verse": 49,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6864,7 +6864,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6902,7 +6902,7 @@
                 {
                   "verse": 51,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -6934,7 +6934,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -6972,7 +6972,7 @@
                 {
                   "verse": 53,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7004,7 +7004,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7042,7 +7042,7 @@
                 {
                   "verse": 55,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7074,7 +7074,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7112,7 +7112,7 @@
                 {
                   "verse": 57,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7144,7 +7144,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7182,7 +7182,7 @@
                 {
                   "verse": 59,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7214,7 +7214,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7252,7 +7252,7 @@
                 {
                   "verse": 61,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7284,7 +7284,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7322,7 +7322,7 @@
                 {
                   "verse": 63,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7354,7 +7354,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7392,7 +7392,7 @@
                 {
                   "verse": 65,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7424,7 +7424,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7462,7 +7462,7 @@
                 {
                   "verse": 67,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7494,7 +7494,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7532,7 +7532,7 @@
                 {
                   "verse": 69,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7564,7 +7564,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7602,7 +7602,7 @@
                 {
                   "verse": 71,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7634,7 +7634,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7672,7 +7672,7 @@
                 {
                   "verse": 73,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7704,7 +7704,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7742,7 +7742,7 @@
                 {
                   "verse": 75,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7774,7 +7774,7 @@
                 "revelation": "Madina"
               },
               "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-              "translation": "Then which of the favours of your Lord will ye deny",
+              "translation": "So which of the favors of your Lord would you deny",
               "confidence": 100,
               "state": "matched",
               "changedWords": [],
@@ -7812,7 +7812,7 @@
                 {
                   "verse": 77,
                   "text": "فَبِأَیِّ ءَالَاۤءِ رَبِّكُمَا تُكَذِّبَانِ",
-                  "translation": "Then which of the favours of your Lord will ye deny",
+                  "translation": "So which of the favors of your Lord would you deny",
                   "confidence": 100,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -7833,16 +7833,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 13.09
+          "executionTimeMs": 11.82
         },
-        "duration": 17,
-        "timestamp": "2026-10-04T20:48:34.272Z"
+        "duration": 16,
+        "timestamp": "2026-10-05T04:43:05.157Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 17
+      "avgDuration": 16
     }
   },
   {
@@ -7882,7 +7882,7 @@
                 "revelation": "Madina"
               },
               "text": "وَإِذَا لَقُوا۟ ٱلَّذِینَ ءَامَنُوا۟ قَالُوۤا۟ ءَامَنَّا وَإِذَا خَلَوۡا۟ إِلَىٰ شَیَـٰطِینِهِمۡ قَالُوۤا۟ إِنَّا مَعَكُمۡ إِنَّمَا نَحۡنُ مُسۡتَهۡزِءُونَ",
-              "translation": "When they meet those who believe, they say: \"We believe;\" but when they are alone with their evil ones, they say: \"We are really with you: We (were) only jesting\"",
+              "translation": "And when they meet those who believe, they say, \"We believe\"; but when they are alone with their evil ones, they say, \"Indeed, we are with you; we were only mockers\"",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [
@@ -7973,7 +7973,7 @@
                 {
                   "verse": 14,
                   "text": "وَإِذَا لَقُوا۟ ٱلَّذِینَ ءَامَنُوا۟ قَالُوۤا۟ ءَامَنَّا وَإِذَا خَلَوۡا۟ إِلَىٰ شَیَـٰطِینِهِمۡ قَالُوۤا۟ إِنَّا مَعَكُمۡ إِنَّمَا نَحۡنُ مُسۡتَهۡزِءُونَ",
-                  "translation": "When they meet those who believe, they say: \"We believe;\" but when they are alone with their evil ones, they say: \"We are really with you: We (were) only jesting",
+                  "translation": "And when they meet those who believe, they say, \"We believe\"; but when they are alone with their evil ones, they say, \"Indeed, we are with you; we were only mockers",
                   "confidence": 95,
                   "coverage": "full",
                   "coverageRatio": 0.94,
@@ -8006,16 +8006,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 8.25
+          "executionTimeMs": 8.78
         },
-        "duration": 14,
-        "timestamp": "2026-10-04T20:48:34.286Z"
+        "duration": 12,
+        "timestamp": "2026-10-05T04:43:05.170Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 14
+      "avgDuration": 12
     }
   },
   {
@@ -8055,7 +8055,7 @@
                 "revelation": "Madina"
               },
               "text": "وَقَـٰتِلُوا۟ فِی سَبِیلِ ٱللَّهِ وَٱعۡلَمُوۤا۟ أَنَّ ٱللَّهَ سَمِیعٌ عَلِیمࣱ",
-              "translation": "Then fight in the cause of Allah, and know that Allah Heareth and knoweth all things",
+              "translation": "And fight in the cause of Allah and know that Allah is Hearing and Knowing",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [
@@ -8118,7 +8118,7 @@
                 {
                   "verse": 244,
                   "text": "وَقَـٰتِلُوا۟ فِی سَبِیلِ ٱللَّهِ وَٱعۡلَمُوۤا۟ أَنَّ ٱللَّهَ سَمِیعٌ عَلِیمࣱ",
-                  "translation": "Then fight in the cause of Allah, and know that Allah Heareth and knoweth all things",
+                  "translation": "And fight in the cause of Allah and know that Allah is Hearing and Knowing",
                   "confidence": 92,
                   "coverage": "full",
                   "coverageRatio": 0.89,
@@ -8144,10 +8144,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 15.11
+          "executionTimeMs": 16.94
         },
         "duration": 20,
-        "timestamp": "2026-10-04T20:48:34.307Z"
+        "timestamp": "2026-10-05T04:43:05.190Z"
       }
     ],
     "summary": {
@@ -8193,7 +8193,7 @@
                 "revelation": "Mecca"
               },
               "text": "قُل لِّمَن مَّا فِی ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ قُل لِّلَّهِۚ كَتَبَ عَلَىٰ نَفۡسِهِ ٱلرَّحۡمَةَۚ لَیَجۡمَعَنَّكُمۡ إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۚ ٱلَّذِینَ خَسِرُوۤا۟ أَنفُسَهُمۡ فَهُمۡ لَا یُؤۡمِنُونَ",
-              "translation": "Say: \"To whom belongeth all that is in the heavens and on earth?\" Say: \"To Allah. He hath inscribed for Himself (the rule of) Mercy. That He will gather you together for the Day of Judgment, there is no doubt whatever. It is they who have lost their own souls, that will not believe\"",
+              "translation": "Say, \"To whom belongs whatever is in the heavens and earth?\" Say, \"To Allah.\" He has decreed upon Himself mercy. He will surely assemble you for the Day of Resurrection, about which there is no doubt. Those who will lose themselves [that Day] do not believe",
               "confidence": 89,
               "state": "close_match",
               "changedWords": [
@@ -8320,7 +8320,7 @@
                 {
                   "verse": 12,
                   "text": "قُل لِّمَن مَّا فِی ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضِۖ قُل لِّلَّهِۚ كَتَبَ عَلَىٰ نَفۡسِهِ ٱلرَّحۡمَةَۚ لَیَجۡمَعَنَّكُمۡ إِلَىٰ یَوۡمِ ٱلۡقِیَـٰمَةِ لَا رَیۡبَ فِیهِۚ ٱلَّذِینَ خَسِرُوۤا۟ أَنفُسَهُمۡ فَهُمۡ لَا یُؤۡمِنُونَ",
-                  "translation": "Say: \"To whom belongeth all that is in the heavens and on earth?\" Say: \"To Allah. He hath inscribed for Himself (the rule of) Mercy. That He will gather you together for the Day of Judgment, there is no doubt whatever. It is they who have lost their own souls, that will not believe",
+                  "translation": "Say, \"To whom belongs whatever is in the heavens and earth?\" Say, \"To Allah.\" He has decreed upon Himself mercy. He will surely assemble you for the Day of Resurrection, about which there is no doubt. Those who will lose themselves [that Day] do not believe",
                   "confidence": 97,
                   "coverage": "full",
                   "coverageRatio": 0.96,
@@ -8362,16 +8362,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 28.93
+          "executionTimeMs": 28.11
         },
-        "duration": 34,
-        "timestamp": "2026-10-04T20:48:34.342Z"
+        "duration": 31,
+        "timestamp": "2026-10-05T04:43:05.222Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 34
+      "avgDuration": 31
     }
   },
   {
@@ -10315,16 +10315,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 93.35
+          "executionTimeMs": 84.83
         },
-        "duration": 99,
-        "timestamp": "2026-10-04T20:48:34.443Z"
+        "duration": 89,
+        "timestamp": "2026-10-05T04:43:05.315Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 99
+      "avgDuration": 89
     }
   },
   {
@@ -16881,16 +16881,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 372.82
+          "executionTimeMs": 494.38
         },
-        "duration": 379,
-        "timestamp": "2026-10-04T20:48:34.854Z"
+        "duration": 501,
+        "timestamp": "2026-10-05T04:43:05.861Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 379
+      "avgDuration": 501
     }
   },
   {
@@ -17590,16 +17590,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 61.46
+          "executionTimeMs": 66.73
         },
-        "duration": 67,
-        "timestamp": "2026-10-04T20:48:34.922Z"
+        "duration": 71,
+        "timestamp": "2026-10-05T04:43:05.933Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 67
+      "avgDuration": 71
     }
   },
   {
@@ -18475,16 +18475,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 305.74
+          "executionTimeMs": 187.97
         },
-        "duration": 318,
-        "timestamp": "2026-10-04T20:48:35.244Z"
+        "duration": 191,
+        "timestamp": "2026-10-05T04:43:06.129Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 318
+      "avgDuration": 191
     }
   },
   {
@@ -20979,16 +20979,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 64.04
+          "executionTimeMs": 78.58
         },
-        "duration": 75,
-        "timestamp": "2026-10-04T20:48:35.320Z"
+        "duration": 84,
+        "timestamp": "2026-10-05T04:43:06.215Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 75
+      "avgDuration": 84
     }
   },
   {
@@ -21372,16 +21372,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 29.9
+          "executionTimeMs": 36.22
         },
-        "duration": 35,
-        "timestamp": "2026-10-04T20:48:35.356Z"
+        "duration": 40,
+        "timestamp": "2026-10-05T04:43:06.256Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 35
+      "avgDuration": 40
     }
   },
   {
@@ -23785,16 +23785,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 118.55
+          "executionTimeMs": 151.01
         },
-        "duration": 123,
-        "timestamp": "2026-10-04T20:48:35.483Z"
+        "duration": 156,
+        "timestamp": "2026-10-05T04:43:06.417Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 123
+      "avgDuration": 156
     }
   },
   {
@@ -27573,16 +27573,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.64
+          "executionTimeMs": 71.88
         },
-        "duration": 70,
-        "timestamp": "2026-10-04T20:48:35.554Z"
+        "duration": 77,
+        "timestamp": "2026-10-05T04:43:06.496Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 70
+      "avgDuration": 77
     }
   },
   {
@@ -27766,16 +27766,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 60.06
+          "executionTimeMs": 65.84
         },
-        "duration": 65,
-        "timestamp": "2026-10-04T20:48:35.619Z"
+        "duration": 70,
+        "timestamp": "2026-10-05T04:43:06.566Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 65
+      "avgDuration": 70
     }
   },
   {
@@ -29919,16 +29919,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 148.54
+          "executionTimeMs": 283.16
         },
-        "duration": 154,
-        "timestamp": "2026-10-04T20:48:35.793Z"
+        "duration": 288,
+        "timestamp": "2026-10-05T04:43:06.881Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 154
+      "avgDuration": 288
     }
   },
   {
@@ -30834,16 +30834,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 121.62
+          "executionTimeMs": 150.16
         },
-        "duration": 134,
-        "timestamp": "2026-10-04T20:48:35.930Z"
+        "duration": 155,
+        "timestamp": "2026-10-05T04:43:07.039Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 134
+      "avgDuration": 155
     }
   },
   {
@@ -37400,16 +37400,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 311.41
+          "executionTimeMs": 452.93
         },
-        "duration": 319,
-        "timestamp": "2026-10-04T20:48:36.285Z"
+        "duration": 460,
+        "timestamp": "2026-10-05T04:43:07.548Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 319
+      "avgDuration": 460
     }
   },
   {
@@ -37884,16 +37884,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 64.63
+          "executionTimeMs": 81.97
         },
-        "duration": 68,
-        "timestamp": "2026-10-04T20:48:36.355Z"
+        "duration": 86,
+        "timestamp": "2026-10-05T04:43:07.636Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 68
+      "avgDuration": 86
     }
   },
   {
@@ -38489,16 +38489,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 84.18
+          "executionTimeMs": 106.39
         },
-        "duration": 89,
-        "timestamp": "2026-10-04T20:48:36.445Z"
+        "duration": 109,
+        "timestamp": "2026-10-05T04:43:07.747Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 89
+      "avgDuration": 109
     }
   },
   {
@@ -39106,16 +39106,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 60.51
+          "executionTimeMs": 81.28
         },
-        "duration": 65,
-        "timestamp": "2026-10-04T20:48:36.512Z"
+        "duration": 85,
+        "timestamp": "2026-10-05T04:43:07.835Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 65
+      "avgDuration": 85
     }
   },
   {
@@ -45666,16 +45666,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 328.97
+          "executionTimeMs": 481.41
         },
-        "duration": 336,
-        "timestamp": "2026-10-04T20:48:36.879Z"
+        "duration": 489,
+        "timestamp": "2026-10-05T04:43:08.367Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 336
+      "avgDuration": 489
     }
   },
   {
@@ -47936,16 +47936,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 115.07
+          "executionTimeMs": 148.55
         },
-        "duration": 120,
-        "timestamp": "2026-10-04T20:48:37.002Z"
+        "duration": 153,
+        "timestamp": "2026-10-05T04:43:08.524Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 120
+      "avgDuration": 153
     }
   },
   {
@@ -48877,16 +48877,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 79.69
+          "executionTimeMs": 105.15
         },
-        "duration": 84,
-        "timestamp": "2026-10-04T20:48:37.089Z"
+        "duration": 109,
+        "timestamp": "2026-10-05T04:43:08.638Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 84
+      "avgDuration": 109
     }
   },
   {
@@ -50276,16 +50276,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 22.98
+          "executionTimeMs": 27.37
         },
-        "duration": 27,
-        "timestamp": "2026-10-04T20:48:37.117Z"
+        "duration": 31,
+        "timestamp": "2026-10-05T04:43:08.670Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 27
+      "avgDuration": 31
     }
   },
   {
@@ -50831,10 +50831,10 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 14.39
+          "executionTimeMs": 16.96
         },
         "duration": 19,
-        "timestamp": "2026-10-04T20:48:37.136Z"
+        "timestamp": "2026-10-05T04:43:08.689Z"
       }
     ],
     "summary": {
@@ -51928,16 +51928,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 21.38
+          "executionTimeMs": 25.24
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T20:48:37.162Z"
+        "duration": 29,
+        "timestamp": "2026-10-05T04:43:08.718Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 29
     }
   },
   {
@@ -52094,16 +52094,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 50.95
+          "executionTimeMs": 65.08
         },
-        "duration": 55,
-        "timestamp": "2026-10-04T20:48:37.217Z"
+        "duration": 69,
+        "timestamp": "2026-10-05T04:43:08.788Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 55
+      "avgDuration": 69
     }
   },
   {
@@ -54228,16 +54228,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 81.07
+          "executionTimeMs": 100.57
         },
-        "duration": 86,
-        "timestamp": "2026-10-04T20:48:37.304Z"
+        "duration": 106,
+        "timestamp": "2026-10-05T04:43:08.894Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 86
+      "avgDuration": 106
     }
   },
   {
@@ -55196,16 +55196,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 37.94
+          "executionTimeMs": 45.81
         },
-        "duration": 43,
-        "timestamp": "2026-10-04T20:48:37.348Z"
+        "duration": 50,
+        "timestamp": "2026-10-05T04:43:08.944Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 43
+      "avgDuration": 50
     }
   },
   {
@@ -55887,16 +55887,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 547.83
+          "executionTimeMs": 915.28
         },
-        "duration": 558,
-        "timestamp": "2026-10-04T20:48:37.906Z"
+        "duration": 926,
+        "timestamp": "2026-10-05T04:43:09.871Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 558
+      "avgDuration": 926
     }
   },
   {
@@ -56431,16 +56431,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 498.13
+          "executionTimeMs": 674.69
         },
-        "duration": 503,
-        "timestamp": "2026-10-04T20:48:38.409Z"
+        "duration": 680,
+        "timestamp": "2026-10-05T04:43:10.551Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 503
+      "avgDuration": 680
     }
   },
   {
@@ -56467,16 +56467,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 497.82
+          "executionTimeMs": 615.51
         },
-        "duration": 502,
-        "timestamp": "2026-10-04T20:48:38.911Z"
+        "duration": 621,
+        "timestamp": "2026-10-05T04:43:11.172Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 502
+      "avgDuration": 621
     }
   },
   {
@@ -56601,16 +56601,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 519.4
+          "executionTimeMs": 620.98
         },
-        "duration": 525,
-        "timestamp": "2026-10-04T20:48:39.436Z"
+        "duration": 626,
+        "timestamp": "2026-10-05T04:43:11.798Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 525
+      "avgDuration": 626
     }
   },
   {
@@ -56637,16 +56637,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 568.43
+          "executionTimeMs": 690.56
         },
-        "duration": 573,
-        "timestamp": "2026-10-04T20:48:40.009Z"
+        "duration": 695,
+        "timestamp": "2026-10-05T04:43:12.492Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 573
+      "avgDuration": 695
     }
   },
   {
@@ -56673,16 +56673,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 565.71
+          "executionTimeMs": 669.52
         },
-        "duration": 570,
-        "timestamp": "2026-10-04T20:48:40.579Z"
+        "duration": 674,
+        "timestamp": "2026-10-05T04:43:13.167Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 570
+      "avgDuration": 674
     }
   },
   {
@@ -56711,10 +56711,10 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.3
+          "executionTimeMs": 0.42
         },
         "duration": 4,
-        "timestamp": "2026-10-04T20:48:40.583Z"
+        "timestamp": "2026-10-05T04:43:13.171Z"
       }
     ],
     "summary": {
@@ -56748,16 +56748,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 46.8
+          "executionTimeMs": 55.66
         },
-        "duration": 51,
-        "timestamp": "2026-10-04T20:48:40.635Z"
+        "duration": 58,
+        "timestamp": "2026-10-05T04:43:13.229Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 51
+      "avgDuration": 58
     }
   },
   {
@@ -56786,16 +56786,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.24
+          "executionTimeMs": 0.29
         },
-        "duration": 3,
-        "timestamp": "2026-10-04T20:48:40.637Z"
+        "duration": 2,
+        "timestamp": "2026-10-05T04:43:13.231Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 3
+      "avgDuration": 2
     }
   },
   {
@@ -56823,16 +56823,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 20.07
+          "executionTimeMs": 21.44
         },
-        "duration": 24,
-        "timestamp": "2026-10-04T20:48:40.662Z"
+        "duration": 25,
+        "timestamp": "2026-10-05T04:43:13.256Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 24
+      "avgDuration": 25
     }
   },
   {
@@ -56861,16 +56861,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.1
+          "executionTimeMs": 0.07
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:40.666Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:13.259Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -56898,16 +56898,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 24.41
+          "executionTimeMs": 30.46
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T20:48:40.695Z"
+        "duration": 32,
+        "timestamp": "2026-10-05T04:43:13.291Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 32
     }
   },
   {
@@ -56936,16 +56936,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.97
+          "executionTimeMs": 1.52
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T20:48:40.700Z"
+        "duration": 4,
+        "timestamp": "2026-10-05T04:43:13.295Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 4
     }
   },
   {
@@ -56973,16 +56973,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 0.55
+          "executionTimeMs": 0.59
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:40.704Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:13.298Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -57011,16 +57011,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 16.85
+          "executionTimeMs": 22.18
         },
-        "duration": 21,
-        "timestamp": "2026-10-04T20:48:40.725Z"
+        "duration": 25,
+        "timestamp": "2026-10-05T04:43:13.323Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 21
+      "avgDuration": 25
     }
   },
   {
@@ -57048,16 +57048,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 48.14
+          "executionTimeMs": 52.93
         },
-        "duration": 52,
-        "timestamp": "2026-10-04T20:48:40.777Z"
+        "duration": 56,
+        "timestamp": "2026-10-05T04:43:13.379Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 52
+      "avgDuration": 56
     }
   },
   {
@@ -57086,16 +57086,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 0.21
+          "executionTimeMs": 0.29
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:40.781Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:13.383Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -57123,16 +57123,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 21.69
+          "executionTimeMs": 27.79
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T20:48:40.807Z"
+        "duration": 32,
+        "timestamp": "2026-10-05T04:43:13.414Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 32
     }
   },
   {
@@ -57161,16 +57161,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 28.66
+          "executionTimeMs": 35.77
         },
-        "duration": 32,
-        "timestamp": "2026-10-04T20:48:40.838Z"
+        "duration": 39,
+        "timestamp": "2026-10-05T04:43:13.453Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 32
+      "avgDuration": 39
     }
   },
   {
@@ -57198,16 +57198,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 71.88
+          "executionTimeMs": 93.03
         },
-        "duration": 76,
-        "timestamp": "2026-10-04T20:48:40.914Z"
+        "duration": 97,
+        "timestamp": "2026-10-05T04:43:13.550Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 76
+      "avgDuration": 97
     }
   },
   {
@@ -57235,16 +57235,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 26.91
+          "executionTimeMs": 32.99
         },
-        "duration": 31,
-        "timestamp": "2026-10-04T20:48:40.945Z"
+        "duration": 37,
+        "timestamp": "2026-10-05T04:43:13.586Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 31
+      "avgDuration": 37
     }
   },
   {
@@ -57280,16 +57280,16 @@
             "source": "user-verified on dorar.net"
           },
           "notice": "حديث منتشر لا يصح\nالنص: «حب الوطن من الإيمان»\nالحكم في الدرر السنية: ليس بحديث\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/74",
-          "executionTimeMs": 0.12
+          "executionTimeMs": 0.13
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:40.949Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:13.590Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -57317,16 +57317,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 18.84
+          "executionTimeMs": 26.93
         },
-        "duration": 23,
-        "timestamp": "2026-10-04T20:48:40.972Z"
+        "duration": 29,
+        "timestamp": "2026-10-05T04:43:13.618Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 23
+      "avgDuration": 29
     }
   },
   {
@@ -57354,16 +57354,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 21.13
+          "executionTimeMs": 27.73
         },
-        "duration": 25,
-        "timestamp": "2026-10-04T20:48:40.997Z"
+        "duration": 31,
+        "timestamp": "2026-10-05T04:43:13.649Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 25
+      "avgDuration": 31
     }
   },
   {
@@ -57399,16 +57399,16 @@
             "source": "user-verified on dorar.net"
           },
           "notice": "حديث منتشر لا يصح\nالنص: «المعِدة بيت الداء، والحمية رأس الدواء»\nالحكم في الدرر السنية: لا أصل له\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/557",
-          "executionTimeMs": 0.15
+          "executionTimeMs": 0.16
         },
-        "duration": 4,
-        "timestamp": "2026-10-04T20:48:41.002Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:13.652Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 4
+      "avgDuration": 3
     }
   },
   {
@@ -57447,7 +57447,7 @@
                 "revelation": "Madina"
               },
               "text": "یَـٰۤأَیُّهَا ٱلَّذِینَ ءَامَنُوا۟ كُتِبَ عَلَیۡكُمُ ٱلصِّیَامُ كَمَا كُتِبَ عَلَى ٱلَّذِینَ مِن قَبۡلِكُمۡ لَعَلَّكُمۡ تَتَّقُونَ",
-              "translation": "O ye who believe! Fasting is prescribed to you as it was prescribed to those before you, that ye may (learn) self-restraint",
+              "translation": "O you who have believed, decreed upon you is fasting as it was decreed upon those before you that you may become righteous",
               "confidence": 81,
               "state": "close_match",
               "changedWords": [
@@ -57539,7 +57539,7 @@
                 {
                   "verse": 183,
                   "text": "یَـٰۤأَیُّهَا ٱلَّذِینَ ءَامَنُوا۟ كُتِبَ عَلَیۡكُمُ ٱلصِّیَامُ كَمَا كُتِبَ عَلَى ٱلَّذِینَ مِن قَبۡلِكُمۡ لَعَلَّكُمۡ تَتَّقُونَ",
-                  "translation": "O ye who believe! Fasting is prescribed to you as it was prescribed to those before you, that ye may (learn) self-restraint",
+                  "translation": "O you who have believed, decreed upon you is fasting as it was decreed upon those before you that you may become righteous",
                   "confidence": 81,
                   "coverage": "fragment",
                   "coverageRatio": 0.79,
@@ -57570,16 +57570,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 7.83
+          "executionTimeMs": 11.28
         },
-        "duration": 12,
-        "timestamp": "2026-10-04T20:48:41.014Z"
+        "duration": 15,
+        "timestamp": "2026-10-05T04:43:13.667Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 12
+      "avgDuration": 15
     }
   },
   {
@@ -57618,7 +57618,7 @@
                 "revelation": "Madina"
               },
               "text": "إِنَّ ٱلَّذِینَ كَفَرُوا۟ سَوَاۤءٌ عَلَیۡهِمۡ ءَأَنذَرۡتَهُمۡ أَمۡ لَمۡ تُنذِرۡهُمۡ لَا یُؤۡمِنُونَ خَتَمَ ٱللَّهُ عَلَىٰ قُلُوبِهِمۡ وَعَلَىٰ سَمۡعِهِمۡۖ وَعَلَىٰۤ أَبۡصَـٰرِهِمۡ غِشَـٰوَةࣱۖ وَلَهُمۡ عَذَابٌ عَظِیمࣱ",
-              "translation": "As to those who reject Faith, it is the same to them whether thou warn them or do not warn them; they will not believe, Allah hath set a seal on their hearts and on their hearing, and on their eyes is a veil; great is the penalty they (incur)",
+              "translation": "Indeed, those who disbelieve - it is all the same for them whether you warn them or do not warn them - they will not believe, Allah has set a seal upon their hearts and upon their hearing, and over their vision is a veil. And for them is a great punishment.",
               "confidence": 85,
               "state": "close_match",
               "changedWords": [
@@ -57717,7 +57717,7 @@
                 {
                   "verse": 6,
                   "text": "إِنَّ ٱلَّذِینَ كَفَرُوا۟ سَوَاۤءٌ عَلَیۡهِمۡ ءَأَنذَرۡتَهُمۡ أَمۡ لَمۡ تُنذِرۡهُمۡ لَا یُؤۡمِنُونَ",
-                  "translation": "As to those who reject Faith, it is the same to them whether thou warn them or do not warn them; they will not believe",
+                  "translation": "Indeed, those who disbelieve - it is all the same for them whether you warn them or do not warn them - they will not believe",
                   "confidence": 85,
                   "coverage": "fragment",
                   "coverageRatio": 0.82,
@@ -57743,7 +57743,7 @@
                 {
                   "verse": 7,
                   "text": "خَتَمَ ٱللَّهُ عَلَىٰ قُلُوبِهِمۡ وَعَلَىٰ سَمۡعِهِمۡۖ وَعَلَىٰۤ أَبۡصَـٰرِهِمۡ غِشَـٰوَةࣱۖ وَلَهُمۡ عَذَابٌ عَظِیمࣱ",
-                  "translation": "Allah hath set a seal on their hearts and on their hearing, and on their eyes is a veil; great is the penalty they (incur)",
+                  "translation": "Allah has set a seal upon their hearts and upon their hearing, and over their vision is a veil. And for them is a great punishment",
                   "confidence": 85,
                   "coverage": "fragment",
                   "coverageRatio": 0.33,
@@ -57772,16 +57772,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 21.09
+          "executionTimeMs": 42.72
         },
-        "duration": 26,
-        "timestamp": "2026-10-04T20:48:41.040Z"
+        "duration": 46,
+        "timestamp": "2026-10-05T04:43:13.714Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 26
+      "avgDuration": 46
     }
   },
   {
@@ -57820,7 +57820,7 @@
                 "revelation": "Madina"
               },
               "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
-              "translation": "Allah! There is no god but He,-the Living, the Self-subsisting, Eternal. No slumber can seize Him nor sleep. His are all things in the heavens and on earth. Who is there can intercede in His presence except as He permitteth? He knoweth what (appeareth to His creatures as) before or after or behind them. Nor shall they compass aught of His knowledge except as He willeth. His Throne doth extend over the heavens and the earth, and He feeleth no fatigue in guarding and preserving them for He is the Most High, the Supreme (in glory)",
+              "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
               "confidence": 88,
               "state": "close_match",
               "changedWords": [
@@ -57962,7 +57962,7 @@
                 {
                   "verse": 255,
                   "text": "ٱللَّهُ لَاۤ إِلَـٰهَ إِلَّا هُوَ ٱلۡحَیُّ ٱلۡقَیُّومُۚ لَا تَأۡخُذُهُۥ سِنَةࣱ وَلَا نَوۡمࣱۚ لَّهُۥ مَا فِی ٱلسَّمَـٰوَٰتِ وَمَا فِی ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِی یَشۡفَعُ عِندَهُۥۤ إِلَّا بِإِذۡنِهِۦۚ یَعۡلَمُ مَا بَیۡنَ أَیۡدِیهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا یُحِیطُونَ بِشَیۡءࣲ مِّنۡ عِلۡمِهِۦۤ إِلَّا بِمَا شَاۤءَۚ وَسِعَ كُرۡسِیُّهُ ٱلسَّمَـٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا یَءُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِیُّ ٱلۡعَظِیمُ",
-                  "translation": "Allah! There is no god but He,-the Living, the Self-subsisting, Eternal. No slumber can seize Him nor sleep. His are all things in the heavens and on earth. Who is there can intercede in His presence except as He permitteth? He knoweth what (appeareth to His creatures as) before or after or behind them. Nor shall they compass aught of His knowledge except as He willeth. His Throne doth extend over the heavens and the earth, and He feeleth no fatigue in guarding and preserving them for He is the Most High, the Supreme (in glory)",
+                  "translation": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great",
                   "confidence": 88,
                   "coverage": "fragment",
                   "coverageRatio": 0.32,
@@ -58029,16 +58029,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 44.45
+          "executionTimeMs": 61.05
         },
-        "duration": 50,
-        "timestamp": "2026-10-04T20:48:41.089Z"
+        "duration": 67,
+        "timestamp": "2026-10-05T04:43:13.781Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 50
+      "avgDuration": 67
     }
   },
   {
@@ -58077,7 +58077,7 @@
                 "revelation": "Mecca"
               },
               "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
-              "translation": "Say: He is Allah, the One and Only, Allah, the Eternal, Absolute, He begetteth not, nor is He begotten, And there is none like unto Him.",
+              "translation": "Say, \"He is Allah, [who is] One, Allah, the Eternal Refuge, He neither begets nor is born, Nor is there to Him any equivalent.\"",
               "confidence": 80,
               "state": "close_match",
               "changedWords": [
@@ -58172,7 +58172,7 @@
                 {
                   "verse": 1,
                   "text": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ",
-                  "translation": "Say: He is Allah, the One and Only",
+                  "translation": "Say, \"He is Allah, [who is] One",
                   "confidence": 80,
                   "coverage": "fragment",
                   "coverageRatio": 0.5,
@@ -58191,7 +58191,7 @@
                 {
                   "verse": 2,
                   "text": "ٱللَّهُ ٱلصَّمَدُ",
-                  "translation": "Allah, the Eternal, Absolute",
+                  "translation": "Allah, the Eternal Refuge",
                   "confidence": 80,
                   "coverage": "fragment",
                   "coverageRatio": 0.5,
@@ -58208,7 +58208,7 @@
                 {
                   "verse": 3,
                   "text": "لَمۡ یَلِدۡ وَلَمۡ یُولَدۡ",
-                  "translation": "He begetteth not, nor is He begotten",
+                  "translation": "He neither begets nor is born",
                   "confidence": 80,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -58227,7 +58227,7 @@
                 {
                   "verse": 4,
                   "text": "وَلَمۡ یَكُن لَّهُۥ كُفُوًا أَحَدُۢ",
-                  "translation": "And there is none like unto Him",
+                  "translation": "Nor is there to Him any equivalent",
                   "confidence": 80,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -58249,16 +58249,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 12.55
+          "executionTimeMs": 23.93
         },
-        "duration": 17,
-        "timestamp": "2026-10-04T20:48:41.107Z"
+        "duration": 27,
+        "timestamp": "2026-10-05T04:43:13.808Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 17
+      "avgDuration": 27
     }
   },
   {
@@ -58297,7 +58297,7 @@
                 "revelation": "Mecca"
               },
               "text": "وَٱلۡعَصۡرِ إِنَّ ٱلۡإِنسَـٰنَ لَفِی خُسۡرٍ إِلَّا ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوۡا۟ بِٱلۡحَقِّ وَتَوَاصَوۡا۟ بِٱلصَّبۡرِ",
-              "translation": "By (the Token of) Time (through the ages) Verily Man is in loss, Except such as have Faith, and do righteous deeds, and (join together) in the mutual teaching of Truth, and of Patience and Constancy.",
+              "translation": "By time, Indeed, mankind is in loss, Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience.",
               "confidence": 83,
               "state": "close_match",
               "changedWords": [
@@ -58384,7 +58384,7 @@
                 {
                   "verse": 1,
                   "text": "وَٱلۡعَصۡرِ",
-                  "translation": "By (the Token of) Time (through the ages)",
+                  "translation": "By time",
                   "confidence": 83,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -58400,7 +58400,7 @@
                 {
                   "verse": 2,
                   "text": "إِنَّ ٱلۡإِنسَـٰنَ لَفِی خُسۡرٍ",
-                  "translation": "Verily Man is in loss",
+                  "translation": "Indeed, mankind is in loss",
                   "confidence": 83,
                   "coverage": "fragment",
                   "coverageRatio": 0.5,
@@ -58419,7 +58419,7 @@
                 {
                   "verse": 3,
                   "text": "إِلَّا ٱلَّذِینَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوۡا۟ بِٱلۡحَقِّ وَتَوَاصَوۡا۟ بِٱلصَّبۡرِ",
-                  "translation": "Except such as have Faith, and do righteous deeds, and (join together) in the mutual teaching of Truth, and of Patience and Constancy",
+                  "translation": "Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience",
                   "confidence": 83,
                   "coverage": "full",
                   "coverageRatio": 1,
@@ -58445,16 +58445,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 0.42
+          "executionTimeMs": 0.64
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T20:48:41.112Z"
+        "duration": 4,
+        "timestamp": "2026-10-05T04:43:13.812Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 4
     }
   },
   {
@@ -58481,16 +58481,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 23.16
+          "executionTimeMs": 27.05
         },
-        "duration": 32,
-        "timestamp": "2026-10-04T20:48:41.144Z"
+        "duration": 30,
+        "timestamp": "2026-10-05T04:43:13.842Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 32
+      "avgDuration": 30
     }
   },
   {
@@ -58517,16 +58517,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 21.63
+          "executionTimeMs": 23.84
         },
-        "duration": 26,
-        "timestamp": "2026-10-04T20:48:41.170Z"
+        "duration": 27,
+        "timestamp": "2026-10-05T04:43:13.869Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 26
+      "avgDuration": 27
     }
   },
   {
@@ -58553,16 +58553,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 18.01
+          "executionTimeMs": 21.44
         },
-        "duration": 22,
-        "timestamp": "2026-10-04T20:48:41.192Z"
+        "duration": 24,
+        "timestamp": "2026-10-05T04:43:13.893Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 22
+      "avgDuration": 24
     }
   },
   {
@@ -59382,16 +59382,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 19.29
+          "executionTimeMs": 24.83
         },
-        "duration": 22,
-        "timestamp": "2026-10-04T20:48:41.215Z"
+        "duration": 28,
+        "timestamp": "2026-10-05T04:43:13.922Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 22
+      "avgDuration": 28
     }
   },
   {
@@ -59587,16 +59587,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 21.47
+          "executionTimeMs": 27.26
         },
-        "duration": 26,
-        "timestamp": "2026-10-04T20:48:41.241Z"
+        "duration": 30,
+        "timestamp": "2026-10-05T04:43:13.952Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 26
+      "avgDuration": 30
     }
   },
   {
@@ -59624,16 +59624,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 8.52
+          "executionTimeMs": 9.36
         },
-        "duration": 13,
-        "timestamp": "2026-10-04T20:48:41.254Z"
+        "duration": 12,
+        "timestamp": "2026-10-05T04:43:13.964Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 13
+      "avgDuration": 12
     }
   },
   {
@@ -59661,16 +59661,16 @@
           "results": [],
           "referralRequired": true,
           "referralMessage": "لم يتم العثور على تطابق موثوق، راجع أهل العلم",
-          "executionTimeMs": 34.2
+          "executionTimeMs": 43.99
         },
-        "duration": 39,
-        "timestamp": "2026-10-04T20:48:41.293Z"
+        "duration": 48,
+        "timestamp": "2026-10-05T04:43:14.012Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 39
+      "avgDuration": 48
     }
   },
   {
@@ -59697,16 +59697,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 24.92
+          "executionTimeMs": 31.11
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T20:48:41.323Z"
+        "duration": 34,
+        "timestamp": "2026-10-05T04:43:14.046Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 34
     }
   },
   {
@@ -59733,16 +59733,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 20.02
+          "executionTimeMs": 26.39
         },
-        "duration": 23,
-        "timestamp": "2026-10-04T20:48:41.346Z"
+        "duration": 31,
+        "timestamp": "2026-10-05T04:43:14.077Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 23
+      "avgDuration": 31
     }
   },
   {
@@ -59769,16 +59769,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 5.64
+          "executionTimeMs": 4.96
         },
-        "duration": 9,
-        "timestamp": "2026-10-04T20:48:41.354Z"
+        "duration": 8,
+        "timestamp": "2026-10-05T04:43:14.085Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 9
+      "avgDuration": 8
     }
   },
   {
@@ -59806,16 +59806,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 500.88
+          "executionTimeMs": 627.86
         },
-        "duration": 505,
-        "timestamp": "2026-10-04T20:48:41.859Z"
+        "duration": 631,
+        "timestamp": "2026-10-05T04:43:14.717Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 505
+      "avgDuration": 631
     }
   },
   {
@@ -59843,16 +59843,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 489.06
+          "executionTimeMs": 618.26
         },
-        "duration": 495,
-        "timestamp": "2026-10-04T20:48:42.354Z"
+        "duration": 623,
+        "timestamp": "2026-10-05T04:43:15.339Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 495
+      "avgDuration": 623
     }
   },
   {
@@ -59880,16 +59880,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 482.3
+          "executionTimeMs": 589.84
         },
-        "duration": 487,
-        "timestamp": "2026-10-04T20:48:42.841Z"
+        "duration": 594,
+        "timestamp": "2026-10-05T04:43:15.934Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 487
+      "avgDuration": 594
     }
   },
   {
@@ -59917,16 +59917,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 491.48
+          "executionTimeMs": 591.55
         },
-        "duration": 496,
-        "timestamp": "2026-10-04T20:48:43.337Z"
+        "duration": 594,
+        "timestamp": "2026-10-05T04:43:16.528Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 496
+      "avgDuration": 594
     }
   },
   {
@@ -59954,16 +59954,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 521.42
+          "executionTimeMs": 613.56
         },
-        "duration": 526,
-        "timestamp": "2026-10-04T20:48:43.863Z"
+        "duration": 618,
+        "timestamp": "2026-10-05T04:43:17.146Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 526
+      "avgDuration": 618
     }
   },
   {
@@ -60001,14 +60001,14 @@
           "notice": "حديث منتشر لا يصح\nالنص: «اطلبوا العلم ولو بالصين»\nالحكم في الدرر السنية: لا يصح\nالمصدر: الدرر السنية — أحاديث منتشرة لا تصح\nرابط التحقق: https://dorar.net/fake-hadith/38",
           "executionTimeMs": 0.09
         },
-        "duration": 5,
-        "timestamp": "2026-10-04T20:48:43.868Z"
+        "duration": 3,
+        "timestamp": "2026-10-05T04:43:17.149Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 5
+      "avgDuration": 3
     }
   },
   {
@@ -60036,16 +60036,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 31.58
+          "executionTimeMs": 39.14
         },
-        "duration": 36,
-        "timestamp": "2026-10-04T20:48:43.904Z"
+        "duration": 42,
+        "timestamp": "2026-10-05T04:43:17.191Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 36
+      "avgDuration": 42
     }
   },
   {
@@ -60073,16 +60073,16 @@
           "totalMatches": 0,
           "results": [],
           "referralRequired": true,
-          "executionTimeMs": 22.07
+          "executionTimeMs": 26.81
         },
-        "duration": 28,
-        "timestamp": "2026-10-04T20:48:43.931Z"
+        "duration": 30,
+        "timestamp": "2026-10-05T04:43:17.221Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 28
+      "avgDuration": 30
     }
   },
   {
@@ -60801,16 +60801,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 69.51
+          "executionTimeMs": 88.29
         },
-        "duration": 74,
-        "timestamp": "2026-10-04T20:48:44.007Z"
+        "duration": 92,
+        "timestamp": "2026-10-05T04:43:17.315Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 74
+      "avgDuration": 92
     }
   },
   {
@@ -61403,16 +61403,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 49.39
+          "executionTimeMs": 59.69
         },
-        "duration": 54,
-        "timestamp": "2026-10-04T20:48:44.063Z"
+        "duration": 62,
+        "timestamp": "2026-10-05T04:43:17.379Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 54
+      "avgDuration": 62
     }
   },
   {
@@ -62088,16 +62088,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.96
+          "executionTimeMs": 94.67
         },
-        "duration": 67,
-        "timestamp": "2026-10-04T20:48:44.132Z"
+        "duration": 99,
+        "timestamp": "2026-10-05T04:43:17.481Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 67
+      "avgDuration": 99
     }
   },
   {
@@ -62873,16 +62873,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 95.28
+          "executionTimeMs": 121.7
         },
-        "duration": 100,
-        "timestamp": "2026-10-04T20:48:44.235Z"
+        "duration": 126,
+        "timestamp": "2026-10-05T04:43:17.610Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 100
+      "avgDuration": 126
     }
   },
   {
@@ -63659,16 +63659,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 56.2
+          "executionTimeMs": 67.81
         },
-        "duration": 63,
-        "timestamp": "2026-10-04T20:48:44.299Z"
+        "duration": 73,
+        "timestamp": "2026-10-05T04:43:17.685Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 63
+      "avgDuration": 73
     }
   },
   {
@@ -64790,16 +64790,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 63.07
+          "executionTimeMs": 66.4
         },
-        "duration": 68,
-        "timestamp": "2026-10-04T20:48:44.369Z"
+        "duration": 69,
+        "timestamp": "2026-10-05T04:43:17.756Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 68
+      "avgDuration": 69
     }
   },
   {
@@ -65142,16 +65142,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 38.18
+          "executionTimeMs": 47.3
         },
-        "duration": 43,
-        "timestamp": "2026-10-04T20:48:44.413Z"
+        "duration": 51,
+        "timestamp": "2026-10-05T04:43:17.808Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 43
+      "avgDuration": 51
     }
   },
   {
@@ -67881,16 +67881,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 45.34
+          "executionTimeMs": 54.26
         },
-        "duration": 52,
-        "timestamp": "2026-10-04T20:48:44.467Z"
+        "duration": 59,
+        "timestamp": "2026-10-05T04:43:17.870Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 52
+      "avgDuration": 59
     }
   },
   {
@@ -71864,16 +71864,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 70.71
+          "executionTimeMs": 80.28
         },
-        "duration": 75,
-        "timestamp": "2026-10-04T20:48:44.544Z"
+        "duration": 85,
+        "timestamp": "2026-10-05T04:43:17.957Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 75
+      "avgDuration": 85
     }
   },
   {
@@ -72930,16 +72930,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 77.59
+          "executionTimeMs": 98.72
         },
-        "duration": 82,
-        "timestamp": "2026-10-04T20:48:44.627Z"
+        "duration": 104,
+        "timestamp": "2026-10-05T04:43:18.063Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 82
+      "avgDuration": 104
     }
   },
   {
@@ -73364,16 +73364,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 36.38
+          "executionTimeMs": 45.57
         },
-        "duration": 41,
-        "timestamp": "2026-10-04T20:48:44.670Z"
+        "duration": 50,
+        "timestamp": "2026-10-05T04:43:18.114Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 41
+      "avgDuration": 50
     }
   },
   {
@@ -74080,16 +74080,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 48.73
+          "executionTimeMs": 62.34
         },
-        "duration": 52,
-        "timestamp": "2026-10-04T20:48:44.723Z"
+        "duration": 66,
+        "timestamp": "2026-10-05T04:43:18.181Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 52
+      "avgDuration": 66
     }
   },
   {
@@ -74772,16 +74772,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 23.34
+          "executionTimeMs": 33.64
         },
-        "duration": 29,
-        "timestamp": "2026-10-04T20:48:44.753Z"
+        "duration": 38,
+        "timestamp": "2026-10-05T04:43:18.223Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 29
+      "avgDuration": 38
     }
   },
   {
@@ -75434,16 +75434,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 62.68
+          "executionTimeMs": 78.09
         },
-        "duration": 67,
-        "timestamp": "2026-10-04T20:48:44.823Z"
+        "duration": 83,
+        "timestamp": "2026-10-05T04:43:18.308Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 67
+      "avgDuration": 83
     }
   },
   {
@@ -75736,16 +75736,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 28.42
+          "executionTimeMs": 33.9
         },
-        "duration": 34,
-        "timestamp": "2026-10-04T20:48:44.857Z"
+        "duration": 37,
+        "timestamp": "2026-10-05T04:43:18.347Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 34
+      "avgDuration": 37
     }
   },
   {
@@ -76361,16 +76361,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 39.64
+          "executionTimeMs": 55.13
         },
-        "duration": 44,
-        "timestamp": "2026-10-04T20:48:44.903Z"
+        "duration": 59,
+        "timestamp": "2026-10-05T04:43:18.407Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 44
+      "avgDuration": 59
     }
   },
   {
@@ -77198,16 +77198,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 34.08
+          "executionTimeMs": 46.62
         },
-        "duration": 39,
-        "timestamp": "2026-10-04T20:48:44.943Z"
+        "duration": 51,
+        "timestamp": "2026-10-05T04:43:18.461Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 39
+      "avgDuration": 51
     }
   },
   {
@@ -78031,16 +78031,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 24.7
+          "executionTimeMs": 30.22
         },
-        "duration": 30,
-        "timestamp": "2026-10-04T20:48:44.974Z"
+        "duration": 34,
+        "timestamp": "2026-10-05T04:43:18.495Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 30
+      "avgDuration": 34
     }
   },
   {
@@ -78323,16 +78323,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 31.44
+          "executionTimeMs": 38.45
         },
-        "duration": 34,
-        "timestamp": "2026-10-04T20:48:45.009Z"
+        "duration": 42,
+        "timestamp": "2026-10-05T04:43:18.538Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 34
+      "avgDuration": 42
     }
   },
   {
@@ -79128,16 +79128,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 43.43
+          "executionTimeMs": 53.8
         },
-        "duration": 48,
-        "timestamp": "2026-10-04T20:48:45.059Z"
+        "duration": 57,
+        "timestamp": "2026-10-05T04:43:18.598Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 48
+      "avgDuration": 57
     }
   },
   {
@@ -79566,16 +79566,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 68.17
+          "executionTimeMs": 86.08
         },
-        "duration": 74,
-        "timestamp": "2026-10-04T20:48:45.134Z"
+        "duration": 90,
+        "timestamp": "2026-10-05T04:43:18.689Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 74
+      "avgDuration": 90
     }
   },
   {
@@ -80164,16 +80164,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 82.76
+          "executionTimeMs": 104.32
         },
-        "duration": 87,
-        "timestamp": "2026-10-04T20:48:45.223Z"
+        "duration": 108,
+        "timestamp": "2026-10-05T04:43:18.799Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 87
+      "avgDuration": 108
     }
   },
   {
@@ -80845,16 +80845,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 67.45
+          "executionTimeMs": 83.75
         },
-        "duration": 74,
-        "timestamp": "2026-10-04T20:48:45.298Z"
+        "duration": 88,
+        "timestamp": "2026-10-05T04:43:18.890Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 74
+      "avgDuration": 88
     }
   },
   {
@@ -81626,16 +81626,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 88.16
+          "executionTimeMs": 120.66
         },
-        "duration": 92,
-        "timestamp": "2026-10-04T20:48:45.392Z"
+        "duration": 125,
+        "timestamp": "2026-10-05T04:43:19.017Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 92
+      "avgDuration": 125
     }
   },
   {
@@ -82099,16 +82099,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 52.81
+          "executionTimeMs": 70.75
         },
-        "duration": 56,
-        "timestamp": "2026-10-04T20:48:45.450Z"
+        "duration": 75,
+        "timestamp": "2026-10-05T04:43:19.094Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 56
+      "avgDuration": 75
     }
   },
   {
@@ -82831,16 +82831,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 144.24
+          "executionTimeMs": 64.3
         },
-        "duration": 149,
-        "timestamp": "2026-10-04T20:48:45.600Z"
+        "duration": 68,
+        "timestamp": "2026-10-05T04:43:19.165Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 149
+      "avgDuration": 68
     }
   },
   {
@@ -83179,16 +83179,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 36.26
+          "executionTimeMs": 45.46
         },
-        "duration": 39,
-        "timestamp": "2026-10-04T20:48:45.641Z"
+        "duration": 48,
+        "timestamp": "2026-10-05T04:43:19.214Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 39
+      "avgDuration": 48
     }
   },
   {
@@ -85905,16 +85905,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 38.65
+          "executionTimeMs": 52.2
         },
-        "duration": 42,
-        "timestamp": "2026-10-04T20:48:45.685Z"
+        "duration": 56,
+        "timestamp": "2026-10-05T04:43:19.274Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 42
+      "avgDuration": 56
     }
   },
   {
@@ -89854,16 +89854,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 64.92
+          "executionTimeMs": 84.18
         },
-        "duration": 69,
-        "timestamp": "2026-10-04T20:48:45.756Z"
+        "duration": 88,
+        "timestamp": "2026-10-05T04:43:19.364Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 69
+      "avgDuration": 88
     }
   },
   {
@@ -91002,16 +91002,16 @@
             }
           ],
           "referralRequired": false,
-          "executionTimeMs": 88.99
+          "executionTimeMs": 110.89
         },
-        "duration": 94,
-        "timestamp": "2026-10-04T20:48:45.852Z"
+        "duration": 116,
+        "timestamp": "2026-10-05T04:43:19.482Z"
       }
     ],
     "summary": {
       "passed": true,
       "consistent": true,
-      "avgDuration": 94
+      "avgDuration": 116
     }
   }
 ]

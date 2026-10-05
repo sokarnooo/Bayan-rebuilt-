@@ -6,10 +6,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const candidateDirs = [
-  path.resolve(__dirname, './data'),
-  path.resolve(__dirname, '../server/corpus/data'),
-  path.resolve(__dirname, './corpus/data'),
   path.resolve(process.cwd(), 'server/corpus/data'),
+  path.resolve(__dirname, '../server/corpus/data'),
+  path.resolve(__dirname, './data'),
   path.resolve(process.cwd(), 'dist-server/data'),
 ];
 export const DATA_DIR = candidateDirs.find((d) => fs.existsSync(path.join(d, 'quran_ar.json'))) || path.resolve(process.cwd(), 'server/corpus/data');
@@ -87,6 +86,24 @@ export function getQuranEn(): QuranVerse[] {
     }));
   }
   return cachedQuranEn!;
+}
+
+let cachedTafsirMap: Map<string, string> | null = null;
+export function getQuranTafsirMap(): Map<string, string> {
+  if (!cachedTafsirMap) {
+    cachedTafsirMap = new Map();
+    const list = readJsonFile('quran_tafsir_moyassar.json');
+    if (Array.isArray(list)) {
+      for (const item of list) {
+        cachedTafsirMap.set(`${item.chapter}:${item.verse}`, item.tafsir || '');
+      }
+    }
+  }
+  return cachedTafsirMap!;
+}
+
+export function getQuranTafsirForAyah(chapter: number, verse: number): string {
+  return getQuranTafsirMap().get(`${chapter}:${verse}`) || '';
 }
 
 const EMPTY_GRADES: any[] = Object.freeze([]);

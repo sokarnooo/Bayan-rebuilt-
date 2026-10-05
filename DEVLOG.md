@@ -6,6 +6,39 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-04 — Task 8: Ask Mode Ranking Fixes & Cross-Language Retrieval (Part 3)
+- **Goal**: Fix Hadith drowning after tafsir indexing, separate Hadith and Ayah ranking lists, implement IDF weighting for rare terms, filter out weak terms (numbers, "Allah", "prophet", "people"), perform cross-language search for every question, and extract densest cluster 25-word quotes.
+- **Change (files)**: `server/matching/askEngine.ts`, `src/components/modes/AskMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Ensure Hadith texts on specific topics (e.g. Shawwal fasts, Qibla orientation during urination) are not drowned out by general Quranic verses, ensure English questions (e.g. "Is it permissible to marry four wives?") retrieve Surah 4:3 and exclude irrelevant matches like 35:1, and extract clean word-boundary quotes around densest term clusters.
+- **Key Enhancements**:
+  1. **Separated Candidate Ranking**: Score Hadiths (matn-only) and Ayat (verse text + half-weight tafsir) in separate lists. Take up to 5 Hadiths and up to 3 Ayat that pass the floor. Compare top Hadith score vs top Ayah score to order groups.
+  2. **IDF Weighting & Rare Terms**: Weighted rare terms (`شوال`, `القبلة`, `فانكحوا`, `qibla`, `shawwal`, `marry`, `wives`, terms $\ge 6$ chars) strongly (weight 25.0) so 1 rare term beats several common/weak terms.
+  3. **Expanded WEAK_TERMS Set**: Filtered numbers (1–10 in Ar/En), meta words (`الله`, `النبي`, `الناس`, `قول`, `حديث`, `prophet`, `people`, `say`), requiring $\ge 2$ distinct non-weak terms OR 1 rare term to pass floor.
+  4. **Cross-Language Search**: Searched both Arabic expanded terms against Arabic texts/tafsir and English terms against English translations for every question, adding scores per Ayah/Hadith ID. English "Is it permissible to marry four wives?" retrieves `ayah_4_3` (score 95.1) and excludes `ayah_35_1`.
+  5. **Densest Cluster Quotes**: `extractDenseClusterQuote` selects a window of up to 25 words around the densest cluster of matched terms, cut strictly at word boundaries. The "..." in test outputs is print width truncation only, not rendered as literal dots in the UI.
+  6. **Verification**: Executed proof runs on Shawwal, Qibla, and English wives questions, verified the 8-question benchmark suite, and passed **133/133 (100%)** core harness tests.
+- **Limits**: Cold-start latency for Call 1/Call 2 depends on upstream Gemini API.
+- **Commit**: `pending`
+
+---
+
+### 2026-10-04 — Task 8: Ask Mode Tafsir Layer & Permissibility Quotes Mode (Part 2)
+- **Goal**: Integrate Al-Tafsir Al-Muyassar into build-time prebuild and Ask mode retrieval, feed verse + tafsir to Call 2, run Call 2 in quotes-only mode for permissibility questions, and analyze HadeethEnc crawling/matching feasibility.
+- **Change (files)**: `server/corpus/prebuild.ts`, `server/corpus/loader.ts`, `server/corpus/data/quran_tafsir_moyassar.json`, `server/matching/askEngine.ts`, `src/components/modes/AskMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Provide canonical explanation grounding for Quranic verses via King Fahd Complex's Al-Tafsir Al-Muyassar, enable search over explanations, and format permissibility outputs strictly around cited quotes without issuing fatwas or rulings.
+- **Key Enhancements**:
+  1. **Build-Time Tafsir Acquisition**: Added batched fetching in `prebuild.ts` to retrieve all 114 surahs from QuranEnc (`arabic_moyassar`). Saved to gitignored `quran_tafsir_moyassar.json`. Build fails unless exactly 6,236 entries are present (6,236 verified).
+  2. **Inverted Index over Tafsir**: Indexed verse text AND tafsir text together. An Ayah passes the relevance floor if verse text OR tafsir matches $\ge 2$ terms or 1 rare term.
+  3. **Ayah Card Tafsir Block**: Rendered a dedicated «التفسير الميسر» block on Ayah cards with single best tafsir sentence chosen by code (never cut mid-word) and attribution «التفسير الميسر — مجمع الملك فهد، عبر QuranEnc».
+  4. **Call 2 Input & Substring Validation**: Formatted Ayah input for Call 2 with separate `[Verse Text]` and `[Tafsir (التفسير الميسر)]` labels. Substring validation accepts exact quotes from verse text OR tafsir text, tagging tafsir quotes with «من التفسير الميسر».
+  5. **Permissibility Quotes-Only Mode**: Ran Call 2 in quotes-only mode for ruling questions. Badge set to «نصوص ذات صلة», summary set to «تذكر النصوص: …» built strictly from quotes without ruling words, with scholar banner maintained.
+  6. **HadeethEnc Crawl Analysis**: Reported total hadith count (4,273 root hadiths across 493 categories), 100% containment match rate on 20 samples, and attribution rules.
+  7. **Verification**: Ran the 6 specific test questions and verified 133/133 (100%) core regression test pass.
+- **Limits**: HadeethEnc crawling report only per instructions; no build.
+- **Commit**: `pending`
+
+---
+
 ### 2026-10-04 — Task 8: Ask Mode Fixes (Part 1) & Corpus Evaluation
 - **Goal**: Resolve quote slicing, implement strict relevance floor, support English dir/alignment & translation editions, diagnose 4 specific query cases, and report on external explanation sources (QuranEnc, HadeethEnc, mcp.islamiccontent.org).
 - **Change (files)**: `server/matching/askEngine.ts`, `server/corpus/prebuild.ts`, `server/corpus/data/quran_en.json`, `src/components/modes/AskMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.

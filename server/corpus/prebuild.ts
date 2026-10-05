@@ -61,6 +61,47 @@ export async function runPrebuild() {
       await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path.join(DATA_DIR, 'quran_ar.json'));
     }
     await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-ummmuhammad.json`, path.join(DATA_DIR, 'quran_en.json'));
+
+    // Download Muyassar Tafsir from QuranEnc (per sura) if missing or incomplete
+    const tafsirPath = path.join(DATA_DIR, 'quran_tafsir_moyassar.json');
+    if (!fs.existsSync(tafsirPath)) {
+      console.log('Fetching Muyassar Tafsir from QuranEnc (arabic_moyassar)...');
+      const tafsirList: Array<{ chapter: number; verse: number; tafsir: string }> = [];
+      const BATCH_SIZE = 15;
+      for (let i = 1; i <= 114; i += BATCH_SIZE) {
+        const batch = [];
+        for (let s = i; s < i + BATCH_SIZE && s <= 114; s++) {
+          batch.push(
+            fetch(`https://quranenc.com/api/v1/translation/sura/arabic_moyassar/${s}`)
+              .then((r) => r.json())
+              .catch((err) => {
+                console.error(`Failed to fetch tafsir for sura ${s}:`, err);
+                return null;
+              })
+          );
+        }
+        const results = await Promise.all(batch);
+        for (const res of results) {
+          if (res && res.result) {
+            for (const v of res.result) {
+              tafsirList.push({
+                chapter: Number(v.sura),
+                verse: Number(v.aya),
+                tafsir: (v.translation || '').trim(),
+              });
+            }
+          }
+        }
+      }
+
+      if (tafsirList.length !== QURAN_EXPECTED) {
+        console.error(`CRITICAL ERROR: Muyassar Tafsir count mismatch! Expected ${QURAN_EXPECTED}, got ${tafsirList.length}`);
+        process.exit(1);
+      }
+
+      fs.writeFileSync(tafsirPath, JSON.stringify(tafsirList, null, 2));
+      console.log(`Saved ${tafsirList.length} Muyassar Tafsir entries to ${tafsirPath}`);
+    }
   } catch (err) {
     console.error('CRITICAL: Download failed. Prebuild aborted.');
     console.error(err);

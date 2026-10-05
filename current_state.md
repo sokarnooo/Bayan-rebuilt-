@@ -3,13 +3,12 @@
 ## Status
 - **Ask Mode (اسأل بالدليل)**:
   - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
-  - Deterministic word-level TF-IDF corpus retrieval with matn-only token matching (eliminating isnad noise) and light Arabic prefix stripping (zero embeddings).
-  - Relevance floor: filters out candidates failing $\ge 2$ distinct content terms or 1 rare term; caps output at 5 sources; displays «لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم» with zero cards when 0 pass.
-  - Quote selection: no mid-word slicing; permissibility uses highest sentence keyword overlap or displays no quote box.
-  - English support: `dir="ltr"`, left alignment, translation edition metadata, and pinned Saheeh International (`eng-ummmuhammad`) Quran edition.
-  - Strict code-side quote and ID substring validation; forbidden ruling words filtered from automated summary.
-  - Scholarly safeguards: Permissibility questions bypass Call 2 and show texts + scholar banner; weak hadiths show «وُجد نص، لكن درجته ضعيفة عند المصدر»; Dorar.net fabricated entries return `contradicted` + card.
-  - 14-case ask evaluation suite in `eval/run_ask.ts` executed.
+  - Al-Tafsir Al-Muyassar integrated into build-time prebuild (6,236 entries verified) and indexed alongside verse text.
+  - Ayah cards display a dedicated «التفسير الميسر» block with single best sentence chosen by code and attribution «التفسير الميسر — مجمع الملك فهد، عبر QuranEnc».
+  - Ranking fixes: Score Hadiths (matn-only) and Ayat (verse + half-weight tafsir) in separate lists (top 5 Hadiths, top 3 Ayat); order groups by top score; strong IDF weighting for rare terms (`شوال`, `القبلة`, `فانكحوا`, `marry`, `wives`).
+  - WEAK_TERMS filtering (numbers, meta words); cross-language dual-search for every query (English wives query retrieves Surah 4:3 with score 95.1 and excludes 35:1).
+  - Densest cluster 25-word quotes cut strictly at word boundaries.
+  - Permissibility questions run Call 2 in quotes-only mode: badge «نصوص ذات صلة», summary «تذكر النصوص: …» built strictly from quoted text without ruling words, with scholar banner maintained.
 - **Evaluation Harness**: 133/133 (100%) test cases passing with zero failures under `--quiet --concurrency 1` (both dev server on port 3000 and standalone production bundle on port 3099).
 - **Matching Performance & Latency**:
   - p50: **71 ms**, p95: **564 ms**, max: **1.5s** (target < 2s met).

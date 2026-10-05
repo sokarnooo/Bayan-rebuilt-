@@ -2,7 +2,7 @@ import express from 'express';
 import { loadCorpus } from './corpus/loader.ts';
 import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
 import { initHadithEngine, searchHadith, getIndexedCounts } from './matching/hadithMatcher.ts';
-import { askQuestion } from './matching/askEngine.ts';
+import { askQuestion, executeAskStage1, executeAskVerdict } from './matching/askEngine.ts';
 
 export const app = express();
 
@@ -20,7 +20,6 @@ app.use((req, res, next) => {
 });
 
 export function getEngineReadiness() {
-  // Engines are singletons, init calls are idempotent if we check internal state
   const h = initHadithEngine();
   const a = initAyahEngine();
   return {
@@ -39,6 +38,7 @@ export const REGISTERED_ROUTES = [
   'POST /api/hadith/search',
   'POST /api/hadith/match',
   'POST /api/ask',
+  'POST /api/ask/verdict',
   'POST /api/ocr',
 ];
 
@@ -122,7 +122,7 @@ app.post('/api/ask', async (req, res) => {
       (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
       req.socket.remoteAddress ||
       '127.0.0.1';
-    const result = await askQuestion(req.body || {}, clientIp);
+    const result = await executeAskStage1(req.body || {}, clientIp);
     if (result.error && result.error.includes('تم تجاوز الحد المسموح به')) {
       res.status(429).json(result);
       return;
@@ -135,6 +135,18 @@ app.post('/api/ask', async (req, res) => {
   } catch (err: any) {
     res.status(500).json({
       error: 'حدث خطأ أثناء معالجة السؤال الشرعي.',
+      details: err?.message,
+    });
+  }
+});
+
+app.post('/api/ask/verdict', async (req, res) => {
+  try {
+    const result = await executeAskVerdict(req.body || {});
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      error: 'حدث خطأ أثناء إعداد ملخص الاستدلال.',
       details: err?.message,
     });
   }

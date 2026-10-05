@@ -32,7 +32,7 @@
 
 ## Next
 [ ] 7 Review the import-run edits (ayahMatcher.ts, hadithMatcher.ts, AyahMode.tsx, HadithMode.tsx)
-[x] 8 Ask mode: fixes part 1 (2026-10-04: Fixed quote box mid-word slicing, relevance floor with max 5 sources & no-cards banner on 0 matches, matn-only tokens, English dir=ltr with translation edition names & Saheeh International eng-ummmuhammad, 14/14 ask suite & 133/133 core tests pass)
+[x] 8 Ask mode: ranking fixes part 3 (2026-10-04: Fixed Hadith drowning via separate top-5 Hadith and top-3 Ayat lists, IDF rare term weighting, WEAK_TERMS filter for numbers/meta words, cross-language search with Ayah 4:3 returned and 35:1 excluded, densest cluster 25-word quotes, 133/133 core tests pass)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
 [ ] 9 OCR test
 [ ] 10 Server key and hourly limits (owner supplies RPD values)

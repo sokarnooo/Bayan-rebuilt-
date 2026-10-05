@@ -26,6 +26,10 @@ interface AskCitationItem {
   sourceTitle: string;
   editionName?: string;
   fullText: string;
+  arabicFullText?: string;
+  tafsirText?: string;
+  tafsirExcerpt?: string;
+  isTafsirQuote?: boolean;
   grades?: Array<{
     name: string;
     originalGrade: string;
@@ -86,6 +90,7 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
     setErrorMessage(null);
 
     try {
+      // Stage 1: Fast cards and search terms (< 2-3s)
       const response = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,8 +102,45 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
       if (!response.ok && data?.error) {
         setErrorMessage(data.error);
         setResult(data);
-      } else {
-        setResult(data);
+        setIsLoading(false);
+        return;
+      }
+
+      setResult(data);
+      setIsLoading(false);
+
+      // Stage 2: Summary and verdict verification in background if pending
+      if (data.verdictPending && data.items && data.items.length > 0) {
+        try {
+          const verdictRes = await fetch('/api/ask/verdict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              question: trimmed,
+              language,
+              category: data.category,
+              searchedTerms: data.searchedTerms,
+              items: data.items,
+            }),
+          });
+          if (verdictRes.ok) {
+            const verdictData: AskResponse = await verdictRes.json();
+            setResult((prev) => (prev ? { ...prev, ...verdictData, verdictPending: false } : prev));
+          }
+        } catch {
+          // If stage 2 fails, keep stage 1 cards with fallback summary
+          setResult((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  summary: isAr
+                    ? 'تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر'
+                    : 'Automated summary unavailable; texts below are the source',
+                  verdictPending: false,
+                }
+              : prev
+          );
+        }
       }
     } catch (err: any) {
       setErrorMessage(
@@ -106,7 +148,6 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
           ? 'تعذر الاتصال بالخادم. يرجى التحقق من اتصال الشبكة.'
           : 'Failed to connect to the server. Please check your network connection.'
       );
-    } finally {
       setIsLoading(false);
     }
   };
@@ -123,8 +164,8 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
       <form onSubmit={handleSearch} className="rounded-xl bg-[#12183F] border border-[#6150EA]/30 p-4 shadow-xl focus-within:border-[#2EF2C2]/60 transition">
         <label className="block text-sm font-medium text-[#F2F4FF]/90 mb-2">
           {isAr
-            ? 'السؤال الشرعي بالدليل (توسيع استعلام + استرجاع بالكلمات المفتاحية):'
-            : 'Question with evidence (Query expansion + keyword retrieval):'}
+            ? 'السؤال الشرعي بالدليل (توسيع استعلام + استرجاع ثنائي اللغة):'
+            : 'Question with evidence (Query expansion + cross-language retrieval):'}
         </label>
 
         <textarea
@@ -134,8 +175,8 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
           dir={isAr ? 'rtl' : 'ltr'}
           placeholder={
             isAr
-              ? 'اطرح مسألتك أو ابحث عن نص (مثال: هل صيام ستة أيام من شوال مستحب؟ أو: هل تبسمك في وجه أخيك صدقة؟)...'
-              : 'Ask a religious question to retrieve primary evidence (e.g. Does smiling at your brother count as charity?)...'
+              ? 'اطرح مسألتك أو ابحث عن نص (مثال: هل صيام ستة أيام من شوال مستحب؟ أو: كم عدد الزوجات المباح للرجل؟)...'
+              : 'Ask a religious question (e.g. Is it permissible to marry four wives? or Is smiling at your brother charity?)...'
           }
           className="w-full bg-[#12183F]/70 border border-[#6150EA]/20 rounded-lg p-3 text-[#F2F4FF] placeholder-[#F2F4FF]/30 focus:outline-none focus:border-[#2EF2C2]/70 text-base leading-relaxed resize-y font-sans"
         />
@@ -143,8 +184,8 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#6150EA]/15">
           <p className="text-xs text-[#F2F4FF]/50 leading-relaxed">
             {isAr
-              ? 'توسيع استعلام ذكي بدون تضمينات متجهة — إجابة حصرية من النصوص المسترجعة مع إحالة المسائل الاجتهادية لأهل العلم.'
-              : 'Deterministic keyword retrieval over canonical corpora. Permissibility questions refer strictly to scholars.'}
+              ? 'توسيع استعلام ذكي ثنائي اللغة — بحث في المتون والتفسير الميسر مع عرض الشواهد بدقة والتحقق المباشر.'
+              : 'Cross-language retrieval over canonical text, English translations, and Al-Tafsir Al-Muyassar.'}
           </p>
 
           <button
@@ -167,7 +208,7 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
         </div>
       </form>
 
-      {/* Error / 429 Rate Limit Banner */}
+      {/* Error Banner */}
       {errorMessage && (
         <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm">
           <AlertTriangle className="w-5 h-5 shrink-0" />
@@ -287,8 +328,8 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
               <div className="flex items-center justify-between text-xs text-[#F2F4FF]/70 pb-1 border-b border-[#6150EA]/20">
                 <span className="font-semibold text-sm text-[#F2F4FF]">
                   {isAr
-                    ? `النصوص المسترجعة من المصادر الأصلية (${result.items.length}):`
-                    : `Retrieved Primary Sources (${result.items.length}):`}
+                    ? `النصوص المسترجعة من المصادر الأصلية والتفسير الميسر (${result.items.length}):`
+                    : `Retrieved Primary Sources & Tafsir (${result.items.length}):`}
                 </span>
                 <span>
                   {result.executionTimeMs} {isAr ? 'مللي ثانية' : 'ms'}
@@ -341,8 +382,8 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
                       </button>
                     </div>
 
-                    {/* Scripture Text: Amiri for Arabic, clean Sans for English */}
-                    <div className="space-y-2">
+                    {/* Scripture Text */}
+                    <div className="space-y-3">
                       <p
                         dir={isItemEnglish ? 'ltr' : 'rtl'}
                         lang={isItemEnglish ? 'en' : 'ar'}
@@ -355,13 +396,45 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
                         « {item.fullText} »
                       </p>
 
+                      {/* Arabic Original for English questions */}
+                      {isItemEnglish && item.arabicFullText && item.arabicFullText !== item.fullText && (
+                        <div className="pt-2 border-t border-[#6150EA]/15 text-right font-serif text-lg sm:text-xl leading-[2.1] text-[#F2F4FF]/80" dir="rtl" lang="ar">
+                          « {item.arabicFullText} »
+                        </div>
+                      )}
+
+                      {/* Muyassar Tafsir Block on Ayah Cards */}
+                      {item.type === 'ayah' && (item.tafsirExcerpt || item.tafsirText) && (
+                        <div className="mt-3 p-3.5 rounded-lg bg-[#6150EA]/10 border border-[#6150EA]/20 text-xs space-y-1.5">
+                          <div className="flex items-center justify-between text-[#2EF2C2] font-semibold text-xs">
+                            <span className="flex items-center gap-1.5">
+                              <BookOpen className="w-3.5 h-3.5" />
+                              <span>{isAr ? 'التفسير الميسر:' : 'Al-Tafsir Al-Muyassar:'}</span>
+                            </span>
+                            <span className="text-[10px] text-[#F2F4FF]/50 font-normal">
+                              {isAr ? 'التفسير الميسر — مجمع الملك فهد، عبر QuranEnc' : 'Al-Tafsir Al-Muyassar — King Fahd Complex via QuranEnc'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-[#F2F4FF]/90 leading-relaxed font-sans" dir="rtl" lang="ar">
+                            {item.tafsirExcerpt || item.tafsirText}
+                          </p>
+                        </div>
+                      )}
+
                       {/* Quote Box: only when item.quote is present and non-empty */}
                       {item.quote && item.quote.trim().length > 0 && (
-                        <div className="mt-2 p-2.5 rounded-lg bg-[#2EF2C2]/10 border border-[#2EF2C2]/20 text-xs text-[#2EF2C2]">
-                          <span className="font-bold">{isAr ? 'الشاهد المقتبس: ' : 'Quoted excerpt: '}</span>
-                          <span className={isItemEnglish ? 'font-sans text-sm' : 'font-serif text-sm'}>
-                            «{item.quote.trim()}»
-                          </span>
+                        <div className="mt-2 p-2.5 rounded-lg bg-[#2EF2C2]/10 border border-[#2EF2C2]/20 text-xs text-[#2EF2C2] flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <span className="font-bold">{isAr ? 'الشاهد المقتبس: ' : 'Quoted excerpt: '}</span>
+                            <span className={isItemEnglish ? 'font-sans text-sm' : 'font-serif text-sm'}>
+                              «{item.quote.trim()}»
+                            </span>
+                          </div>
+                          {item.isTafsirQuote && (
+                            <span className="px-2 py-0.5 rounded bg-[#6150EA]/30 border border-[#6150EA]/40 text-[10px] text-[#F2F4FF] font-semibold shrink-0">
+                              {isAr ? 'من التفسير الميسر' : 'From Al-Tafsir Al-Muyassar'}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -431,12 +504,12 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
             <div className="p-5 rounded-xl border border-amber-500/30 bg-amber-500/10 space-y-2 text-amber-200">
               <div className="flex items-center gap-2 font-bold text-base">
                 <HelpCircle className="w-5 h-5 text-amber-400" />
-                <span>{isAr ? 'لم يتم العثور على تطابق موثوق، راجع أهل العلم' : 'No reliable match found; consult qualified scholars'}</span>
+                <span>{isAr ? 'لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم' : 'No relevant text found in indexed sources; consult qualified scholars'}</span>
               </div>
               <p className="text-xs text-amber-200/80 leading-relaxed">
                 {isAr
-                  ? 'لم تتضمن مجموعات الحديث والآيات المفهرسة نصاً صريحاً يثبت أو ينفي المسألة المطروحة بدلالة قطعية. يُرجى مراجعة كتب الفقه المعتمدة واستفتاء أهل العلم الموثوقين.'
-                  : 'The indexed Quranic and Hadith collections do not contain explicit textual evidence for this specific phrasing. Consult recognized scholars.'}
+                  ? 'لم تتضمن مجموعات الحديث والآيات والتفاسير المفهرسة نصاً صريحاً يطابق المسألة المطروحة بدلالة قطعية. يُرجى مراجعة كتب الفقه المعتمدة واستفتاء أهل العلم الموثوقين.'
+                  : 'The indexed Quranic, Hadith, and Tafsir collections do not contain explicit textual evidence for this specific phrasing. Consult recognized scholars.'}
               </p>
             </div>
           )}
@@ -448,12 +521,12 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
         <div className="p-8 text-center rounded-xl border border-dashed border-[#6150EA]/20 bg-[#12183F]/40 space-y-3">
           <MessageSquareQuote className="w-10 h-10 text-[#6150EA]/60 mx-auto" />
           <h4 className="text-base font-semibold text-[#F2F4FF]/90">
-            {isAr ? 'اسأل بالدليل الموثق من الكتاب والسنة' : 'Ask with Verified Evidence'}
+            {isAr ? 'اسأل بالدليل الموثق من الكتاب والسنة والتفسير' : 'Ask with Verified Evidence & Tafsir'}
           </h4>
           <p className="text-xs text-[#F2F4FF]/60 max-w-lg mx-auto leading-relaxed">
             {isAr
-              ? 'يقوم النظام بتوسيع السؤال إلى جذوره الشرعية، والبحث في كتب السنة السبعة وفهرس القرآن الكريم، ثم التحقق من النص دون افتئات على الأحكام أو تخمين.'
-              : 'Expands query into classical terminology, searches the 7 Hadith collections and Quran index, and verifies citations strictly from primary texts.'}
+              ? 'يقوم النظام بتوسيع السؤال إلى جذوره الشرعية، والبحث في كتب السنة السبعة، القرآن الكريم والتفسير الميسر، ثم التحقق من النص دون افتئات على الأحكام أو تخمين.'
+              : 'Expands query into classical terminology, searches 7 Hadith collections, Quran, and Al-Tafsir Al-Muyassar, strictly verifying citations.'}
           </p>
         </div>
       )}
