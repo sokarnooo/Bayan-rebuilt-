@@ -24,6 +24,14 @@
 - [الخصوصية](#الخصوصية)
 - [المعروف الحدود](#المعروف-الحدود)
 
+### مرفقات العرض
+
+| الملف | الوصف |
+|---|---|
+| [`docs/Bayan-Presentation.pdf`](docs/Bayan-Presentation.pdf) | العرض التقديمي — ١٥ صفحة على القالب الرسمي |
+| [`docs/presentation-source.html`](docs/presentation-source.html) | مصدر العرض (HTML) لإعادة التوليد |
+| [`docs/screenshots/`](docs/screenshots/) | ستّ لقطات شاشة حقيقية من التطبيق العامل |
+
 ---
 
 ## ما الذي يفعله التطبيق
