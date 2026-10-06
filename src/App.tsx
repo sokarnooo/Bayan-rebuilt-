@@ -21,7 +21,7 @@ export default function App() {
     collectionsCount: number;
   }>({
     quranCount: 6236,
-    hadithCount: 34574,
+    hadithCount: 34195,
     collectionsCount: 7,
   });
 
@@ -35,9 +35,14 @@ export default function App() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.corpusLoaded) {
+          const totalHadiths =
+            data.corpusLoaded.hadithCounts?.totalIndexed ||
+            (data.corpusLoaded.hadithCounts
+              ? Object.values(data.corpusLoaded.hadithCounts).reduce((acc: number, val: any) => typeof val === 'number' ? acc + val : acc, 0)
+              : 34195);
           setCorpusStats({
             quranCount: data.corpusLoaded.quranAyatCount || 6236,
-            hadithCount: 34574,
+            hadithCount: totalHadiths,
             collectionsCount: data.corpusLoaded.hadithCollectionsCount || 7,
           });
         }
@@ -177,6 +182,8 @@ export default function App() {
             <span>التفسير الميسر: مجمع الملك فهد</span>
             <span>•</span>
             <span>مجموعات الحديث السبع المفهرسة</span>
+            <span>•</span>
+            <span>موسوعة الأحاديث النبوية (HadeethEnc.com)</span>
           </div>
         </div>
       </footer>

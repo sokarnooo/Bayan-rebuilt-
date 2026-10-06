@@ -2323,5 +2323,80 @@
       "stateNot": "supported"
     },
     "note": "Invented reward for night charity gets permissibility/unclear not supported"
+  },
+  {
+    "id": "hadeethenc_arabic_exact_1",
+    "mode": "hadeethenc",
+    "input": "الصلوات الخمس والجمعة إلى الجمعة ورمضان إلى رمضان مكفرات ما بينهن",
+    "language": "ar",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "matched",
+      "ref": "hadeethenc_3591"
+    },
+    "note": "HadeethEnc Arabic exact match for five prayers hadith"
+  },
+  {
+    "id": "hadeethenc_arabic_exact_2",
+    "mode": "hadeethenc",
+    "input": "نهى عن النذر وقال إنه لا يأتي بخير وإنما يستخرج به من البخيل",
+    "language": "ar",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "matched",
+      "ref": "hadeethenc_2960"
+    },
+    "note": "HadeethEnc Arabic match for prohibition of vowing"
+  },
+  {
+    "id": "hadeethenc_arabic_famous_3",
+    "mode": "hadeethenc",
+    "input": "إنما الأعمال بالنيات وإنما لكل امرئ ما نوى",
+    "language": "ar",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "matched",
+      "ref": "hadeethenc_4560"
+    },
+    "note": "HadeethEnc match for intentions hadith"
+  },
+  {
+    "id": "hadeethenc_english_1",
+    "mode": "hadeethenc",
+    "input": "forbade vowing",
+    "language": "en",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "close_match",
+      "ref": "hadeethenc_2960"
+    },
+    "note": "HadeethEnc English query match for prohibition of vowing"
+  },
+  {
+    "id": "hadeethenc_english_2",
+    "mode": "hadeethenc",
+    "input": "creation of each one of you is brought together in his mothers womb",
+    "language": "en",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "close_match",
+      "refs": [
+        "hadeethenc_66513",
+        "hadeethenc_65037"
+      ]
+    },
+    "note": "HadeethEnc English query match for creation stages hadith"
+  },
+  {
+    "id": "hadeethenc_negative_invented",
+    "mode": "hadeethenc",
+    "input": "نص مخترع عشوائي لا وجود له في موسوعة الأحاديث النبوية قطعا سسسسس",
+    "language": "ar",
+    "category": "hadeethenc",
+    "expected": {
+      "state": "not_found",
+      "ref": null
+    },
+    "note": "HadeethEnc negative query returns not_found"
   }
 ]

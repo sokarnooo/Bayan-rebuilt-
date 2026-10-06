@@ -7,6 +7,7 @@ import type { HadithGradeItem } from './hadithMatcher.ts';
 import { initAyahEngine } from './ayahMatcher.ts';
 import { normalizeArabic } from './normalizer.ts';
 import { quotaManager } from '../quota.config.ts';
+import { searchAndGetHadeethEnc, toAskCitationItem } from '../services/hadeethEnc.ts';
 
 const CALL_TIMEOUT_MS = 3500; // 3.5 seconds timeout per model call for fast response
 
@@ -15,6 +16,7 @@ export interface AskRequest {
   language?: 'ar' | 'en';
   singlePass?: boolean;
   userApiKey?: string;
+  includeHadeethEnc?: boolean;
 }
 
 export interface AskCitationItem {
@@ -1666,6 +1668,21 @@ export async function executeAskStage1(
     };
   });
 
+  // Query HadeethEnc for supporting Hadith evidence
+  if ((req.includeHadeethEnc || (!req.singlePass && !isPermissibilityQuestion)) && rawQuestion.length >= 3) {
+    try {
+      const hList = await searchAndGetHadeethEnc(rawQuestion, language, 2);
+      for (const h of hList) {
+        const hItem = toAskCitationItem(h, language, 25.0);
+        if (!items.some((it) => it.id === hItem.id)) {
+          items.push(hItem);
+        }
+      }
+    } catch (_e) {
+      // Graceful fallback on API timeout/error
+    }
+  }
+
   const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
   const totalStage1Ms = Math.round(performance.now() - startTime);
 
@@ -1682,7 +1699,7 @@ export async function executeAskStage1(
     summary: '',
     searchedTerms: finalTerms,
     items,
-    retrievedCount: finalPassingSources.length,
+    retrievedCount: items.length,
     droppedItemsCount: 0,
     topRetrievedIds: items.slice(0, 3).map((i) => i.id),
     executionTimeMs: totalStage1Ms,

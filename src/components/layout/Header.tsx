@@ -45,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, onOp
             <button
               type="button"
               onClick={onOpenSettings}
+              aria-label={isAr ? 'الإعدادات والمفتاح' : 'Settings & API Key'}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#6150EA]/30 bg-[#12183F] hover:bg-[#6150EA]/20 text-xs font-medium text-[#F2F4FF] transition"
               title={isAr ? 'الإعدادات والمفتاح' : 'Settings & API Key'}
             >
@@ -56,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, onOp
           <button
             type="button"
             onClick={() => onLanguageChange(isAr ? 'en' : 'ar')}
+            aria-label={isAr ? 'Switch to English' : 'التحويل إلى العربية'}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#6150EA]/30 bg-[#12183F] hover:bg-[#6150EA]/20 text-xs font-medium text-[#F2F4FF] transition"
             title={isAr ? 'Switch to English' : 'التحويل إلى العربية'}
           >

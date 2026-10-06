@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { InterfaceLanguage } from '../../types';
+import type { InterfaceLanguage, HadeethEncHadithDetails } from '../../types';
 import { OcrButton } from '../common/OcrButton';
 import {
   Search,
@@ -15,6 +15,8 @@ import {
   Layers,
   Award,
   BookmarkCheck,
+  FileText,
+  Lightbulb,
 } from 'lucide-react';
 
 interface HadithGradeItem {
@@ -95,6 +97,8 @@ interface HadithSearchResponse {
     url: string;
     source: string;
   };
+  hadeethEncResults?: HadithMatchResult[];
+  hadeethEncDetails?: HadeethEncHadithDetails[];
 }
 
 interface HadithModeProps {
@@ -121,7 +125,7 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language, onQuotaNotice 
       const res = await fetch('/api/hadith/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: textToSearch }),
+        body: JSON.stringify({ query: textToSearch, includeHadeethEnc: true }),
       });
 
       if (res.status === 503) {
@@ -678,6 +682,193 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language, onQuotaNotice 
               </div>
             </div>
           ))}
+
+          {/* HadeethEnc Disagreement Banner */}
+          {(() => {
+            if (!result.hadeethEncDetails?.length || !result.results.length) return null;
+            const canonicalGrades = result.results.flatMap((r) => r.grades);
+            if (!canonicalGrades.length) return null;
+
+            for (const he of result.hadeethEncDetails) {
+              if (!he.grade) continue;
+              const heFamily = (he.grade.includes('صحيح') || /sahih|authentic/i.test(he.grade))
+                ? 'صحيح'
+                : (he.grade.includes('حسن') || /hasan|good/i.test(he.grade))
+                ? 'حسن'
+                : (he.grade.includes('ضعيف') || /da'?if|weak/i.test(he.grade))
+                ? 'ضعيف'
+                : 'neutral';
+
+              if (heFamily === 'neutral') continue;
+
+              for (const cg of canonicalGrades) {
+                if (cg.family !== 'neutral' && cg.family !== heFamily) {
+                  return (
+                    <div key="hadeethenc-disagreement" className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-1.5 shadow-sm">
+                      <div className="flex items-center gap-2 font-bold text-amber-300">
+                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>{isAr ? 'اختلاف في حكم الحديث بين المصادر المعتمدة:' : 'Grader Disagreement Between Verified Sources:'}</span>
+                      </div>
+                      <p className="leading-relaxed">
+                        {isAr
+                          ? `حكم ${cg.name}: «${cg.arabicLabel}» مقابل حكم موسوعة الأحاديث النبوية (HadeethEnc): «${he.grade}».`
+                          : `Grading by ${cg.name}: "${cg.arabicLabel}" vs. Encyclopedia of Hadiths (HadeethEnc): "${he.grade}".`}
+                      </p>
+                      <p className="text-[11px] text-amber-300/70 pt-0.5 border-t border-amber-500/20">
+                        {isAr
+                          ? 'بيان: يُعرض اختلاف أئمة الحديث ومصادر التخريج بأسمائها الموثقة كما وردت في البيانات، دون ترجيح آلي.'
+                          : 'Note: Disagreements between hadith scholars and takhrij sources are displayed as documented, without automated resolution.'}
+                      </p>
+                    </div>
+                  );
+                }
+              }
+            }
+            return null;
+          })()}
+
+          {/* HadeethEnc Source Cards */}
+          {result.hadeethEncDetails && result.hadeethEncDetails.length > 0 && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-2 text-sm font-bold text-[#2EF2C2]">
+                  <BookOpen className="w-4 h-4" />
+                  <span>{isAr ? 'تخريج موسوعة الأحاديث النبوية (HadeethEnc):' : 'Encyclopedia of Prophetic Hadiths (HadeethEnc):'}</span>
+                </div>
+                <a
+                  href="https://hadeethenc.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-sky-400 hover:underline inline-flex items-center gap-1 font-mono"
+                >
+                  <span>HadeethEnc.com</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              {result.hadeethEncDetails.map((he) => (
+                <div
+                  key={`he-${he.id}`}
+                  className="rounded-xl bg-[#12183F] border border-[#2EF2C2]/30 p-5 shadow-lg space-y-4 transition hover:border-[#2EF2C2]/60"
+                >
+                  {/* Header Strip */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#6150EA]/15">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#2EF2C2] text-base">
+                        {isAr ? 'موسوعة الأحاديث النبوية' : 'Encyclopedia of Prophetic Hadiths'}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-[#2EF2C2]/20 text-[#2EF2C2] font-mono">
+                        #{he.id}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {he.attribution && (
+                        <span className="text-xs px-2.5 py-1 rounded bg-[#6150EA]/20 border border-[#6150EA]/30 text-[#F2F4FF]/90 font-medium">
+                          {he.attribution}
+                        </span>
+                      )}
+                      <a
+                        href={he.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-sky-400 hover:underline inline-flex items-center gap-1 px-2.5 py-1 rounded bg-sky-500/10 border border-sky-500/30"
+                      >
+                        <span>{isAr ? 'عرض في الموسوعة' : 'View on HadeethEnc'}</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Hadith Matn */}
+                  <p
+                    dir="rtl"
+                    lang="ar"
+                    className="font-quran text-xl sm:text-2xl leading-[2.3] text-[#F2F4FF] select-text"
+                  >
+                    « {he.hadeeth_ar || he.hadeeth} »
+                  </p>
+
+                  {/* English Translation if available */}
+                  {he.hadeeth && he.hadeeth_ar && he.hadeeth !== he.hadeeth_ar && (
+                    <p dir="ltr" className="text-sm text-[#F2F4FF]/80 italic leading-relaxed pt-2 border-t border-[#6150EA]/15">
+                      {he.hadeeth}
+                    </p>
+                  )}
+
+                  {/* Grade Section */}
+                  <div className="pt-3 border-t border-[#6150EA]/15 space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2EF2C2]">
+                      <Award className="w-3.5 h-3.5" />
+                      <span>{isAr ? 'درجة الحديث في الموسوعة:' : 'Hadith Grade in HadeethEnc:'}</span>
+                    </div>
+
+                    <div className="p-3 rounded-lg border bg-[#2EF2C2]/10 border-[#2EF2C2]/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div>
+                        <span className="font-semibold text-[#F2F4FF]">{isAr ? 'المصدر: ' : 'Source: '}</span>
+                        <span className="text-[#2EF2C2] font-bold">{isAr ? 'موسوعة الأحاديث النبوية (HadeethEnc)' : 'HadeethEnc.com'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-[#F2F4FF]/80">{isAr ? 'الدرجة الموثقة: ' : 'Documented Grade: '}</span>
+                        <span className="px-2.5 py-0.5 rounded font-bold bg-[#2EF2C2]/20 text-[#2EF2C2] border border-[#2EF2C2]/40">
+                          {he.grade || he.grade_ar || (isAr ? 'لا تتوفر درجة موثقة' : 'No documented grade')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {he.reference && (
+                      <p className="text-[11px] text-[#F2F4FF]/60 pt-1 leading-relaxed">
+                        <span className="font-semibold text-[#F2F4FF]/80">{isAr ? 'التخريج والمرجع: ' : 'Reference: '}</span>
+                        {he.reference}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Explanation / Sharh */}
+                  {he.explanation && (
+                    <div className="pt-3 border-t border-[#6150EA]/15 space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#6150EA]">
+                        <FileText className="w-3.5 h-3.5 text-[#2EF2C2]" />
+                        <span>{isAr ? 'الشرح الموجز (من الموسوعة):' : 'Explanation (HadeethEnc):'}</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#F2F4FF]/85 leading-relaxed bg-[#6150EA]/10 p-3 rounded-lg border border-[#6150EA]/20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+                        {he.explanation_ar || he.explanation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Hints / Benefits */}
+                  {he.hints && he.hints.length > 0 && (
+                    <div className="pt-3 border-t border-[#6150EA]/15 space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2EF2C2]">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-300" />
+                        <span>{isAr ? 'من فوائد الحديث المستنبطة:' : 'Derived Lessons & Benefits:'}</span>
+                      </div>
+                      <ul className="list-disc list-inside space-y-1 text-xs text-[#F2F4FF]/80 bg-[#12183F]/90 p-3 rounded-lg border border-[#6150EA]/20">
+                        {he.hints.map((hint, hIdx) => (
+                          <li key={hIdx} className="leading-relaxed">
+                            {hint}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Copy Button */}
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(`he-${he.id}`, he.hadeeth_ar || he.hadeeth)}
+                      className="inline-flex items-center gap-1.5 text-xs text-[#F2F4FF]/60 hover:text-[#2EF2C2] transition cursor-pointer"
+                    >
+                      {copiedId === `he-${he.id}` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedId === `he-${he.id}` ? (isAr ? 'تم النسخ' : 'Copied') : isAr ? 'نسخ الحديث' : 'Copy'}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

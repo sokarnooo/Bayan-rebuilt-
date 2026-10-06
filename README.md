@@ -16,7 +16,7 @@
 - [بنية المشروع](#بنية-المشروع)
 - [كيف يعمل التطبيق](#كيف-يعمل-التطبيق)
 - [واجهة API](#واجهة-api)
-- [المطابقة والتحطبيع](#المطابقة-والتحطبيع)
+- [المطابقة والتطبيع](#المطابقة-والتطبيع)
 - [نظام الحكم في «اسأل بالدليل»](#نظام-الحكم-في-اسأل-بالدليل)
 - [إدارة الحصة](#إدارة-الحصة)
 - [الاختبار الآلي](#الاختبار-الآلي)
@@ -155,14 +155,14 @@ server/
     loader.ts               التحميل الكسول لملفات JSON
     data/                   (مستثنى من Git) الفهرس والنصوص المُنزَّلة
   matching/
-    normalizer.ts           التحطبيع العربي + نافذة المنزلقة + مسافة تحرير لِفرق الكلمات (Levenshtein)
+    normalizer.ts           التطبيع العربي + نافذة المنزلقة + مسافة تحرير لِفرق الكلمات (Levenshtein)
     ayahMatcher.ts          مطابقة الآيات (عربي)
     ayahMatcherEn.ts        مطابقة الآيات (إنجليزي — Saheeh International)
     hadithMatcher.ts        تجريد الأسانيد، محاذاة الكلمات، فهرس سريع
     askEngine.ts            وضع «اسأل»: استرجاع + توسيع + تلخيص + حكم حتمي
   quota.config.ts           إدارة الحصة بالساعة + Failover
 eval/
-  cases.json                ١٨١ حالة مُعنونة بالنتائج المتوقّعة
+  cases.json                ١٨٧ حالة مُعنونة بالنتائج المتوقّعة
   run.ts                    مُشغّل الاختبار (--quiet, --runs, --only, --concurrency)
 src/
   App.tsx                   التخطيط والتبويبات
@@ -179,7 +179,7 @@ src/
 ```
 المستخدم يُدخل نصًّا
    ↓
-تحطبيع عربي (شكل، همزات، تاء مربوطة، ألف مقصورة…)
+تطبيع عربي (شكل، همزات، تاء مربوطة، ألف مقصورة…)
    ↓
 تجريد السند إن وُجدت علاماته  ──→  تحذير «مطابقة على المتن فقط»
    ↓
@@ -246,9 +246,9 @@ curl -X POST http://localhost:3000/api/hadith/match \
 
 ---
 
-## المطابقة والتحطبيع
+## المطابقة والتطبيع
 
-التحطبيع يطبّق بالترتيب: تنظيف المسافات → ردّ الفارسية → ردّ الألف الخنجرية → إزالة التشكيل والتطويل → ردّ الهمزات والألف → ردّ التاء المربوطة → ردّ الياء (ى/ي) → توحيد الألف المقصورة والمنقوصة.
+التطبيع يطبّق بالترتيب: تنظيف المسافات → ردّ الفارسية → ردّ الألف الخنجرية → إزالة التشكيل والتطويل → ردّ الهمزات والألف → ردّ التاء المربوطة → ردّ الياء (ى/ي) → توحيد الألف المقصورة والمنقوصة.
 
 في **صيغة المطابقة** يُحذف الألف والهمزة والتاء المربوطة، فلا يفصل اختلاف الرسم الناقص بين مصدرَين للنص نفسه.
 
@@ -302,7 +302,7 @@ npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1
 
 خيارات: `--only <group>` لمجموعة واحدة · `--runs N` للتكرار · `--concurrency N` للتوازي.
 
-**النتيجة المُقاسة** (`--quiet --runs 1`، ١٨١ حالة):
+**النتيجة المُقاسة** (`--quiet --runs 1`، ١٨٧ حالة):
 
 | المجموعة | حالات | النتيجة |
 |---|---|---|
@@ -311,7 +311,8 @@ npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1
 | الحالات السالبة | ٤٧ | **٤٧/٤٧ (١٠٠٪)** |
 | الصلة والاستطراد | ٢٨ | ٢٤/٢٨ (٨٦٪) |
 | الأسئلة الخصومية | ٢٠ | **٢٠/٢٠ (١٠٠٪)** |
-| **الإجمالي** | **١٨١** | **١٧٧/١٨١ (٩٨٪)** |
+| موسوعة الأحاديث النبوية (HadeethEnc) | ٦ | **٦/٦ (١٠٠٪)** |
+| **الإجمالي** | **١٨٧** | **١٨٣/١٨٧ (٩٨٪)** |
 
 **الحالات الأربع المتبقية** كلها في «الصلة»:
 - `ask_green_tea_en` و `ask_green_tea_en_verdict_equal` — تُصنَّف «غير واضح» بدل «نصوص ذات صلة» (اتجاه متحفّظ: لا جواب بلا دليل).
@@ -337,12 +338,15 @@ npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1
 | [fawazahmed0/quran-api](https://github.com/fawazahmed0/quran-api) | ٦٬٢٣٦ آية بالرسم العثماني | مصدر مفتوح — انظر المستودع |
 | نفس المصدر — `eng-ummmuhammad` | ترجمة **Saheeh International** | مفتوح |
 | [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api) | ٣٤٬١٩٥ حديثًا في ٧ مجموعات | مفتوح |
+| [HadeethEnc (موسوعة الأحاديث النبوية)](https://hadeethenc.com) (API: [hadeethenc.com/en/api](https://hadeethenc.com/en/api)) | أحاديث نبوية مشروحة ومترجمة مع التخريج والفوائد ومعاني المفردات والدرجة المعتمدة (٤٬٢٧٣ حديثًا مصنفًا عبر ٧ أقسام رئيسية) | HadeethEnc API — استخدام موثق مع عزو كامل ودون تعديل |
 | **التفسير الميسر** — مجمع الملك فهد | شرح مختصر للآيات | عبر QuranEnc؛ يُنسب في الواجهة |
 | QuranEnc API v4 (المعرّف ١٦) | جلب التفسير عند الطلب | إسناد في الواجهة |
 | [dorar.net/fake-hadith](https://dorar.net/fake-hadith) | قائمة الأحاديث الموضوعة المُنقّحة | الحكم **كما هو في الصفحة** + رابط التحقق |
 | Google Gemini (`@google/genai`) | الملخص، توسيع الاستعلام، OCR | Google AI Studio Terms |
 
-**درجات الأئمة** تُقرأ من حقل `grades` في بيانات `hadith-api` وتُعرض **باسم مُصنِّفها**. مصمِّنو الدرجات في البيانات: عبد الفتاح أبو غدة، أحمد شاكر، ناصر الدين الألباني، بشار عواد معروف، محمد فؤاد عبد الباقي، محمد محيي الدين عبد الحميد، شعيب الأرنؤوط، زبير علي زئي. البخاري والنووي لا يحملان حقل درجة في هذه النسخة، فتُعرض عبارة «لا تتوفر درجة موثقة في مصدر البيانات» ولا تُختلق لهما حكم.
+**درجات الأئمة** تُقرأ من حقل `grades` في بيانات `hadith-api` وتُعرض **باسم مُصنِّفها**. مصمِّنو الدرجات في البيانات: عبد الفتاح أبو غدة، أحمد شاكر، ناصر الدين الألباني، بشار عواد معروف، محمد فؤاد عبد الباقي، محمد محيي الدين عبد الحميد، شعيب الأرنؤوط، زبير علي زئي. البخاري والنووي لا يحملان حقل درجة في هذه النسخة، فتُعرض عبارة «لا تتوفر درجة موثقة في مصدر البيانات» ولا تُختلق لهما حكم. كما تُعرض درجات موسوعة الأحاديث النبوية (HadeethEnc) بوضوح تحت اسمها وتخريجها دون خلط، وفي حال وجود خلاف بين درجات المصادر يُعرض الخلاف نصاً دون ترجيح آلي.
+
+**حدود HadeethEnc:** تعتمد على نداءات الشبكة (API)، مقتصرة على الأحاديث المختارة والمشروحة في الموسوعة، ويحميها كاش محلي مع مهلة سريعة (٣ ثوانٍ) لمنع أي تعطل لمصادر التخريج الأخرى في حال انقطاع الخدمة أو بطئها.
 
 **قاعدة إلزامية:** لا تُنسَب درجة ولا نص إلى مصدر غير موجود فيه.
 
@@ -391,7 +395,7 @@ npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1
 - **34,195 hadith** across 7 collections (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, النووي-٤٠) with per-narrator grades shown by name; **6,236 ayat** in Uthmani script with Saheeh International translation and Al-Muyassar tafsir.
 - **Every grade is traceable** to a field in fetched data. No grade in the data means «لا تتوفر درجة موثقة» — never an invented ruling.
 - **Escalation is never removed.** Below the evidence threshold the tool refers the user to qualified scholars instead of guessing.
-- **Automated evaluation: 177/181 cases (98%)**, including 20/20 on adversarial questions that reuse real corpus vocabulary but assert a false claim — all correctly refused.
+- **Automated evaluation: 183/187 cases (98%)**, including 20/20 on adversarial questions that reuse real corpus vocabulary but assert a false claim — all correctly refused.
 
 See [DEVLOG.md](DEVLOG.md) for the full change history, including the measured retrieval benchmarks and every verification run behind the numbers quoted above.
 

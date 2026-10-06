@@ -4,18 +4,30 @@ import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
 import { initAyahEngineEn, searchAyahEn } from './matching/ayahMatcherEn.ts';
 import { initHadithEngine, searchHadith, getIndexedCounts } from './matching/hadithMatcher.ts';
 import { askQuestion, executeAskStage1, executeAskVerdict, getGeminiClient } from './matching/askEngine.ts';
+import {
+  searchHadeethEnc,
+  getHadeethEncById,
+  searchAndGetHadeethEnc,
+  toHadithMatchResult,
+} from './services/hadeethEnc.ts';
 import { quotaManager } from './quota.config.ts';
 
 export const app = express();
 
 app.use(express.json({ limit: '10mb' }));
 
-let requestCounter = 0;
+let lastGcTime = 0;
 app.use((req, res, next) => {
   res.on('finish', () => {
-    requestCounter++;
-    if (requestCounter % 20 === 0 && global.gc) {
-      global.gc();
+    const now = Date.now();
+    if (global.gc && now - lastGcTime > 30000) {
+      const mem = process.memoryUsage().heapUsed;
+      if (mem > 650 * 1024 * 1024) {
+        lastGcTime = now;
+        setImmediate(() => {
+          if (global.gc) global.gc();
+        });
+      }
     }
   });
   next();
@@ -41,6 +53,9 @@ export const REGISTERED_ROUTES = [
   'POST /api/ayah/match/en',
   'POST /api/hadith/search',
   'POST /api/hadith/match',
+  'POST /api/hadeethenc/search',
+  'POST /api/hadeethenc/match',
+  'GET /api/hadeethenc/hadith/:id',
   'POST /api/ask',
   'POST /api/ask/verdict',
   'POST /api/ocr',
@@ -116,22 +131,109 @@ app.post('/api/ayah/match/en', (req, res) => {
   res.json(result);
 });
 
-app.post('/api/hadith/search', (req, res) => {
+app.post('/api/hadith/search', async (req, res) => {
   const query = req.body?.query || req.body?.text || '';
+  const includeHadeethEnc = req.body?.includeHadeethEnc === true;
   const result = searchHadith(query);
+
+  if (includeHadeethEnc && query.trim().length >= 2) {
+    try {
+      const hadeethEncDetails = await searchAndGetHadeethEnc(query, result.language || 'ar', 3);
+      const hadeethEncResults = hadeethEncDetails.map((d) => toHadithMatchResult(d, query, result.language || 'ar'));
+      (result as any).hadeethEncResults = hadeethEncResults;
+      (result as any).hadeethEncDetails = hadeethEncDetails;
+    } catch (_e) {
+      (result as any).hadeethEncResults = [];
+      (result as any).hadeethEncDetails = [];
+    }
+  }
+
   if (result.language === 'en' && global.gc) {
     global.gc();
   }
   res.json(result);
 });
 
-app.post('/api/hadith/match', (req, res) => {
+app.post('/api/hadith/match', async (req, res) => {
   const query = req.body?.query || req.body?.text || '';
+  const includeHadeethEnc = req.body?.includeHadeethEnc === true;
   const result = searchHadith(query);
+
+  if (includeHadeethEnc && query.trim().length >= 2) {
+    try {
+      const hadeethEncDetails = await searchAndGetHadeethEnc(query, result.language || 'ar', 3);
+      const hadeethEncResults = hadeethEncDetails.map((d) => toHadithMatchResult(d, query, result.language || 'ar'));
+      (result as any).hadeethEncResults = hadeethEncResults;
+      (result as any).hadeethEncDetails = hadeethEncDetails;
+    } catch (_e) {
+      (result as any).hadeethEncResults = [];
+      (result as any).hadeethEncDetails = [];
+    }
+  }
+
   if (result.language === 'en' && global.gc) {
     global.gc();
   }
   res.json(result);
+});
+
+// Dedicated HadeethEnc search endpoint
+app.post('/api/hadeethenc/search', async (req, res) => {
+  try {
+    const phrase = req.body?.phrase || req.body?.query || req.body?.text || '';
+    const language = req.body?.language === 'en' ? 'en' : 'ar';
+    const items = await searchHadeethEnc(phrase, language);
+    res.json({ phrase, language, count: items.length, items });
+  } catch (err: any) {
+    res.status(500).json({ error: 'FAILED_TO_SEARCH_HADEETHENC', details: err?.message, items: [] });
+  }
+});
+
+// Dedicated HadeethEnc single hadith endpoint
+app.get('/api/hadeethenc/hadith/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const language = req.query.language === 'en' ? 'en' : 'ar';
+    const hadith = await getHadeethEncById(id, language);
+    if (!hadith) {
+      res.status(404).json({ error: 'HADEETH_NOT_FOUND', id });
+      return;
+    }
+    res.json(hadith);
+  } catch (err: any) {
+    res.status(500).json({ error: 'FAILED_TO_FETCH_HADEETHENC', details: err?.message });
+  }
+});
+
+// Dedicated HadeethEnc matching endpoint
+app.post('/api/hadeethenc/match', async (req, res) => {
+  try {
+    const query = req.body?.query || req.body?.text || '';
+    const language = req.body?.language === 'en' ? 'en' : (/[a-z]/i.test(query) ? 'en' : 'ar');
+    const detailsList = await searchAndGetHadeethEnc(query, language, 5);
+    const results = detailsList.map((d) => toHadithMatchResult(d, query, language));
+    const topConfidence = results.length > 0 ? results[0].confidence : 0;
+    const state = results.length === 0 ? 'not_found' : (results[0].state);
+
+    res.json({
+      query,
+      language,
+      source: 'hadeethenc',
+      state,
+      topConfidence,
+      totalMatches: results.length,
+      results,
+      details: detailsList,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      query: req.body?.query || '',
+      error: 'HADEETHENC_MATCH_FAILED',
+      details: err?.message,
+      state: 'not_found',
+      results: [],
+    });
+  }
 });
 
 app.post('/api/ask', async (req, res) => {

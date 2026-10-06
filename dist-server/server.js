@@ -1,9 +1,10 @@
 // server/server.ts
 import express2 from "express";
-import fs5 from "fs";
-import path5 from "path";
-import { fileURLToPath as fileURLToPath5 } from "url";
+import fs6 from "fs";
+import path6 from "path";
+import { fileURLToPath as fileURLToPath6 } from "url";
 import { createServer as createViteServer } from "vite";
+import dotenv from "dotenv";
 
 // server/app.ts
 import express from "express";
@@ -216,7 +217,7 @@ function normalizeArabic(text) {
   s = s.replace(/\u0629/g, "\u0647");
   s = s.replace(/[\u0649\u06CC]/g, "\u064A");
   s = s.replace(/[\u0624\u0626\u0654\u0655\u0674]/g, "\u0621");
-  s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ]/g, " ");
+  s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ“”‘’‹›„‟‚‛]/g, " ");
   s = s.replace(/(^|[\s])الرحمان(?=[\s]|$)/g, "$1\u0627\u0644\u0631\u062D\u0645\u0646");
   s = s.replace(/(^|[\s])هاذا(?=[\s]|$)/g, "$1\u0647\u0630\u0627");
   s = s.replace(/(^|[\s])هاذه(?=[\s]|$)/g, "$1\u0647\u0630\u0647");
@@ -900,6 +901,11 @@ function searchAyah(rawQuery) {
     executionTimeMs: elapsed
   };
 }
+
+// server/matching/ayahMatcherEn.ts
+import fs4 from "fs";
+import path4 from "path";
+import { fileURLToPath as fileURLToPath4 } from "url";
 
 // server/matching/hadithMatcher.ts
 import fs3 from "fs";
@@ -2359,38 +2365,536 @@ function searchHadith(rawQuery) {
   };
 }
 
+// server/matching/ayahMatcherEn.ts
+var __filename4 = fileURLToPath4(import.meta.url);
+var __dirname4 = path4.dirname(__filename4);
+var indexedAyatEn = [];
+var surahMetadataEn = /* @__PURE__ */ new Map();
+var surahWordStreamsEn = /* @__PURE__ */ new Map();
+var surahAyatMapEn = /* @__PURE__ */ new Map();
+var exactNormalizedMapEn = /* @__PURE__ */ new Map();
+var wordPositionIndexEn = /* @__PURE__ */ new Map();
+var twoGramIndexEn = /* @__PURE__ */ new Map();
+var isInitializedEn = false;
+function initAyahEngineEn() {
+  if (isInitializedEn) {
+    return { totalIndexed: indexedAyatEn.length };
+  }
+  const infoRaw = JSON.parse(
+    fs4.readFileSync(path4.join(DATA_DIR, "quran_info.json"), "utf8")
+  );
+  for (const c of infoRaw.chapters || []) {
+    surahMetadataEn.set(c.chapter, {
+      chapter: c.chapter,
+      arabicName: c.arabicname || `\u0633\u0648\u0631\u0629 ${c.chapter}`,
+      englishName: c.englishname || `Chapter ${c.chapter}`,
+      transliteration: c.name || `Surah ${c.chapter}`,
+      revelation: c.revelation || "Mecca",
+      totalVerses: c.verses ? c.verses.length : 0
+    });
+  }
+  const enVerses = getQuranEn();
+  indexedAyatEn = enVerses.map((v, idx) => {
+    const cleanDisplay = v.text.trim();
+    const norm = normalizeEnglish(cleanDisplay);
+    const words = cleanDisplay.split(" ").filter(Boolean);
+    const normWords = norm.split(" ").filter(Boolean);
+    const surah = surahMetadataEn.get(v.chapter) || {
+      chapter: v.chapter,
+      arabicName: `\u0633\u0648\u0631\u0629 ${v.chapter}`,
+      englishName: `Surah ${v.chapter}`,
+      transliteration: `Surah ${v.chapter}`,
+      revelation: "Mecca",
+      totalVerses: 0
+    };
+    let normList = exactNormalizedMapEn.get(norm);
+    if (!normList) {
+      normList = [];
+      exactNormalizedMapEn.set(norm, normList);
+    }
+    normList.push(idx);
+    return {
+      index: idx,
+      chapter: v.chapter,
+      verse: v.verse,
+      text: cleanDisplay,
+      normalizedText: norm,
+      words,
+      normalizedWords: normWords,
+      surah
+    };
+  });
+  for (let c = 1; c <= 114; c++) {
+    surahWordStreamsEn.set(c, []);
+    surahAyatMapEn.set(c, []);
+  }
+  for (let i = 0; i < indexedAyatEn.length; i++) {
+    const ayah = indexedAyatEn[i];
+    const stream = surahWordStreamsEn.get(ayah.chapter);
+    const surahAyat = surahAyatMapEn.get(ayah.chapter);
+    surahAyat.push(ayah);
+    for (let w = 0; w < ayah.normalizedWords.length; w++) {
+      const globalIndex = stream.length;
+      const raw = ayah.words[w] || "";
+      const normalized = ayah.normalizedWords[w] || "";
+      const wordObj = {
+        chapter: ayah.chapter,
+        verse: ayah.verse,
+        wordIndexInAyah: w,
+        globalWordIndex: globalIndex,
+        raw,
+        normalized
+      };
+      stream.push(wordObj);
+      if (normalized) {
+        let posList = wordPositionIndexEn.get(normalized);
+        if (!posList) {
+          posList = [];
+          wordPositionIndexEn.set(normalized, posList);
+        }
+        posList.push(ayah.chapter << 16 | globalIndex);
+      }
+      if (w > 0 && ayah.normalizedWords[w - 1]) {
+        const prevNorm = ayah.normalizedWords[w - 1];
+        const twoGram = `${prevNorm}_${normalized}`;
+        let twoList = twoGramIndexEn.get(twoGram);
+        if (!twoList) {
+          twoList = [];
+          twoGramIndexEn.set(twoGram, twoList);
+        }
+        twoList.push(ayah.chapter << 16 | globalIndex - 1);
+      }
+    }
+  }
+  for (const [k, list] of wordPositionIndexEn) {
+    wordPositionIndexEn.set(k, new Int32Array(list));
+  }
+  for (const [k, list] of twoGramIndexEn) {
+    twoGramIndexEn.set(k, new Int32Array(list));
+  }
+  for (const [k, list] of exactNormalizedMapEn) {
+    exactNormalizedMapEn.set(k, new Int32Array(list));
+  }
+  isInitializedEn = true;
+  return { totalIndexed: indexedAyatEn.length };
+}
+function wordSimilarityEn(qWord, sWord) {
+  if (qWord === sWord) return { score: 1, isExact: true };
+  const len1 = qWord.length;
+  const len2 = sWord.length;
+  if (Math.abs(len1 - len2) > 2) return { score: 0, isExact: false };
+  const dp = new Array(len2 + 1).fill(0).map((_, i) => i);
+  for (let i = 1; i <= len1; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= len2; j++) {
+      const cost = qWord[i - 1] === sWord[j - 1] ? 0 : 1;
+      const temp = dp[j];
+      dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + cost);
+      prev = temp;
+    }
+  }
+  const dist = dp[len2];
+  const maxLen = Math.max(len1, len2);
+  const sim = maxLen === 0 ? 1 : 1 - dist / maxLen;
+  if (sim >= 0.85) return { score: 0.9, isExact: false };
+  if (sim >= 0.7) return { score: 0.7, isExact: false };
+  return { score: 0, isExact: false };
+}
+function searchAyahEn(rawQuery) {
+  if (!isInitializedEn) {
+    initAyahEngineEn();
+  }
+  const startTime = performance.now();
+  const trimmed = rawQuery.trim();
+  const normalizedQuery = normalizeEnglish(trimmed);
+  const queryWords = normalizedQuery.split(" ").filter(Boolean);
+  const qWordCount = queryWords.length;
+  if (qWordCount === 0) {
+    return {
+      query: rawQuery,
+      normalizedQuery,
+      query_mode: "ayah_en",
+      state: "not_found",
+      topConfidence: 0,
+      totalMatches: 0,
+      results: [],
+      referralRequired: true,
+      referralMessage: "No reliable match found, consult scholars",
+      executionTimeMs: Math.round((performance.now() - startTime) * 100) / 100
+    };
+  }
+  const wholeAyahHits = /* @__PURE__ */ new Set();
+  const exactNorm = exactNormalizedMapEn.get(normalizedQuery);
+  if (exactNorm) exactNorm.forEach((idx) => wholeAyahHits.add(idx));
+  const queryVariants = [
+    { words: queryWords, isBasmalaStripped: false }
+  ];
+  const rawCandidateMatches = [];
+  for (const variant of queryVariants) {
+    const vWords = variant.words;
+    const vLen = vWords.length;
+    if (vLen === 0) continue;
+    const candidateStartsBySurah = /* @__PURE__ */ new Map();
+    for (let i = 0; i < Math.min(3, vLen - 1); i++) {
+      const twoGram = `${vWords[i]}_${vWords[i + 1]}`;
+      const hits = twoGramIndexEn.get(twoGram);
+      if (hits) {
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 65535;
+          let sSet = candidateStartsBySurah.get(ch);
+          if (!sSet) {
+            sSet = /* @__PURE__ */ new Set();
+            candidateStartsBySurah.set(ch, sSet);
+          }
+          sSet.add(Math.max(0, gIdx - i));
+        }
+      }
+    }
+    for (let i = 0; i < Math.min(2, vLen); i++) {
+      const hits = wordPositionIndexEn.get(vWords[i]);
+      if (hits) {
+        for (let j = 0; j < hits.length; j++) {
+          const hit = hits[j];
+          const ch = hit >> 16;
+          const gIdx = hit & 65535;
+          let sSet = candidateStartsBySurah.get(ch);
+          if (!sSet) {
+            sSet = /* @__PURE__ */ new Set();
+            candidateStartsBySurah.set(ch, sSet);
+          }
+          sSet.add(Math.max(0, gIdx - i));
+        }
+      }
+    }
+    for (const hIdx of wholeAyahHits) {
+      const ayah = indexedAyatEn[hIdx];
+      const stream = surahWordStreamsEn.get(ayah.chapter);
+      if (stream) {
+        const firstWIdx = stream.findIndex((w) => w.verse === ayah.verse && w.wordIndexInAyah === 0);
+        if (firstWIdx !== -1) {
+          let sSet = candidateStartsBySurah.get(ayah.chapter);
+          if (!sSet) {
+            sSet = /* @__PURE__ */ new Set();
+            candidateStartsBySurah.set(ayah.chapter, sSet);
+          }
+          sSet.add(firstWIdx);
+        }
+      }
+    }
+    for (const [ch, startIndices] of candidateStartsBySurah.entries()) {
+      const stream = surahWordStreamsEn.get(ch);
+      if (!stream || stream.length === 0) continue;
+      for (const startIdx of startIndices) {
+        if (startIdx >= stream.length) continue;
+        const availableWords = stream.length - startIdx;
+        const compareLen = Math.min(vLen, availableWords);
+        if (compareLen < Math.min(1, vLen)) continue;
+        let totalScore = 0;
+        const wordScores = [];
+        const wordExactList = [];
+        const matchedTokens = [];
+        const changedWords = [];
+        for (let i = 0; i < vLen; i++) {
+          if (startIdx + i < stream.length) {
+            const streamWord = stream[startIdx + i];
+            const qWord = vWords[i];
+            const { score, isExact } = wordSimilarityEn(qWord, streamWord.normalized);
+            wordScores.push(score);
+            wordExactList.push(isExact);
+            totalScore += score;
+            if (score >= 0.4) {
+              matchedTokens.push(streamWord.raw);
+            } else {
+              changedWords.push({
+                queryWord: qWord,
+                sourceWord: streamWord.raw,
+                position: i
+              });
+            }
+          } else {
+            wordScores.push(0);
+            wordExactList.push(false);
+            changedWords.push({
+              queryWord: vWords[i],
+              sourceWord: null,
+              position: i
+            });
+          }
+        }
+        const avgScore = totalScore / vLen;
+        const confidence = Math.round(avgScore * 100);
+        if (confidence >= 65) {
+          const startVerse = stream[startIdx].verse;
+          const endGlobal = Math.min(stream.length - 1, startIdx + vLen - 1);
+          const endVerse = stream[endGlobal].verse;
+          rawCandidateMatches.push({
+            chapter: ch,
+            startVerse,
+            endVerse,
+            startGlobalWord: startIdx,
+            endGlobalWord: endGlobal,
+            confidence,
+            wordScores,
+            wordExactList,
+            matchedTokens,
+            changedWords,
+            isBasmalaStripped: variant.isBasmalaStripped
+          });
+        }
+      }
+    }
+  }
+  const bestMatchMap = /* @__PURE__ */ new Map();
+  for (const m of rawCandidateMatches) {
+    const key = `${m.chapter}:${m.startVerse}-${m.endVerse}`;
+    const existing = bestMatchMap.get(key);
+    if (!existing || m.confidence > existing.confidence) {
+      bestMatchMap.set(key, m);
+    }
+  }
+  const candidateList = Array.from(bestMatchMap.values());
+  if (candidateList.length === 0) {
+    const elapsed2 = Math.round((performance.now() - startTime) * 100) / 100;
+    return {
+      query: rawQuery,
+      normalizedQuery,
+      query_mode: "ayah_en",
+      state: "not_found",
+      topConfidence: 0,
+      totalMatches: 0,
+      results: [],
+      referralRequired: true,
+      referralMessage: "No reliable match found, consult scholars",
+      executionTimeMs: elapsed2
+    };
+  }
+  let topConfidence = 0;
+  for (const m of candidateList) {
+    if (m.confidence > topConfidence) {
+      topConfidence = m.confidence;
+    }
+  }
+  if (topConfidence < 70) {
+    const elapsed2 = Math.round((performance.now() - startTime) * 100) / 100;
+    return {
+      query: rawQuery,
+      normalizedQuery,
+      query_mode: "ayah_en",
+      state: "not_found",
+      topConfidence,
+      totalMatches: 0,
+      results: [],
+      referralRequired: true,
+      referralMessage: "No reliable match found, consult scholars",
+      executionTimeMs: elapsed2
+    };
+  }
+  const threshold = Math.max(70, topConfidence - 3);
+  const filteredCandidates = candidateList.filter((m) => m.confidence >= threshold);
+  const formattedResults = filteredCandidates.map((m) => {
+    const surah = surahMetadataEn.get(m.chapter);
+    const surahAyat = surahAyatMapEn.get(m.chapter);
+    const stream = surahWordStreamsEn.get(m.chapter);
+    const matchedAyat = surahAyat.filter(
+      (a) => a.verse >= m.startVerse && a.verse <= m.endVerse
+    );
+    const breakdown = [];
+    let totalAyatWords = 0;
+    let totalMatchedWords = 0;
+    let overallStartWordIndex = 0;
+    let overallEndWordIndex = 0;
+    const fullResultWordStatus = [];
+    let hasApproximateMatch = false;
+    for (let aIdx = 0; aIdx < matchedAyat.length; aIdx++) {
+      const ayah = matchedAyat[aIdx];
+      const ayahWords = ayah.words;
+      const ayahWordStatus = [];
+      let ayahMatchedCount = 0;
+      let ayahStartIdx = -1;
+      let ayahEndIdx = -1;
+      for (let w = 0; w < ayahWords.length; w++) {
+        const globalIdx = stream.findIndex(
+          (sw) => sw.chapter === ayah.chapter && sw.verse === ayah.verse && sw.wordIndexInAyah === w
+        );
+        let status = "none";
+        if (globalIdx >= m.startGlobalWord && globalIdx <= m.endGlobalWord) {
+          const matchOffset = globalIdx - m.startGlobalWord;
+          const score = m.wordScores[matchOffset] ?? 1;
+          const isExact = m.wordExactList[matchOffset] ?? true;
+          if (isExact && score >= 0.95) {
+            status = "exact";
+          } else if (score >= 0.4) {
+            status = "approx";
+            hasApproximateMatch = true;
+          }
+          if (status !== "none") {
+            ayahMatchedCount++;
+            if (ayahStartIdx === -1) ayahStartIdx = w;
+            ayahEndIdx = w;
+          }
+        }
+        ayahWordStatus.push(status);
+        fullResultWordStatus.push(status);
+      }
+      if (ayahStartIdx === -1) ayahStartIdx = 0;
+      if (ayahEndIdx === -1) ayahEndIdx = ayahWords.length - 1;
+      if (aIdx === 0) overallStartWordIndex = ayahStartIdx;
+      if (aIdx === matchedAyat.length - 1) overallEndWordIndex = ayahEndIdx;
+      totalAyatWords += ayahWords.length;
+      totalMatchedWords += ayahMatchedCount;
+      const covRatio = ayahWords.length > 0 ? ayahMatchedCount / ayahWords.length : 0;
+      const cov = covRatio >= 0.85 ? "full" : "fragment";
+      breakdown.push({
+        verse: ayah.verse,
+        text: ayah.text,
+        confidence: m.confidence,
+        coverage: cov,
+        coverageRatio: Math.round(covRatio * 100) / 100,
+        matchedWordCount: ayahMatchedCount,
+        totalWordCount: ayahWords.length,
+        matchedStartWordIndex: ayahStartIdx,
+        matchedEndWordIndex: ayahEndIdx,
+        matchedSlice: ayahWords.slice(ayahStartIdx, ayahEndIdx + 1).join(" "),
+        wordMatchStatus: ayahWordStatus
+      });
+    }
+    const overallCoverageRatio = totalAyatWords > 0 ? Math.min(1, totalMatchedWords / totalAyatWords) : 0;
+    const allAyatFull = breakdown.every((b) => b.coverage === "full");
+    const isSingleAyah = m.startVerse === m.endVerse;
+    const coverage = isSingleAyah ? overallCoverageRatio >= 0.85 || qWordCount >= totalAyatWords * 0.85 ? "full" : "fragment" : allAyatFull ? "full" : "fragment";
+    const fullRangeText = matchedAyat.map((a) => a.text).join(" ");
+    const verseRange = isSingleAyah ? `${m.startVerse}` : `${m.startVerse}\u2013${m.endVerse}`;
+    const hasUnmatchedWord = m.changedWords && m.changedWords.length > 0;
+    const isFullyMatched = !hasUnmatchedWord && !hasApproximateMatch && coverage === "full" && m.confidence >= 90;
+    const displayWords = [];
+    const wordGlobalToFullRangeIndex = /* @__PURE__ */ new Map();
+    let fullRangeIdx = 0;
+    for (const ayah of matchedAyat) {
+      for (let w = 0; w < ayah.words.length; w++) {
+        const swIdx = stream.findIndex(
+          (sw) => sw.chapter === ayah.chapter && sw.verse === ayah.verse && sw.wordIndexInAyah === w
+        );
+        if (swIdx !== -1) {
+          wordGlobalToFullRangeIndex.set(swIdx, fullRangeIdx);
+        }
+        displayWords.push(ayah.words[w]);
+        fullRangeIdx++;
+      }
+    }
+    const matchedOriginalIndices = [];
+    const matchedWords = [];
+    for (let swIdx = m.startGlobalWord; swIdx <= m.endGlobalWord; swIdx++) {
+      const frIdx = wordGlobalToFullRangeIndex.get(swIdx);
+      if (frIdx !== void 0) {
+        matchedOriginalIndices.push(frIdx);
+        matchedWords.push(displayWords[frIdx]);
+      }
+    }
+    return {
+      chapter: m.chapter,
+      verse: m.startVerse,
+      startVerse: m.startVerse,
+      endVerse: m.endVerse,
+      verseRange,
+      isRange: !isSingleAyah,
+      surah: {
+        arabic: surah.arabicName,
+        english: surah.englishName,
+        revelation: surah.revelation
+      },
+      text: fullRangeText,
+      confidence: isFullyMatched ? m.confidence : Math.min(89, m.confidence),
+      state: isFullyMatched ? "matched" : "close_match",
+      changedWords: m.changedWords || [],
+      coverage,
+      coverageRatio: Math.round(overallCoverageRatio * 100) / 100,
+      matchedStartWordIndex: matchedOriginalIndices[0] ?? 0,
+      matchedEndWordIndex: matchedOriginalIndices[matchedOriginalIndices.length - 1] ?? 0,
+      matchedSlice: fullRangeText,
+      matchedTokens: m.matchedTokens,
+      matchedWords,
+      matchedOriginalIndices,
+      wordMatchStatus: fullResultWordStatus,
+      hasApproximateMatch,
+      breakdown
+    };
+  });
+  formattedResults.sort((a, b) => {
+    if (a.coverage === "full" && b.coverage !== "full") return -1;
+    if (b.coverage === "full" && a.coverage !== "full") return 1;
+    if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+    if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+    return (a.startVerse || a.verse) - (b.startVerse || b.verse);
+  });
+  if (qWordCount < 3) {
+    const fullMatches = formattedResults.filter((r) => r.coverage === "full");
+    if (fullMatches.length === 0) {
+      const elapsed2 = Math.round((performance.now() - startTime) * 100) / 100;
+      return {
+        query: rawQuery,
+        normalizedQuery,
+        query_mode: "ayah_en",
+        state: "too_short",
+        topConfidence: 0,
+        totalMatches: 0,
+        results: [],
+        referralRequired: false,
+        notice: "Input too short for verification, please enter 3 or more words",
+        executionTimeMs: elapsed2
+      };
+    }
+  }
+  const overallTopConfidence = formattedResults.length > 0 ? formattedResults[0].confidence : topConfidence;
+  const overallState = formattedResults.some((r) => r.state === "matched") ? "matched" : "close_match";
+  const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
+  return {
+    query: rawQuery,
+    normalizedQuery,
+    query_mode: "ayah_en",
+    state: overallState,
+    topConfidence: overallTopConfidence,
+    totalMatches: formattedResults.length,
+    results: formattedResults,
+    referralRequired: false,
+    executionTimeMs: elapsed
+  };
+}
+
 // server/matching/askEngine.ts
 import { GoogleGenAI } from "@google/genai";
 
 // server/quota.config.ts
 var SAFETY_FACTOR = 0.8;
 var MODEL_CONFIGS = {
-  "gemini-2.5-flash-lite": {
-    id: "gemini-2.5-flash-lite",
-    name: "Gemini 2.5 Flash Lite",
+  "gemini-3.5-flash-lite": {
+    id: "gemini-3.5-flash-lite",
+    name: "Gemini 3.5 Flash Lite",
     rpd: 500,
     hourlyBudget: Math.floor(500 * SAFETY_FACTOR / 24)
     // 16 req/hr
   },
-  "gemini-2.5-flash": {
-    id: "gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    rpd: 1500,
-    hourlyBudget: Math.floor(1500 * SAFETY_FACTOR / 24)
-    // 50 req/hr
+  "gemini-3.1-flash-lite": {
+    id: "gemini-3.1-flash-lite",
+    name: "Gemini 3.1 Flash Lite",
+    rpd: 500,
+    hourlyBudget: Math.floor(500 * SAFETY_FACTOR / 24)
+    // 16 req/hr
   },
-  "gemma-2-27b-it": {
-    id: "gemma-2-27b-it",
-    name: "Gemma 2 27B",
+  "gemma-4-31b-it": {
+    id: "gemma-4-31b-it",
+    name: "Gemma 4 31B",
     rpd: 14400,
     hourlyBudget: Math.floor(14400 * SAFETY_FACTOR / 24)
     // 480 req/hr
   }
 };
 var ACTION_CHAINS = {
-  ocr: ["gemini-2.5-flash", "gemini-2.5-flash-lite"],
-  ask_call1: ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
-  ask_call2: ["gemini-2.5-flash-lite", "gemini-2.5-flash"]
+  ocr: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-31b-it"],
+  ask_call1: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-31b-it"],
+  ask_call2: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-31b-it"]
 };
 var QuotaManager = class {
   buckets = /* @__PURE__ */ new Map();
@@ -2591,6 +3095,205 @@ var QuotaManager = class {
 };
 var quotaManager = new QuotaManager();
 
+// server/services/hadeethEnc.ts
+var HADEETHENC_API_BASE = "https://hadeethenc.com/api/v1";
+var REQUEST_TIMEOUT_MS = 3e3;
+var CACHE_TTL_MS = 2 * 60 * 60 * 1e3;
+var searchCache = /* @__PURE__ */ new Map();
+var detailsCache = /* @__PURE__ */ new Map();
+function getCached(map, key) {
+  const entry = map.get(key);
+  if (!entry) return void 0;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    map.delete(key);
+    return void 0;
+  }
+  return entry.data;
+}
+function setCache(map, key, data, maxEntries = 500) {
+  if (map.size >= maxEntries) {
+    const oldestKey = map.keys().next().value;
+    if (oldestKey) map.delete(oldestKey);
+  }
+  map.set(key, { data, timestamp: Date.now() });
+}
+async function safeFetchJson(url) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "Accept": "application/json",
+        "User-Agent": "Bayan-Quran-Hadith-Verifier/1.0"
+      }
+    });
+    clearTimeout(timer);
+    if (!res.ok) {
+      return null;
+    }
+    const text = await res.text();
+    if (!text || text.trim() === '""' || text.trim() === "") {
+      return null;
+    }
+    const data = JSON.parse(text);
+    return data;
+  } catch (_err) {
+    return null;
+  }
+}
+async function searchHadeethEnc(phrase, language = "ar") {
+  const clean = phrase.trim();
+  if (!clean || clean.length < 2) return [];
+  const cacheKey = `${language}:${clean.toLowerCase()}`;
+  const cached = getCached(searchCache, cacheKey);
+  if (cached) return cached;
+  const url = `${HADEETHENC_API_BASE}/hadeeths/search/?language=${language}&phrase=${encodeURIComponent(clean)}`;
+  const data = await safeFetchJson(url);
+  let results = [];
+  if (Array.isArray(data)) {
+    results = data.map((item) => ({
+      id: String(item.id || ""),
+      title: String(item.title || ""),
+      hadith_text: String(item.hadith_text || ""),
+      hadith_text_highlights: item.hadith_text_highlights
+    })).filter((item) => item.id && item.hadith_text);
+  }
+  setCache(searchCache, cacheKey, results);
+  return results;
+}
+async function getHadeethEncById(id, language = "ar") {
+  const cleanId = String(id).trim();
+  if (!cleanId) return null;
+  const cacheKey = `${language}:${cleanId}`;
+  const cached = getCached(detailsCache, cacheKey);
+  if (cached !== void 0) return cached;
+  const url = `${HADEETHENC_API_BASE}/hadeeths/one/?language=${language}&id=${encodeURIComponent(cleanId)}`;
+  const data = await safeFetchJson(url);
+  if (!data || typeof data !== "object" || !data.id) {
+    setCache(detailsCache, cacheKey, null);
+    return null;
+  }
+  const result = {
+    id: String(data.id),
+    title: String(data.title || ""),
+    hadeeth: String(data.hadeeth || ""),
+    attribution: String(data.attribution || "").trim(),
+    grade: String(data.grade || "").trim(),
+    explanation: String(data.explanation || "").trim(),
+    hints: Array.isArray(data.hints) ? data.hints.map((h) => String(h).trim()).filter(Boolean) : [],
+    categories: Array.isArray(data.categories) ? data.categories : void 0,
+    translations: Array.isArray(data.translations) ? data.translations : void 0,
+    hadeeth_intro: data.hadeeth_intro ? String(data.hadeeth_intro) : void 0,
+    reference: data.reference ? String(data.reference).trim() : void 0,
+    words_meanings: Array.isArray(data.words_meanings) ? data.words_meanings : void 0,
+    hadeeth_ar: data.hadeeth_ar ? String(data.hadeeth_ar) : void 0,
+    hadeeth_intro_ar: data.hadeeth_intro_ar ? String(data.hadeeth_intro_ar) : void 0,
+    explanation_ar: data.explanation_ar ? String(data.explanation_ar) : void 0,
+    hints_ar: Array.isArray(data.hints_ar) ? data.hints_ar.map((h) => String(h).trim()).filter(Boolean) : void 0,
+    words_meanings_ar: Array.isArray(data.words_meanings_ar) ? data.words_meanings_ar : void 0,
+    attribution_ar: data.attribution_ar ? String(data.attribution_ar).trim() : void 0,
+    grade_ar: data.grade_ar ? String(data.grade_ar).trim() : void 0,
+    url: `https://hadeethenc.com/${language}/browse/hadith/${data.id}`
+  };
+  setCache(detailsCache, cacheKey, result);
+  return result;
+}
+async function searchAndGetHadeethEnc(phrase, language = "ar", limit = 3) {
+  const searchItems = await searchHadeethEnc(phrase, language);
+  if (!searchItems.length) return [];
+  const topItems = searchItems.slice(0, limit);
+  const detailsList = await Promise.all(
+    topItems.map((item) => getHadeethEncById(item.id, language))
+  );
+  return detailsList.filter((item) => item !== null);
+}
+function mapHadeethEncGradeFamily(grade) {
+  if (!grade) return "neutral";
+  const norm = normalizeArabic(grade).toLowerCase();
+  if (norm.includes("\u0635\u062D\u064A\u062D") || /sahih|authentic/i.test(grade)) return "\u0635\u062D\u064A\u062D";
+  if (norm.includes("\u062D\u0633\u0646") || /hasan|good/i.test(grade)) return "\u062D\u0633\u0646";
+  if (norm.includes("\u0636\u0639\u064A\u0641") || /da'?if|weak/i.test(grade)) return "\u0636\u0639\u064A\u0641";
+  if (norm.includes("\u0645\u0648\u0636\u0648\u0639") || /maudu|fabricated/i.test(grade)) return "\u0645\u0648\u0636\u0648\u0639";
+  return "neutral";
+}
+function toHadeethEncGradeItem(details, language = "ar") {
+  const rawGrade = (language === "en" ? details.grade : details.grade_ar || details.grade) || "";
+  const arabicLabel = details.grade_ar || details.grade || (language === "ar" ? "\u0644\u0627 \u062A\u062A\u0648\u0641\u0631 \u062F\u0631\u062C\u0629 \u0645\u0648\u062B\u0642\u0629" : "No documented grade");
+  const family = mapHadeethEncGradeFamily(rawGrade || arabicLabel);
+  return {
+    name: language === "en" ? "Encyclopedia of Prophetic Hadiths (HadeethEnc)" : "\u0645\u0648\u0633\u0648\u0639\u0629 \u0627\u0644\u0623\u062D\u0627\u062F\u064A\u062B \u0627\u0644\u0646\u0628\u0648\u064A\u0629 (HadeethEnc)",
+    originalGrade: rawGrade || (language === "en" ? "No documented grade" : "\u0644\u0627 \u062A\u062A\u0648\u0641\u0631 \u062F\u0631\u062C\u0629 \u0645\u0648\u062B\u0642\u0629"),
+    arabicLabel: arabicLabel || "\u0644\u0627 \u062A\u062A\u0648\u0641\u0631 \u062F\u0631\u062C\u0629 \u0645\u0648\u062B\u0642\u0629",
+    family,
+    isIsnadJudgment: false,
+    isCitation: true,
+    note: details.attribution || (language === "en" ? "Source: HadeethEnc.com" : "\u0627\u0644\u0645\u0635\u062F\u0631: HadeethEnc.com")
+  };
+}
+function toHadithMatchResult(details, query, language = "ar") {
+  const matn = details.hadeeth_ar || details.hadeeth || "";
+  const translation = language === "en" ? details.hadeeth : void 0;
+  const matnWords = matn.split(/\s+/).filter(Boolean);
+  const qWords = query.trim().split(/\s+/).filter(Boolean);
+  const cleanQ = normalizeArabic(query);
+  const cleanMatn = normalizeArabic(matn);
+  let confidence = 75;
+  if (cleanMatn.includes(cleanQ)) {
+    confidence = 100;
+  } else {
+    const sim = levenshteinSimilarity(cleanQ, cleanMatn.slice(0, Math.min(cleanMatn.length, cleanQ.length * 2)));
+    confidence = Math.min(89, Math.max(70, Math.round(sim * 100)));
+  }
+  const gradeItem = toHadeethEncGradeItem(details, language);
+  const hasNoGrading = !details.grade && !details.grade_ar;
+  return {
+    id: `hadeethenc_${details.id}`,
+    collection: "hadeethenc",
+    collectionArabic: "\u0645\u0648\u0633\u0648\u0639\u0629 \u0627\u0644\u0623\u062D\u0627\u062F\u064A\u062B \u0627\u0644\u0646\u0628\u0648\u064A\u0629 (HadeethEnc)",
+    hadithnumber: parseInt(details.id, 10) || 0,
+    arabicnumber: details.id,
+    book: 0,
+    hadithInBook: parseInt(details.id, 10) || 0,
+    sectionName: details.attribution || "\u062A\u062E\u0631\u064A\u062C \u0627\u0644\u0645\u0648\u0633\u0648\u0639\u0629",
+    text: matn,
+    translation,
+    confidence,
+    state: confidence === 100 ? "matched" : "close_match",
+    coverage: "full",
+    matchedStartWordIndex: 0,
+    matchedEndWordIndex: matnWords.length,
+    matchedTokens: qWords,
+    wordMatchStatus: qWords.map(() => "exact"),
+    hasApproximateMatch: confidence < 100,
+    grades: [gradeItem],
+    hasNoGrading,
+    isnadStripped: false,
+    isnadChecked: true
+  };
+}
+function toAskCitationItem(details, language = "ar", score = 30) {
+  const isEn = language === "en";
+  const gradeItem = toHadeethEncGradeItem(details, language);
+  const hasNoGrading = !details.grade && !details.grade_ar;
+  return {
+    id: `hadeethenc_${details.id}`,
+    role: "supports",
+    sourceTitle: isEn ? "Encyclopedia of Prophetic Hadiths (HadeethEnc)" : "\u0645\u0648\u0633\u0648\u0639\u0629 \u0627\u0644\u0623\u062D\u0627\u062F\u064A\u062B \u0627\u0644\u0646\u0628\u0648\u064A\u0629 (HadeethEnc)",
+    editionName: `HadeethEnc #${details.id} \u2014 ${details.attribution || "HadeethEnc"}`,
+    fullText: isEn ? details.hadeeth : details.hadeeth_ar || details.hadeeth,
+    arabicFullText: details.hadeeth_ar || details.hadeeth,
+    tafsirText: isEn ? details.explanation : details.explanation_ar || details.explanation,
+    tafsirExcerpt: details.hints?.length ? isEn ? details.hints[0] : details.hints_ar?.[0] || details.hints[0] : void 0,
+    grades: [gradeItem],
+    hasNoGrading,
+    type: "hadith",
+    hadithnumber: parseInt(details.id, 10) || 0,
+    collection: "hadeethenc",
+    score
+  };
+}
+
 // server/matching/askEngine.ts
 var CALL_TIMEOUT_MS = 3500;
 var AskLRUCache = class {
@@ -2602,7 +3305,7 @@ var AskLRUCache = class {
   get(key) {
     const entry = this.cache.get(key);
     if (!entry) return void 0;
-    if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    if (Date.now() - entry.timestamp > CACHE_TTL_MS2) {
       this.cache.delete(key);
       return void 0;
     }
@@ -2627,22 +3330,22 @@ var AskLRUCache = class {
   }
 };
 var askCache = new AskLRUCache(200);
-var CACHE_TTL_MS = 60 * 60 * 1e3;
+var CACHE_TTL_MS2 = 60 * 60 * 1e3;
 var CURATED_FABRICATED_SAYINGS = [
   {
-    keywords: ["\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0641\u064A \u0627\u0644\u0635\u064A\u0646"],
+    keywords: ["\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0641\u064A \u0627\u0644\u0635\u064A\u0646", "seek knowledge even in china", "seek knowledge even if in china"],
     matn: "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646",
     ruling: "\u0644\u0627 \u064A\u0635\u062D",
     url: "https://dorar.net/fake-hadith/38"
   },
   {
-    keywords: ["\u062D\u0628 \u0627\u0644\u0648\u0637\u0646 \u0645\u0646 \u0627\u0644\u0625\u064A\u0645\u0627\u0646"],
+    keywords: ["\u062D\u0628 \u0627\u0644\u0648\u0637\u0646 \u0645\u0646 \u0627\u0644\u0625\u064A\u0645\u0627\u0646", "love of homeland is part of faith"],
     matn: "\u062D\u0628 \u0627\u0644\u0648\u0637\u0646 \u0645\u0646 \u0627\u0644\u0625\u064A\u0645\u0627\u0646",
     ruling: "\u0644\u064A\u0633 \u0628\u062D\u062F\u064A\u062B",
     url: "https://dorar.net/fake-hadith/74"
   },
   {
-    keywords: ["\u0627\u0644\u0645\u0639\u062F\u0629 \u0628\u064A\u062A \u0627\u0644\u062F\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0627\u0644\u062F\u0648\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0643\u0644 \u062F\u0648\u0627\u0621"],
+    keywords: ["\u0627\u0644\u0645\u0639\u062F\u0629 \u0628\u064A\u062A \u0627\u0644\u062F\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0627\u0644\u062F\u0648\u0627\u0621", "\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0643\u0644 \u062F\u0648\u0627\u0621", "the stomach is the home of disease", "diet is the head of medicine", "diet is the head of all medicine"],
     matn: "\u0627\u0644\u0645\u0639\u0650\u062F\u0629 \u0628\u064A\u062A \u0627\u0644\u062F\u0627\u0621\u060C \u0648\u0627\u0644\u062D\u0645\u064A\u0629 \u0631\u0623\u0633 \u0627\u0644\u062F\u0648\u0627\u0621",
     ruling: "\u0644\u0627 \u0623\u0635\u0644 \u0644\u0647",
     url: "https://dorar.net/fake-hadith/557"
@@ -3016,6 +3719,304 @@ function countDistinctMatchedConcepts(doc, question, terms) {
   }
   return matches;
 }
+var ASK_FRAME_TERMS = /* @__PURE__ */ new Set([
+  // Arabic interrogative / function words
+  "\u0647\u0644",
+  "\u0645\u0646",
+  "\u0641\u064A",
+  "\u0639\u0644\u0649",
+  "\u0627\u0644\u0649",
+  "\u0639\u0646",
+  "\u0645\u0639",
+  "\u0647\u0630\u0627",
+  "\u0647\u0630\u0647",
+  "\u0630\u0644\u0643",
+  "\u062A\u0644\u0643",
+  "\u0627\u0644\u062A\u064A",
+  "\u0627\u0644\u0630\u064A",
+  "\u0627\u0644\u0630\u064A\u0646",
+  "\u0645\u0627",
+  "\u0644\u0627",
+  "\u0644\u0645",
+  "\u0644\u0646",
+  "\u0642\u062F",
+  "\u0643\u0644",
+  "\u0628\u0639\u0636",
+  "\u0627\u064A",
+  "\u0648",
+  "\u0627\u0648",
+  "\u062B\u0645",
+  "\u0627\u0646",
+  "\u0623\u0646",
+  "\u0625\u0646",
+  "\u0627\u0646\u0647",
+  "\u0643\u0627\u0646",
+  "\u0643\u0627\u0646\u062A",
+  "\u064A\u0643\u0648\u0646",
+  "\u0627\u0646\u0627",
+  "\u0627\u0646\u062A",
+  "\u0647\u0648",
+  "\u0647\u064A",
+  "\u0647\u0646",
+  "\u0646\u062D\u0646",
+  "\u0643\u0645\u0627",
+  "\u062D\u064A\u062B",
+  "\u0644\u062F\u0649",
+  "\u0628\u064A\u0646",
+  "\u062D\u062A\u0649",
+  "\u0628\u0644",
+  "\u063A\u064A\u0631",
+  "\u0633\u0648\u0649",
+  "\u0646\u0641\u0633",
+  "\u0628\u0647",
+  "\u0628\u0647\u0627",
+  "\u0644\u0647",
+  "\u0644\u0647\u0627",
+  "\u0644\u0647\u0645",
+  "\u0641\u064A\u0647",
+  "\u0641\u064A\u0647\u0627",
+  "\u0645\u0646\u0647",
+  "\u0645\u0646\u0647\u0627",
+  "\u0639\u0644\u064A\u0647",
+  "\u0639\u0644\u064A\u0647\u0627",
+  "\u0627\u0644\u064A\u0647",
+  "\u0627\u0644\u064A\u0647\u0627",
+  "\u0639\u0646\u062F",
+  "\u0639\u0646\u062F\u0645\u0627",
+  "\u0645\u062B\u0644",
+  "\u0633\u0648\u0641",
+  "\u0643\u0644\u0647\u0627",
+  "\u0643\u0644\u0645\u0627",
+  // Arabic reporting / attribution scaffolding (never part of the attested claim)
+  "\u0627\u0644\u0644\u0647",
+  "\u0627\u0644\u0646\u0628\u064A",
+  "\u0627\u0644\u0646\u0627\u0633",
+  "\u0642\u0627\u0644",
+  "\u0631\u0633\u0648\u0644",
+  "\u0646\u0628\u064A",
+  "\u0633\u0646\u0629",
+  "\u062D\u062F\u064A\u062B",
+  "\u0631\u0648\u0627\u0647",
+  "\u0627\u062D\u0627\u062F\u064A\u062B",
+  "\u0627\u0635\u062D\u0627\u0628",
+  "\u0648\u0631\u062F",
+  "\u0631\u0648\u0649",
+  "\u0627\u062E\u0628\u0631",
+  "\u0627\u0645\u0631",
+  "\u0627\u0645\u0631\u062A",
+  "\u064A\u0623\u0645\u0631",
+  "\u064A\u0627\u0645\u0631",
+  "\u0646\u0647\u0649",
+  "\u0646\u0647\u064A\u0646\u0627",
+  "\u064A\u0646\u0647\u0649",
+  "\u0646\u0647\u064A\u0627",
+  "\u064A\u062D\u0631\u0645",
+  "\u064A\u062D\u0644",
+  "\u064A\u062D\u0633\u0628",
+  "\u064A\u062C\u0648\u0632",
+  "\u0648\u0627\u062C\u0628",
+  "\u0645\u0628\u0627\u062D",
+  "\u0645\u0633\u062A\u062D\u0628",
+  "\u0645\u0633\u062A\u062D\u0628\u0647",
+  "\u0645\u0643\u0631\u0648\u0647",
+  "\u062D\u0631\u0627\u0645",
+  "\u062D\u0644\u0627\u0644",
+  "\u0633\u0645\u0649",
+  "\u0633\u0645\u0627\u0647\u0627",
+  "\u064A\u0633\u0645\u064A",
+  "\u0641\u0636\u0644",
+  "\u0627\u062C\u0631",
+  "\u062B\u0648\u0627\u0628",
+  "\u0639\u0648\u0636",
+  "\u062C\u0632\u0627\u0621",
+  // English interrogative / function words
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "do",
+  "does",
+  "did",
+  "you",
+  "your",
+  "yours",
+  "the",
+  "a",
+  "an",
+  "of",
+  "at",
+  "in",
+  "to",
+  "for",
+  "it",
+  "its",
+  "and",
+  "or",
+  "not",
+  "no",
+  "if",
+  "so",
+  "can",
+  "will",
+  "would",
+  "should",
+  "must",
+  "me",
+  "my",
+  "we",
+  "us",
+  "they",
+  "them",
+  "he",
+  "she",
+  "his",
+  "her",
+  "their",
+  "there",
+  "here",
+  "then",
+  "than",
+  "that",
+  "this",
+  "with",
+  "on",
+  "as",
+  "any",
+  "all",
+  "while",
+  "when",
+  "what",
+  "which",
+  "who",
+  "whom",
+  "how",
+  "why",
+  "where",
+  "am",
+  "have",
+  "has",
+  "had",
+  "also",
+  "into",
+  "from",
+  "out",
+  "up",
+  "down",
+  "about",
+  "over",
+  "under",
+  "again",
+  "very",
+  "some",
+  "such",
+  "only",
+  "other",
+  "own",
+  "same",
+  "too",
+  // English reporting / attribution scaffolding
+  "prophet",
+  "people",
+  "messenger",
+  "man",
+  "men",
+  "hadith",
+  "sunnah",
+  "say",
+  "said",
+  "says",
+  "narrated",
+  "authority",
+  "god",
+  "lord",
+  "order",
+  "ordered",
+  "orders",
+  "command",
+  "commanded",
+  "forbid",
+  "forbids",
+  "forbidden",
+  "prohibit",
+  "prohibited",
+  "recommend",
+  "recommended",
+  "recommends",
+  "warn",
+  "warned",
+  "warns",
+  "reported",
+  "called",
+  "termed",
+  "named",
+  "obligatory",
+  "obligated",
+  "permissible",
+  "permitted",
+  "allowed",
+  "allows",
+  "ruling"
+]);
+function splitTokens(text, language, dropFrame) {
+  if (!text) return [];
+  const base = language === "en" ? text.toLowerCase() : normalizeArabic(text).toLowerCase();
+  const out = [];
+  for (let w of base.split(/[^\p{L}\p{N}]+/u)) {
+    if (w.length < 2) continue;
+    if (ASK_FRAME_TERMS.has(w)) continue;
+    if (language === "ar") w = stripArabicPrefixes(w);
+    if (w.length < 2) continue;
+    if (ASK_FRAME_TERMS.has(w)) continue;
+    out.push(w);
+  }
+  return dropFrame ? Array.from(new Set(out)) : out;
+}
+var MAX_ATTESTATION_TOKENS = 260;
+function evidenceTextOf(item, language) {
+  if (language === "en") return item.fullText || "";
+  return item.arabicFullText || item.fullText || "";
+}
+function tokenMatchesSet(token, set) {
+  if (set.has(token)) return true;
+  for (const d of set) {
+    if (Math.abs(d.length - token.length) > 3) continue;
+    const shorter = d.length <= token.length ? d : token;
+    const longer = d.length <= token.length ? token : d;
+    if (shorter.length >= 4 && longer.startsWith(shorter)) return true;
+  }
+  return false;
+}
+function measureClaimAttestation(question, items, language, maxItems = 5) {
+  const qTokens = splitTokens(question, language, true);
+  if (!qTokens.length) return { lexical: 0, aligned: 0 };
+  const qForDp = qTokens.map((w) => ({ word: w, normalized: w }));
+  let lexical = 0;
+  let aligned = 0;
+  for (let i = 0; i < items.length && i < maxItems; i++) {
+    const raw = evidenceTextOf(items[i], language);
+    if (!raw) continue;
+    const dedupTokens = splitTokens(raw, language, true);
+    if (!dedupTokens.length) continue;
+    const tokenSet = new Set(dedupTokens);
+    const hits = qTokens.filter((t) => tokenMatchesSet(t, tokenSet)).length;
+    lexical = Math.max(lexical, hits / qTokens.length);
+    const fullTokens = splitTokens(raw, language, false).slice(0, MAX_ATTESTATION_TOKENS);
+    for (const source of [fullTokens, dedupTokens]) {
+      if (!source.length) continue;
+      const sTokens = source.map((w, idx) => ({ word: w, normalized: w, originalIndex: idx }));
+      const alignedResult = alignWordsDP(qForDp, sTokens);
+      const matched = alignedResult.wordStatus.filter((s) => s !== "none").length;
+      aligned = Math.max(aligned, matched / qTokens.length);
+    }
+  }
+  return { lexical, aligned };
+}
+var CLAIM_LEXICAL_THRESHOLD = 0.7;
+var CLAIM_ALIGNED_THRESHOLD = 0.5;
+var CLAIM_PARTIAL_THRESHOLD = 0.4;
 function deriveDeterministicVerdict(items, category, language, question = "") {
   if (items.length === 0) {
     return {
@@ -3041,93 +4042,16 @@ function deriveDeterministicVerdict(items, category, language, question = "") {
       badgeSubline: language === "en" ? "Ruling question; texts only, fatwa is for qualified scholars" : "\u0647\u0630\u0627 \u0633\u0624\u0627\u0644 \u0641\u064A \u0627\u0644\u062D\u0643\u0645 \u0627\u0644\u0634\u0631\u0639\u064A\u061B \u0646\u0639\u0631\u0636 \u0627\u0644\u0646\u0635\u0648\u0635 \u0641\u0642\u0637\u060C \u0648\u0627\u0644\u0641\u062A\u0648\u0649 \u0644\u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
     };
   }
-  const STOPWORDS = /* @__PURE__ */ new Set([
-    "\u0647\u0644",
-    "\u0641\u064A",
-    "\u0645\u0646",
-    "\u0639\u0646",
-    "\u0639\u0644\u0649",
-    "\u0625\u0644\u0649",
-    "\u0623\u0646",
-    "\u0625\u0646",
-    "\u0645\u0627",
-    "\u0643\u0645",
-    "\u0643\u064A\u0641",
-    "\u0645\u062A\u0649",
-    "\u0623\u064A\u0646",
-    "\u0644\u0645\u0627\u0630\u0627",
-    "\u0647\u0648",
-    "\u0647\u064A",
-    "\u0647\u0645",
-    "\u0623\u0646\u0627",
-    "\u0646\u062D\u0646",
-    "\u0647\u0630\u0627",
-    "\u0647\u0630\u0647",
-    "\u0630\u0644\u0643",
-    "\u062A\u0644\u0643",
-    "\u0627\u0644\u062A\u064A",
-    "\u0627\u0644\u0630\u064A",
-    "\u0627\u0644\u0630\u064A\u0646",
-    "\u0642\u0627\u0644",
-    "\u0648\u0631\u062F",
-    "\u0646\u0628\u064A",
-    "\u0627\u0644\u0646\u0628\u064A",
-    "\u0631\u0633\u0648\u0644",
-    "\u0627\u0644\u0644\u0647",
-    "\u0635\u0644\u0649",
-    "\u0639\u0644\u064A\u0647",
-    "\u0648\u0633\u0644\u0645",
-    "is",
-    "it",
-    "at",
-    "in",
-    "of",
-    "on",
-    "to",
-    "for",
-    "with",
-    "the",
-    "a",
-    "an",
-    "are",
-    "was",
-    "were",
-    "does",
-    "do",
-    "did",
-    "how",
-    "what",
-    "where",
-    "when",
-    "why",
-    "who",
-    "whom",
-    "which",
-    "your",
-    "his",
-    "her",
-    "prophet",
-    "said",
-    "order",
-    "ordered",
-    "say",
-    "saying"
-  ]);
-  const qCleanWords = qNorm.split(/[^\u0600-\u06FFa-z0-9]+/i).filter((w) => w.length >= 2 && !STOPWORDS.has(w));
-  const docText = normalizeArabic(items[0]?.fullText + " " + (items[0]?.arabicFullText || "")).toLowerCase();
-  let matchedConcepts = 0;
-  for (const w of qCleanWords) {
-    if (docText.includes(w)) matchedConcepts++;
-  }
-  const coverage = qCleanWords.length > 0 ? matchedConcepts / qCleanWords.length : 0;
-  if (coverage < 0.35) {
+  const attestation = measureClaimAttestation(question, items, language);
+  const { lexical, aligned } = attestation;
+  if (lexical < CLAIM_PARTIAL_THRESHOLD) {
     return {
       verdict: "unclear",
       badgeLabel: language === "en" ? "No reliable match found" : "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642",
       badgeSubline: language === "en" ? "Consult qualified scholars" : "\u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
     };
   }
-  if (coverage < 0.7) {
+  if (lexical < CLAIM_LEXICAL_THRESHOLD || aligned < CLAIM_ALIGNED_THRESHOLD) {
     return {
       verdict: "permissibility",
       badgeLabel: language === "en" ? "Related Texts" : "\u0646\u0635\u0648\u0635 \u0630\u0627\u062A \u0635\u0644\u0629",
@@ -3145,12 +4069,37 @@ function isWeakTerm(term) {
   const norm = stripArabicPrefixes(normalizeArabic(term)).toLowerCase();
   return WEAK_TERMS.has(term) || WEAK_TERMS.has(norm);
 }
+var dfCache = /* @__PURE__ */ new Map();
+function termDocFreq(term) {
+  if (!term) return void 0;
+  if (dfCache.has(term)) return dfCache.get(term);
+  let df;
+  try {
+    const postings = loadAskSearchIndex().postings;
+    const p = postings[term];
+    df = p ? p.length : void 0;
+  } catch {
+    df = void 0;
+  }
+  dfCache.set(term, df);
+  return df;
+}
+var RARE_DOC_FREQ_RATIO = 75e-4;
 function isRareTerm(term) {
   if (!term) return false;
   const norm = stripArabicPrefixes(normalizeArabic(term)).toLowerCase();
   if (RARE_TERMS.has(term) || RARE_TERMS.has(norm)) return true;
-  if (norm.length >= 6 && !isWeakTerm(norm)) return true;
-  return false;
+  if (isWeakTerm(norm)) return false;
+  if (norm.length >= 6) return true;
+  let totalDocs = 0;
+  try {
+    totalDocs = loadAskSearchIndex().docs.length;
+  } catch {
+    return false;
+  }
+  if (!totalDocs) return false;
+  const df = termDocFreq(term) ?? termDocFreq(norm);
+  return df !== void 0 && df <= totalDocs * RARE_DOC_FREQ_RATIO;
 }
 var globalQuranArMap = null;
 var globalQuranEnMap = null;
@@ -3714,7 +4663,7 @@ Output STRICT JSON:
   for (let attempt = 0; attempt < 2; attempt++) {
     let modelToTry = null;
     if (userKey) {
-      modelToTry = attempt === 0 ? "gemini-2.5-flash-lite" : "gemini-2.5-flash";
+      modelToTry = attempt === 0 ? "gemini-3.5-flash-lite" : "gemini-3.1-flash-lite";
     } else {
       const acq = quotaManager.acquireModel("ask_call1");
       modelToTry = acq.model;
@@ -3809,7 +4758,7 @@ ${promptItems}`;
   for (let attempt = 0; attempt < 2; attempt++) {
     let modelToTry = null;
     if (userKey) {
-      modelToTry = attempt === 0 ? "gemini-2.5-flash-lite" : "gemini-2.5-flash";
+      modelToTry = attempt === 0 ? "gemini-3.5-flash-lite" : "gemini-3.1-flash-lite";
     } else {
       const acq = quotaManager.acquireModel("ask_call2");
       modelToTry = acq.model;
@@ -3908,18 +4857,17 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       };
     }
   }
-  const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, " ");
-  const cached = askCache.get(normKey);
-  if (cached) {
-    return {
-      ...cached,
-      cached: true,
-      executionTimeMs: Math.round(performance.now() - startTime)
-    };
-  }
-  const normCleanQuestion = stripArabicPrefixes(rawQuestion);
+  const normCleanQuestionAr = normalizeArabic(rawQuestion).toLowerCase().replace(/[،،]/g, "");
+  const normCleanQuestionEn = rawQuestion.toLowerCase().replace(/[،،]/g, "");
   const matchedFake = CURATED_FABRICATED_SAYINGS.find(
-    (f) => normCleanQuestion.includes(normalizeArabic(f.matn)) || f.keywords.some((k) => normCleanQuestion.includes(normalizeArabic(k)))
+    (f) => normCleanQuestionAr.includes(normalizeArabic(f.matn).toLowerCase().replace(/[،،]/g, "")) || f.keywords.some((k) => {
+      const hasArabic = /[\u0600-\u06FF]/.test(k);
+      if (hasArabic) {
+        return normCleanQuestionAr.includes(normalizeArabic(k).toLowerCase().replace(/[،،]/g, ""));
+      } else {
+        return normCleanQuestionEn.includes(k.toLowerCase());
+      }
+    })
   );
   if (matchedFake) {
     const res2 = {
@@ -3943,8 +4891,16 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       topRetrievedIds: [],
       executionTimeMs: Math.round(performance.now() - startTime)
     };
-    askCache.set(normKey, res2);
     return res2;
+  }
+  const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, " ");
+  const cached = askCache.get(normKey);
+  if (cached) {
+    return {
+      ...cached,
+      cached: true,
+      executionTimeMs: Math.round(performance.now() - startTime)
+    };
   }
   const language = /[a-z]/i.test(rawQuestion) ? "en" : "ar";
   const localTerms = extractLocalTerms(rawQuestion, language);
@@ -4031,6 +4987,18 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       score: d.score
     };
   });
+  if ((req.includeHadeethEnc || !req.singlePass && !isPermissibilityQuestion) && rawQuestion.length >= 3) {
+    try {
+      const hList = await searchAndGetHadeethEnc(rawQuestion, language, 2);
+      for (const h of hList) {
+        const hItem = toAskCitationItem(h, language, 25);
+        if (!items.some((it) => it.id === hItem.id)) {
+          items.push(hItem);
+        }
+      }
+    } catch (_e) {
+    }
+  }
   const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
   const totalStage1Ms = Math.round(performance.now() - startTime);
   const res = {
@@ -4044,7 +5012,7 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
     summary: "",
     searchedTerms: finalTerms,
     items,
-    retrievedCount: finalPassingSources.length,
+    retrievedCount: items.length,
     droppedItemsCount: 0,
     topRetrievedIds: items.slice(0, 3).map((i) => i.id),
     executionTimeMs: totalStage1Ms,
@@ -4206,12 +5174,18 @@ async function askQuestionFullPass(stage1Res, rawQuestion, passingSources, clien
 // server/app.ts
 var app = express();
 app.use(express.json({ limit: "10mb" }));
-var requestCounter = 0;
+var lastGcTime = 0;
 app.use((req, res, next) => {
   res.on("finish", () => {
-    requestCounter++;
-    if (requestCounter % 20 === 0 && global.gc) {
-      global.gc();
+    const now = Date.now();
+    if (global.gc && now - lastGcTime > 3e4) {
+      const mem = process.memoryUsage().heapUsed;
+      if (mem > 650 * 1024 * 1024) {
+        lastGcTime = now;
+        setImmediate(() => {
+          if (global.gc) global.gc();
+        });
+      }
     }
   });
   next();
@@ -4231,8 +5205,13 @@ var REGISTERED_ROUTES = [
   "GET /api/corpus/stats",
   "POST /api/ayah/search",
   "POST /api/ayah/match",
+  "POST /api/ayah/search/en",
+  "POST /api/ayah/match/en",
   "POST /api/hadith/search",
   "POST /api/hadith/match",
+  "POST /api/hadeethenc/search",
+  "POST /api/hadeethenc/match",
+  "GET /api/hadeethenc/hadith/:id",
   "POST /api/ask",
   "POST /api/ask/verdict",
   "POST /api/ocr",
@@ -4288,21 +5267,107 @@ app.post("/api/ayah/match", (req, res) => {
   const result = searchAyah(query);
   res.json(result);
 });
-app.post("/api/hadith/search", (req, res) => {
+app.post("/api/ayah/search/en", (req, res) => {
   const query = req.body?.query || req.body?.text || "";
+  const result = searchAyahEn(query);
+  res.json(result);
+});
+app.post("/api/ayah/match/en", (req, res) => {
+  const query = req.body?.query || req.body?.text || "";
+  const result = searchAyahEn(query);
+  res.json(result);
+});
+app.post("/api/hadith/search", async (req, res) => {
+  const query = req.body?.query || req.body?.text || "";
+  const includeHadeethEnc = req.body?.includeHadeethEnc === true;
   const result = searchHadith(query);
+  if (includeHadeethEnc && query.trim().length >= 2) {
+    try {
+      const hadeethEncDetails = await searchAndGetHadeethEnc(query, result.language || "ar", 3);
+      const hadeethEncResults = hadeethEncDetails.map((d) => toHadithMatchResult(d, query, result.language || "ar"));
+      result.hadeethEncResults = hadeethEncResults;
+      result.hadeethEncDetails = hadeethEncDetails;
+    } catch (_e) {
+      result.hadeethEncResults = [];
+      result.hadeethEncDetails = [];
+    }
+  }
   if (result.language === "en" && global.gc) {
     global.gc();
   }
   res.json(result);
 });
-app.post("/api/hadith/match", (req, res) => {
+app.post("/api/hadith/match", async (req, res) => {
   const query = req.body?.query || req.body?.text || "";
+  const includeHadeethEnc = req.body?.includeHadeethEnc === true;
   const result = searchHadith(query);
+  if (includeHadeethEnc && query.trim().length >= 2) {
+    try {
+      const hadeethEncDetails = await searchAndGetHadeethEnc(query, result.language || "ar", 3);
+      const hadeethEncResults = hadeethEncDetails.map((d) => toHadithMatchResult(d, query, result.language || "ar"));
+      result.hadeethEncResults = hadeethEncResults;
+      result.hadeethEncDetails = hadeethEncDetails;
+    } catch (_e) {
+      result.hadeethEncResults = [];
+      result.hadeethEncDetails = [];
+    }
+  }
   if (result.language === "en" && global.gc) {
     global.gc();
   }
   res.json(result);
+});
+app.post("/api/hadeethenc/search", async (req, res) => {
+  try {
+    const phrase = req.body?.phrase || req.body?.query || req.body?.text || "";
+    const language = req.body?.language === "en" ? "en" : "ar";
+    const items = await searchHadeethEnc(phrase, language);
+    res.json({ phrase, language, count: items.length, items });
+  } catch (err) {
+    res.status(500).json({ error: "FAILED_TO_SEARCH_HADEETHENC", details: err?.message, items: [] });
+  }
+});
+app.get("/api/hadeethenc/hadith/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const language = req.query.language === "en" ? "en" : "ar";
+    const hadith = await getHadeethEncById(id, language);
+    if (!hadith) {
+      res.status(404).json({ error: "HADEETH_NOT_FOUND", id });
+      return;
+    }
+    res.json(hadith);
+  } catch (err) {
+    res.status(500).json({ error: "FAILED_TO_FETCH_HADEETHENC", details: err?.message });
+  }
+});
+app.post("/api/hadeethenc/match", async (req, res) => {
+  try {
+    const query = req.body?.query || req.body?.text || "";
+    const language = req.body?.language === "en" ? "en" : /[a-z]/i.test(query) ? "en" : "ar";
+    const detailsList = await searchAndGetHadeethEnc(query, language, 5);
+    const results = detailsList.map((d) => toHadithMatchResult(d, query, language));
+    const topConfidence = results.length > 0 ? results[0].confidence : 0;
+    const state = results.length === 0 ? "not_found" : results[0].state;
+    res.json({
+      query,
+      language,
+      source: "hadeethenc",
+      state,
+      topConfidence,
+      totalMatches: results.length,
+      results,
+      details: detailsList
+    });
+  } catch (err) {
+    res.status(500).json({
+      query: req.body?.query || "",
+      error: "HADEETHENC_MATCH_FAILED",
+      details: err?.message,
+      state: "not_found",
+      results: []
+    });
+  }
 });
 app.post("/api/ask", async (req, res) => {
   try {
@@ -4367,7 +5432,7 @@ app.post("/api/ocr", async (req, res) => {
     let modelToUse = null;
     let retryAfter = 0;
     if (userKey) {
-      modelToUse = "gemini-2.5-flash";
+      modelToUse = "gemini-3.5-flash-lite";
     } else {
       const acq = quotaManager.acquireModel("ocr");
       modelToUse = acq.model;
@@ -4472,13 +5537,13 @@ app.get("/api/quota", (req, res) => {
 });
 
 // server/corpus/prebuild.ts
-import fs4 from "fs";
-import path4 from "path";
+import fs5 from "fs";
+import path5 from "path";
 import zlib3 from "zlib";
-import { fileURLToPath as fileURLToPath4 } from "url";
-var __filename4 = fileURLToPath4(import.meta.url);
-var __dirname4 = path4.dirname(__filename4);
-var DATA_DIR3 = path4.resolve(__dirname4, "./data");
+import { fileURLToPath as fileURLToPath5 } from "url";
+var __filename5 = fileURLToPath5(import.meta.url);
+var __dirname5 = path5.dirname(__filename5);
+var DATA_DIR3 = path5.resolve(__dirname5, "./data");
 var EXPECTED_COUNTS = {
   bukhari: 7580,
   muslim: 7360,
@@ -4495,35 +5560,35 @@ async function downloadFile(url, dest) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
   const text = await res.text();
-  fs4.writeFileSync(dest, text);
+  fs5.writeFileSync(dest, text);
 }
 async function runPrebuild() {
   console.log("====================================================");
   console.log("Starting Prebuild: Data Acquisition & Index Generation");
   const startTime = performance.now();
-  if (!fs4.existsSync(DATA_DIR3)) {
-    fs4.mkdirSync(DATA_DIR3, { recursive: true });
+  if (!fs5.existsSync(DATA_DIR3)) {
+    fs5.mkdirSync(DATA_DIR3, { recursive: true });
   }
   try {
     for (const col of COLLECTIONS) {
-      const arPath = path4.join(DATA_DIR3, `hadith_${col}_ar.json`);
-      const enPath = path4.join(DATA_DIR3, `hadith_${col}_en.json`);
-      if (!fs4.existsSync(arPath)) {
+      const arPath = path5.join(DATA_DIR3, `hadith_${col}_ar.json`);
+      const enPath = path5.join(DATA_DIR3, `hadith_${col}_en.json`);
+      if (!fs5.existsSync(arPath)) {
         await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/ara-${col}.json`, arPath);
       }
-      if (!fs4.existsSync(enPath)) {
+      if (!fs5.existsSync(enPath)) {
         await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@df57907be35291c91ad6a6691180e22ca9920784/editions/eng-${col}.json`, enPath);
       }
     }
-    if (!fs4.existsSync(path4.join(DATA_DIR3, "quran_info.json"))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path4.join(DATA_DIR3, "quran_info.json"));
+    if (!fs5.existsSync(path5.join(DATA_DIR3, "quran_info.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/info.json`, path5.join(DATA_DIR3, "quran_info.json"));
     }
-    if (!fs4.existsSync(path4.join(DATA_DIR3, "quran_ar.json"))) {
-      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path4.join(DATA_DIR3, "quran_ar.json"));
+    if (!fs5.existsSync(path5.join(DATA_DIR3, "quran_ar.json"))) {
+      await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-quranacademy.json`, path5.join(DATA_DIR3, "quran_ar.json"));
     }
-    await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-ummmuhammad.json`, path4.join(DATA_DIR3, "quran_en.json"));
-    const tafsirPath = path4.join(DATA_DIR3, "quran_tafsir_moyassar.json");
-    if (!fs4.existsSync(tafsirPath)) {
+    await downloadFile(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-ummmuhammad.json`, path5.join(DATA_DIR3, "quran_en.json"));
+    const tafsirPath = path5.join(DATA_DIR3, "quran_tafsir_moyassar.json");
+    if (!fs5.existsSync(tafsirPath)) {
       console.log("Fetching Muyassar Tafsir from QuranEnc (arabic_moyassar)...");
       const tafsirList = [];
       const BATCH_SIZE = 15;
@@ -4554,7 +5619,7 @@ async function runPrebuild() {
         console.error(`CRITICAL ERROR: Muyassar Tafsir count mismatch! Expected ${QURAN_EXPECTED}, got ${tafsirList.length}`);
         process.exit(1);
       }
-      fs4.writeFileSync(tafsirPath, JSON.stringify(tafsirList, null, 2));
+      fs5.writeFileSync(tafsirPath, JSON.stringify(tafsirList, null, 2));
       console.log(`Saved ${tafsirList.length} Muyassar Tafsir entries to ${tafsirPath}`);
     }
   } catch (err) {
@@ -4575,7 +5640,7 @@ async function runPrebuild() {
       mismatch = true;
     }
   }
-  const quranAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_ar.json"), "utf8"));
+  const quranAr = JSON.parse(fs5.readFileSync(path5.join(DATA_DIR3, "quran_ar.json"), "utf8"));
   const quranList = quranAr.quran || quranAr[Object.keys(quranAr)[0]];
   if (quranList.length !== QURAN_EXPECTED) {
     console.error(`ERROR: Quran count mismatch! Expected ${QURAN_EXPECTED}, got ${quranList.length}`);
@@ -4586,7 +5651,7 @@ async function runPrebuild() {
     process.exit(1);
   }
   console.log("Verification PASSED.");
-  const outPathGz = path4.join(DATA_DIR3, "prebuilt_hadiths.json.gz");
+  const outPathGz = path5.join(DATA_DIR3, "prebuilt_hadiths.json.gz");
   const serializedRecords = records.map((r) => ({
     c: r.c,
     n: r.n,
@@ -4597,16 +5662,16 @@ async function runPrebuild() {
   }));
   const jsonStr = JSON.stringify({ v: vocab, r: serializedRecords, s: sections });
   const compressed = zlib3.gzipSync(Buffer.from(jsonStr, "utf8"));
-  fs4.writeFileSync(outPathGz, compressed);
+  fs5.writeFileSync(outPathGz, compressed);
   console.log("Building Precomputed Inverted Ask Index...");
   const askIndexStart = performance.now();
-  const quranEn = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_en.json"), "utf8"));
+  const quranEn = JSON.parse(fs5.readFileSync(path5.join(DATA_DIR3, "quran_en.json"), "utf8"));
   const quranEnList = quranEn.quran || quranEn[Object.keys(quranEn)[0]] || [];
   const quranEnMap2 = /* @__PURE__ */ new Map();
   for (const v of quranEnList) {
     quranEnMap2.set(`${v.chapter}_${v.verse}`, v.text || "");
   }
-  const tafsirListRaw = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_tafsir_moyassar.json"), "utf8"));
+  const tafsirListRaw = JSON.parse(fs5.readFileSync(path5.join(DATA_DIR3, "quran_tafsir_moyassar.json"), "utf8"));
   const tafsirMap = /* @__PURE__ */ new Map();
   for (const t of tafsirListRaw) {
     tafsirMap.set(`${t.chapter}_${t.verse}`, t.tafsir || "");
@@ -4696,8 +5761,8 @@ async function runPrebuild() {
     addDocTokens(docIdx, ar, en, tafsir);
   }
   for (const col of COLLECTIONS) {
-    const rawAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, `hadith_${col}_ar.json`), "utf8"));
-    const rawEn = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, `hadith_${col}_en.json`), "utf8"));
+    const rawAr = JSON.parse(fs5.readFileSync(path5.join(DATA_DIR3, `hadith_${col}_ar.json`), "utf8"));
+    const rawEn = JSON.parse(fs5.readFileSync(path5.join(DATA_DIR3, `hadith_${col}_en.json`), "utf8"));
     const listAr = rawAr.hadiths || [];
     const listEn = rawEn.hadiths || [];
     for (let i = 0; i < listAr.length; i++) {
@@ -4719,10 +5784,10 @@ async function runPrebuild() {
       addDocTokens(docIdx, matnAr, matnEn);
     }
   }
-  const askIndexFile = path4.join(DATA_DIR3, "ask_search_index.json.gz");
+  const askIndexFile = path5.join(DATA_DIR3, "ask_search_index.json.gz");
   const askIndexPayload = JSON.stringify({ docs: askDocs, postings });
   const askCompressed = zlib3.gzipSync(Buffer.from(askIndexPayload, "utf8"));
-  fs4.writeFileSync(askIndexFile, askCompressed);
+  fs5.writeFileSync(askIndexFile, askCompressed);
   const askElapsed = Math.round(performance.now() - askIndexStart);
   console.log(`Precomputed Inverted Ask Index generated in ${askElapsed}ms!`);
   console.log(`Indexed ${askDocs.length} documents (${Object.keys(postings).length} unique tokens). Saved to ${askIndexFile} (${askCompressed.length} bytes).`);
@@ -4739,12 +5804,13 @@ if (process.argv[1]?.includes("prebuild")) {
 }
 
 // server/server.ts
-var __filename5 = fileURLToPath5(import.meta.url);
-var __dirname5 = path5.dirname(__filename5);
+dotenv.config();
+var __filename6 = fileURLToPath6(import.meta.url);
+var __dirname6 = path6.dirname(__filename6);
 var PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3e3;
 async function startServer() {
-  const distPath = path5.resolve(__dirname5, "../dist");
-  const hasDist = fs5.existsSync(distPath);
+  const distPath = path6.resolve(__dirname6, "../dist");
+  const hasDist = fs6.existsSync(distPath);
   const isProd = process.env.NODE_ENV === "production";
   if (!isProd) {
     const vite = await createViteServer({
@@ -4756,13 +5822,13 @@ async function startServer() {
     app.use(express2.static(distPath));
     app.get("*", (req, res, next) => {
       if (req.path.startsWith("/api")) return next();
-      res.sendFile(path5.join(distPath, "index.html"));
+      res.sendFile(path6.join(distPath, "index.html"));
     });
   }
   console.log("Initializing Search Engines...");
   const corpusDir = DATA_DIR;
-  const quranArFile = path5.join(corpusDir, "quran_ar.json");
-  if (!fs5.existsSync(quranArFile)) {
+  const quranArFile = path6.join(corpusDir, "quran_ar.json");
+  if (!fs6.existsSync(quranArFile)) {
     console.log("Corpus data missing, running prebuild data acquisition...");
     await runPrebuild();
   }

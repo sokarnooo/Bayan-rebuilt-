@@ -144,7 +144,7 @@ async function runTest(mode: string, input: string) {
       return { error: e.message };
     }
   }
-  const endpoint = mode === 'ayah' ? '/api/ayah/match' : '/api/hadith/match';
+  const endpoint = mode === 'ayah' ? '/api/ayah/match' : (mode === 'hadeethenc' ? '/api/hadeethenc/match' : '/api/hadith/match');
   try {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'POST',
@@ -278,7 +278,7 @@ function checkPass(expected: any, actual: any) {
   let highlightMatch = true;
   if (!skipHighlight && stateMatch && refMatch) {
     const isEnglish = (actual.query && /^[a-zA-Z\s,.'"-]+$/.test(actual.query)) || expected.containsEnglishSlice;
-    const expectsMatch = actual.query_mode !== 'ask' && !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
+    const expectsMatch = actual.query_mode !== 'ask' && actual.source !== 'hadeethenc' && !isEnglish && (expected.state === 'matched' || expected.state === 'close_match' || (expected.ref && expected.ref !== null) || (expected.refs && expected.refs.length > 0));
     if (expectsMatch) {
       if (topResult) {
         highlightMatch = verifyHighlights(expected.input || actual.query, topResult.matchedWords || [], actual.query_mode, expected.state === 'close_match');

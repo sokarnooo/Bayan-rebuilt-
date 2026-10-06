@@ -98,8 +98,8 @@ export function normalizeArabic(text: string): string {
   // Fold Hamza seats uniformly
   s = s.replace(/[\u0624\u0626\u0654\u0655\u0674]/g, 'ء');
 
-  // Clean punctuation and non-letters
-  s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ]/g, ' ');
+  // Clean punctuation and non-letters (including smart quotes & brackets)
+  s = s.replace(/[.,/#!$%^&*;:{}=\-_`~()؟،؛«»"'\d\u0660-\u0669\uFD3E\uFD3F\[\]<>ـ“”‘’‹›„‟‚‛]/g, ' ');
 
   // Defective nouns and demonstratives normalization (words whose spoken alef is omitted in rasm)
   s = s.replace(/(^|[\s])الرحمان(?=[\s]|$)/g, '$1الرحمن');
