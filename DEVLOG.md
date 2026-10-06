@@ -6,6 +6,85 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+## How to read this log
+
+Every entry answers five questions, in this order:
+
+1. **What was wrong** — the observable failure, with the measured number or the error text.
+2. **Root cause** — why it actually happened, not the surface symptom.
+3. **What changed** — files touched and the decision behind each.
+4. **How it was verified** — the real command and its real output. A claim without output is marked *unverified*.
+5. **What is still open** — what remains unresolved, stated plainly.
+
+**Standing rules for this project**
+
+- No grade or ruling may originate from model memory. It must trace to a field in fetched data or to the curated list with a real citation.
+- Bukhari, Muslim and Nawawi-40 have no grade field in the data. The UI shows «لا تتوفر درجة موثقة في مصدر البيانات» plus a muted note. Never «صحيح», never «إجماع».
+- Confidence and grade are separate values. Below 70 nothing is shown except «لم يتم العثور على تطابق موثوق، راجع أهل العلم». The referral path is never removed.
+- Approximate matches cap at `close_match` (max 89) and render amber.
+- `eval/cases.json` is never edited to make a case pass. Any expectation change records id, old value, new value and reason in this file.
+- Never report 100% or "ready" without a harness run.
+
+**Measured baselines at time of writing**
+
+| Suite | Cases | Result |
+|---|---|---|
+| Core (all except the two ask suites) | 133 | 133/133 (100%) |
+| ask_relevance | 28 | 24/28 (86%) |
+| ask_adversarial | 20 | 20/20 (100%) |
+| **Total** | **181** | **177/181 (98%)** |
+
+Harness command: `npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1`
+
+---
+
+### 2026-10-06 — Submission Pack: README, Presentation PDF, Evidence Screenshots
+
+**1. What was wrong**
+
+The repository had no README. A judge cloning the repo had no way to know the required environment variable, the build order, or that the verification modes work with no API key at all. The presentation template supplied by the organisers was unmodified, and the deck on file still described v1.
+
+**2. Root cause**
+
+Documentation was never a tracked deliverable; it was treated as a by-product of coding. `PROGRESS.md` item 12 (README, sources and licences register) had stayed unticked since 2026-10-04.
+
+**3. What changed**
+
+- `README.md` (new, ~24 KB): what the tool does, quick start, the `GEMINI_API_KEY` requirement with a BYOK alternative, project layout, both request pipelines, full API table, the normalisation and scoring rules, the deterministic verdict system, the quota layer, the measured harness results including the four open failures, a sources-and-licences register, a privacy section, and an explicit limits section. Bilingual: Arabic body with an English summary block at the end.
+- `Bayan-Presentation.pdf` (15 pages, generated at `/home/hhh/ahmed/Bayan-deck/`): built on the official template's slide geometry (18288000 × 10287000 EMU = 20 × 11.25 in) and its exact palette — navy `#12183F`, ice `#F2F4FF`, violet `#6150EA`, turquoise `#2EF2C2` — with Readex Pro, IBM Plex Sans Arabic and Amiri, RTL and `lang="ar-SA"` set on the document.
+- Six screenshots captured from the running application, not mockups.
+
+**4. How it was verified**
+
+Screenshots were taken by driving the live UI at `http://localhost:3000` through a real browser session, then read back and inspected:
+
+| Screenshot | What it proves | Observed output |
+|---|---|---|
+| `03_hadith_match.png` | multi-collection attestation | «المؤمن القوي… رواه مسلم» → `close_match` 89%, 3 results from Muslim and Ibn Majah, isnad warning shown, «لا تتوفر درجة موثقة في مصدر البيانات» |
+| `04_ayah_31_occurrences.png` | repeated-ayah enumeration | Ar-Rahman → `matched` 100%, 31 results, per-word highlight, Saheeh International shown, tafsir attributed |
+| `05_ask_supported.png` | Ask supported verdict | EN question → «وُجد في المصادر», retrieval 0 ms, Tirmidhi 1956 bilingual card |
+| `06_ask_escalation.png` | refusal + referral | «Is it obligatory to pray 500 rak'ahs every night?» → «نصوص ذات صلة» + «هذا سؤال في الحكم الشرعي؛ نعرض النصوص فقط، والفتوى لأهل العلم» |
+| `07_ocr_extract.png` | OCR precision then refusal | Uthmani verse screenshot → «ذَلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِلْمُتَّقِينَ» extracted with diacritics; as a hadith it is refused and escalated |
+| `08_fabricated_saying.png` | curated list with citation | «اطلبوا العلم ولو بالصين» → «حديث منتشر لا يصح», ruling «لا يصح», Dorar link |
+
+Two OCR accuracy measurements were run directly against the Gemini API on the real Uthmani screenshot:
+- `gemini-3.5-flash-lite` → HTTP 200, exact character-for-character match including full diacritics; the verse-number ornament correctly ignored.
+- `gemma-4-31b-it` → HTTP 200 but wraps output in commentary and reasoning; kept as last-resort failover only, never as an OCR primary.
+
+The PDF was rendered headlessly via Chromium `--print-to-pdf` and then rasterised with `pdftoppm` at 42 dpi and inspected page by page. Two rounds of defects were found and fixed this way:
+- 13 stray Latin fragments glued into Arabic sentences (`نGradesه`, `الحتمily`, `ترتيب前三`, `الاستعلام426`). Fixed individually.
+- A bulk regex pass over-eaten three legitimate words, producing `مولّدة administrative` and `روبهات`. Detected on visual re-inspection and repaired.
+
+Final state: 15 pages, 1,046 KB, no clipping, no overflow, all pages visually verified.
+
+**5. What is still open**
+
+- The video (≤ 2 min) is the owner's to record.
+- The live demo host is not configured yet.
+- The deck states the four unresolved relevance failures rather than hiding them; resolving them is item 1 of the next work list.
+
+---
+
 ### 2026-10-06 — Part 11: Ask-mode Relevance & Adversarial Safety (deterministic claim attestation)
 
 - **Goal**: close the committed Part-9 regression in which `ask_adversarial` scored **8/20 with 12 false-positive `supported` verdicts**, lift the harness from the 157/181 baseline to ≥ 95 % **while keeping `ask_adversarial` at 0 `supported`**, and keep every real claim returning `supported`.
