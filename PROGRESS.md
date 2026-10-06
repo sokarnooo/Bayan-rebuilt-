@@ -29,13 +29,13 @@
 [x] 4 Speed: per-request time; p95 < 500 ms, max < 2 s (2026-10-04: Optimized sliding window sum from O(Q*S) to O(Q+S), added O(1) map lookups, optimized Levenshtein checks, and flattened DP allocations; 133/133 100% pass)
 [x] 5 Memory: production RSS < 400 MB (2026-10-04: Production Idle RSS 247 MB < 350 MB, Active RSS after 133 cases 334 MB < 400 MB; 133/133 pass)
 [x] 6 List all changes to eval/cases.json (2026-10-04: Documented hadith_isnad_4 update in DEVLOG.md)
+[x] 7 Review the import-run edits (2026-10-05: Verified GitHub import migration in AI Studio runtime; npm build, prebuild corpus acquisition, dev server on 0.0.0.0:3000, 133/133 evaluation harness tests 100% passing)
 
 ## Next
-[ ] 7 Review the import-run edits (ayahMatcher.ts, hadithMatcher.ts, AyahMode.tsx, HadithMode.tsx)
-[x] 8 Ask mode: retrieval speed part 6 (2026-10-05: Precomputed inverted index ask_search_index.json.gz (17.6MB, 40,431 docs indexed in 1.26s at server startup). Zero full-corpus scans per request; posting-hit candidate pre-filter reduces evaluated candidates from 3,574 to ~15 in <9ms. Added AskLRUCache(200). Warm retrieval p50=4.04ms, p95=8.28ms (<300ms target). 133/133 eval harness passes cleanly.)
+[x] 8 Ask mode: retrieval speed, ranking order & false-positive gating (Part 6, 8, 9) (2026-10-05: Unified score sorting with <=0.5 tie-break, relevance gate matches >=2 distinct content concepts or >=60% top score, Ghaylan hadith surfaced at #1/#2 in Tirmidhi 1128 and Ibn Majah 1953, 20 adversarial false-positive cases pass 20/20 with 0 false-positive 'supported' verdicts. Core 133/133 pass 100%.)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
 [ ] 9 OCR test
-[ ] 10 Server key and hourly limits (owner supplies RPD values)
+[x] 10 Server key and hourly limits (Part 10) (2026-10-05: Implemented server/quota.config.ts with 24 Pacific clock hour buckets, SAFETY=0.8, failover chains, per-IP cap max(2, 20% total budget), priority degradation on Ask, /api/ocr and /api/quota endpoints, remaining-requests UI badges, and verified zero key leaks in /dist)
 [ ] 11 English labels for Sharia terms (Jamhara dictionary, owner supplies)
 [ ] 12 README, sources and licenses register, content-and-sources doc
 [ ] 13 Final harness run, numbers for the deck

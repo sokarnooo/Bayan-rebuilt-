@@ -1899,5 +1899,429 @@
       "state": "contradicted"
     },
     "note": "Matched curated fake saying English gets contradicted"
+  },
+  {
+    "id": "ask_wives_en_no_offtopic_3",
+    "mode": "ask",
+    "input": "Is it permissible to marry four wives?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "permissibility",
+      "ref": "ayah_4_3",
+      "excludeRefs": ["ayah_60_10", "bukhari_5098"],
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Polygyny English question excludes off-topic ayah_60_10 and bukhari_5098 from top 3"
+  },
+  {
+    "id": "ask_wives_ar_no_offtopic_3",
+    "mode": "ask",
+    "input": "كم عدد الزوجات المباح للرجل؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "permissibility",
+      "ref": "ayah_4_3",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Polygyny Arabic question retrieves ayah_4_3 top 1 with shown = retrieval ranking"
+  },
+  {
+    "id": "ask_smiling_en_shown_equals_rank",
+    "mode": "ask",
+    "input": "Is smiling at your brother charity?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "tirmidhi_1956",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Smiling EN question top-1 matches tirmidhi_1956 with shown = retrieval ranking"
+  },
+  {
+    "id": "ask_smiling_ar_shown_equals_rank",
+    "mode": "ask",
+    "input": "هل تبسمك في وجه أخيك صدقة؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "tirmidhi_1956",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Smiling AR question top-1 matches tirmidhi_1956 with shown = retrieval ranking"
+  },
+  {
+    "id": "ask_qibla_en_shown_equals_rank",
+    "mode": "ask",
+    "input": "Did the Prophet forbid facing the qibla while urinating?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Qibla EN question top-1 matches bukhari_394"
+  },
+  {
+    "id": "ask_qibla_ar_shown_equals_rank",
+    "mode": "ask",
+    "input": "هل ورد أن النبي نهى عن استقبال القبلة ببول؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Qibla AR question top-1 matches bukhari_394"
+  },
+  {
+    "id": "ask_shawwal_en_shown_equals_rank",
+    "mode": "ask",
+    "input": "Is fasting six days of Shawwal recommended?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_2758",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Shawwal EN question top-1 matches muslim_2758"
+  },
+  {
+    "id": "ask_shawwal_ar_shown_equals_rank",
+    "mode": "ask",
+    "input": "هل صيام ستة أيام من شوال مستحب؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_2758",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Shawwal AR question top-1 matches muslim_2758"
+  },
+  {
+    "id": "ask_green_tea_en_verdict_equal",
+    "mode": "ask",
+    "input": "The Prophet ordered people to drink green tea",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "unclear"
+    },
+    "note": "Green tea EN gets unclear verdict"
+  },
+  {
+    "id": "ask_green_tea_ar_verdict_equal",
+    "mode": "ask",
+    "input": "هل أمر النبي بشرب الشاي الأخضر؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "unclear"
+    },
+    "note": "Green tea AR gets unclear verdict"
+  },
+  {
+    "id": "ask_purification_en_shown_equals_rank",
+    "mode": "ask",
+    "input": "Allah does not accept prayer without purification",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_224",
+      "requireTopRetrievedMatch": true
+    },
+    "note": "Purification EN top-1 matches muslim_224"
+  },
+  {
+    "id": "ask_cold_p95_latency_benchmark",
+    "mode": "ask",
+    "input": "Is it permissible to marry four wives?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "permissibility",
+      "ref": "ayah_4_3"
+    },
+    "note": "Cold p95 latency benchmark question"
+  },
+  {
+    "id": "ask_qibla_en_no_offtopic_3",
+    "mode": "ask",
+    "input": "Did the Prophet forbid facing the qibla while urinating?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394",
+      "excludeRefs": ["ayah_2_142"]
+    },
+    "note": "Qibla EN excludes off-topic change of qibla verse from top 3"
+  },
+  {
+    "id": "ask_qibla_ar_no_offtopic_3",
+    "mode": "ask",
+    "input": "هل ورد أن النبي نهى عن استقبال القبلة ببول؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "bukhari_394",
+      "excludeRefs": ["ayah_2_142"]
+    },
+    "note": "Qibla AR excludes off-topic change of qibla verse from top 3"
+  },
+  {
+    "id": "ask_shawwal_en_no_offtopic_3",
+    "mode": "ask",
+    "input": "Is fasting six days of Shawwal recommended?",
+    "language": "en",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_2758",
+      "excludeRefs": ["bukhari_1572"]
+    },
+    "note": "Shawwal EN excludes off-topic hajj hadith from top 3"
+  },
+  {
+    "id": "ask_shawwal_ar_no_offtopic_3",
+    "mode": "ask",
+    "input": "هل صيام ستة أيام من شوال مستحب؟",
+    "language": "ar",
+    "category": "ask_relevance",
+    "expected": {
+      "state": "supported",
+      "ref": "muslim_2758",
+      "excludeRefs": ["bukhari_1572"]
+    },
+    "note": "Shawwal AR excludes off-topic hajj hadith from top 3"
+  },
+  {
+    "id": "ask_adv_ar_1",
+    "mode": "ask",
+    "input": "هل من تبسم في وجه أخيه بني له قصر في الجنة؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for smiling gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_2",
+    "mode": "ask",
+    "input": "هل صيام ستة أيام من شوال يوجب مغفرة جميع الكبائر؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for Shawwal gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_3",
+    "mode": "ask",
+    "input": "هل ورد أن الوضوء بماء الورد يبطل الصلاة؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented ruling for rosewater wudu gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_4",
+    "mode": "ask",
+    "input": "هل نهى النبي عن الوضوء بعد أكل لحم الإبل؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Inverted ruling on camel meat wudu gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_5",
+    "mode": "ask",
+    "input": "هل من قرأ سورة الإخلاص مائة مرة أعطي ملك قارون؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for Surah Ikhlas gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_6",
+    "mode": "ask",
+    "input": "هل يحرم استقبال القبلة عند قراءة القرآن؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented prohibition for Quran recitation gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_7",
+    "mode": "ask",
+    "input": "هل يجوز للمرأة أن تتزوج أربعة رجال؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Inverted ruling on polyandry gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_8",
+    "mode": "ask",
+    "input": "هل صلاة الفجر في جماعة تعتق مائة رقبة؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for Fajr prayer gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_9",
+    "mode": "ask",
+    "input": "هل غسل الجمعة واجب على الصبيان الصغار؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Wrong subject for Friday ghusl gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_ar_10",
+    "mode": "ask",
+    "input": "هل من قال سبحان الله وبحمده خمس مرات غفرت له ديونه؟",
+    "language": "ar",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for tasbih gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_11",
+    "mode": "ask",
+    "input": "Does smiling at your brother grant you a golden chariot in Paradise?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for smiling gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_12",
+    "mode": "ask",
+    "input": "Does fasting six days of Shawwal allow you to skip Ramadan next year?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented ruling for Shawwal fasting gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_13",
+    "mode": "ask",
+    "input": "Did the Prophet say washing hands five times guarantees entering Paradise through any gate?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for wudu gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_14",
+    "mode": "ask",
+    "input": "Is it forbidden to face the qibla while eating bread?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented prohibition while eating bread gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_15",
+    "mode": "ask",
+    "input": "Is a woman permitted to marry four husbands at the same time?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Inverted ruling on polyandry gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_16",
+    "mode": "ask",
+    "input": "Did the Prophet forbid drinking water while sitting down?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Inverted ruling on drinking sitting gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_17",
+    "mode": "ask",
+    "input": "Does saying Alhamdulillah once forgive all intentional murders?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for saying Alhamdulillah gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_18",
+    "mode": "ask",
+    "input": "Is praying Fajr prayer four rakats obligatory for travelers?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Fabricated ruling on Fajr prayer gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_19",
+    "mode": "ask",
+    "input": "Did the Prophet order Muslims to fast forty days of Shawwal?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented number for Shawwal fasting gets permissibility/unclear not supported"
+  },
+  {
+    "id": "ask_adv_en_20",
+    "mode": "ask",
+    "input": "Does charity given at night cancel all future sins permanently?",
+    "language": "en",
+    "category": "ask_adversarial",
+    "expected": {
+      "stateNot": "supported"
+    },
+    "note": "Invented reward for night charity gets permissibility/unclear not supported"
   }
 ]

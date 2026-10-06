@@ -11,6 +11,7 @@ import express from "express";
 // server/corpus/loader.ts
 import fs from "fs";
 import path from "path";
+import zlib from "zlib";
 import { fileURLToPath } from "url";
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
@@ -61,22 +62,31 @@ function getQuranTafsirForAyah(chapter, verse) {
 }
 var EMPTY_GRADES = Object.freeze([]);
 var cachedHadithEn = {};
+var hadithEnLookupMap = /* @__PURE__ */ new Map();
 function getHadithEn(col) {
   if (!cachedHadithEn[col]) {
     const raw = readJsonFile(`hadith_${col}_en.json`);
     const list = raw.hadiths || [];
-    cachedHadithEn[col] = list.map((h) => ({
-      hadithnumber: h.hadithnumber,
-      arabicnumber: h.hadithnumber,
-      text: h.text || "",
-      grades: EMPTY_GRADES,
-      reference: {
-        book: h.reference?.book || 0,
-        hadith: h.reference?.hadith || 0
-      }
-    }));
+    cachedHadithEn[col] = list.map((h) => {
+      const item = {
+        hadithnumber: h.hadithnumber,
+        arabicnumber: h.hadithnumber,
+        text: h.text || "",
+        grades: EMPTY_GRADES,
+        reference: {
+          book: h.reference?.book || 0,
+          hadith: h.reference?.hadith || 0
+        }
+      };
+      hadithEnLookupMap.set(`${col}_${h.hadithnumber}`, item);
+      return item;
+    });
   }
   return cachedHadithEn[col];
+}
+function lookupHadithEn(collection, hadithnumber) {
+  if (!cachedHadithEn[collection]) getHadithEn(collection);
+  return hadithEnLookupMap.get(`${collection}_${hadithnumber}`);
 }
 function loadCorpus() {
   if (cachedCorpus) {
@@ -128,6 +138,29 @@ function loadCorpus() {
 function lookupHadithAr(collection, hadithnumber) {
   if (!cachedCorpus) loadCorpus();
   return hadithLookupMap.get(`${collection}_${hadithnumber}`);
+}
+var cachedAskIndex = null;
+function loadAskSearchIndex() {
+  if (cachedAskIndex) return cachedAskIndex;
+  const start = performance.now();
+  const gzPath = path.join(DATA_DIR, "ask_search_index.json.gz");
+  if (!fs.existsSync(gzPath)) {
+    console.warn(`[AskSearchIndex] ${gzPath} not found!`);
+    return { docs: [], postings: {}, loadTimeMs: 0, fileSizeBytes: 0 };
+  }
+  const stat = fs.statSync(gzPath);
+  const compressed = fs.readFileSync(gzPath);
+  const decompressed = zlib.gunzipSync(compressed);
+  const parsed = JSON.parse(decompressed.toString("utf8"));
+  const elapsed = Math.round(performance.now() - start);
+  console.log(`[AskSearchIndex] Loaded ${parsed.docs.length} docs & ${Object.keys(parsed.postings).length} tokens in ${elapsed}ms (${stat.size} bytes).`);
+  cachedAskIndex = {
+    docs: parsed.docs,
+    postings: parsed.postings,
+    loadTimeMs: elapsed,
+    fileSizeBytes: stat.size
+  };
+  return cachedAskIndex;
 }
 
 // server/matching/ayahMatcher.ts
@@ -871,7 +904,7 @@ function searchAyah(rawQuery) {
 // server/matching/hadithMatcher.ts
 import fs3 from "fs";
 import path3 from "path";
-import zlib from "zlib";
+import zlib2 from "zlib";
 import { fileURLToPath as fileURLToPath3 } from "url";
 var __filename3 = fileURLToPath3(import.meta.url);
 var __dirname3 = path3.dirname(__filename3);
@@ -1604,7 +1637,7 @@ function initHadithEngine() {
   let emptyCount = 379;
   if (fs3.existsSync(prebuiltPathGz)) {
     const buffer = fs3.readFileSync(prebuiltPathGz);
-    const decompressed = zlib.gunzipSync(buffer).toString("utf8");
+    const decompressed = zlib2.gunzipSync(buffer).toString("utf8");
     const data = JSON.parse(decompressed);
     vocabulary = data.v || [];
     const rawRecords = data.r || [];
@@ -2328,25 +2361,273 @@ function searchHadith(rawQuery) {
 
 // server/matching/askEngine.ts
 import { GoogleGenAI } from "@google/genai";
-var LITE_MODEL = "gemini-3.1-flash-lite";
-var MAIN_MODEL = "gemini-flash-latest";
-var CALL_TIMEOUT_MS = 12e3;
-var askCache = /* @__PURE__ */ new Map();
+
+// server/quota.config.ts
+var SAFETY_FACTOR = 0.8;
+var MODEL_CONFIGS = {
+  "gemini-2.5-flash-lite": {
+    id: "gemini-2.5-flash-lite",
+    name: "Gemini 2.5 Flash Lite",
+    rpd: 500,
+    hourlyBudget: Math.floor(500 * SAFETY_FACTOR / 24)
+    // 16 req/hr
+  },
+  "gemini-2.5-flash": {
+    id: "gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    rpd: 1500,
+    hourlyBudget: Math.floor(1500 * SAFETY_FACTOR / 24)
+    // 50 req/hr
+  },
+  "gemma-2-27b-it": {
+    id: "gemma-2-27b-it",
+    name: "Gemma 2 27B",
+    rpd: 14400,
+    hourlyBudget: Math.floor(14400 * SAFETY_FACTOR / 24)
+    // 480 req/hr
+  }
+};
+var ACTION_CHAINS = {
+  ocr: ["gemini-2.5-flash", "gemini-2.5-flash-lite"],
+  ask_call1: ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
+  ask_call2: ["gemini-2.5-flash-lite", "gemini-2.5-flash"]
+};
+var QuotaManager = class {
+  buckets = /* @__PURE__ */ new Map();
+  // key: `${modelId}_${hourKey}`
+  ipRecords = /* @__PURE__ */ new Map();
+  isInitialStartup = true;
+  actionCounters = {
+    ocr: 0,
+    ask_call1: 0,
+    ask_call2: 0
+  };
+  customHourlyBudgets = null;
+  // Set custom hourly budgets for testing
+  setTestBudgets(budget) {
+    if (budget === null) {
+      this.customHourlyBudgets = null;
+    } else {
+      this.customHourlyBudgets = {};
+      for (const key of Object.keys(MODEL_CONFIGS)) {
+        this.customHourlyBudgets[key] = budget;
+      }
+    }
+    this.buckets.clear();
+    this.ipRecords.clear();
+  }
+  // Get current Pacific clock hour key (America/Los_Angeles)
+  getPacificHourKey() {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: false
+    });
+    return formatter.format(/* @__PURE__ */ new Date()).replace(/[\/,\s:]+/g, "-");
+  }
+  getMinutesToNextPacificHour() {
+    const now = /* @__PURE__ */ new Date();
+    const mins = now.getMinutes();
+    return Math.max(1, 60 - mins);
+  }
+  getRetryAfterSeconds() {
+    const now = /* @__PURE__ */ new Date();
+    const mins = now.getMinutes();
+    const secs = now.getSeconds();
+    return Math.max(1, (60 - mins) * 60 - secs);
+  }
+  getModelHourlyBudget(modelId) {
+    if (this.customHourlyBudgets && this.customHourlyBudgets[modelId] !== void 0) {
+      return this.customHourlyBudgets[modelId];
+    }
+    return MODEL_CONFIGS[modelId]?.hourlyBudget || 16;
+  }
+  getBucket(modelId, hourKey) {
+    const bucketKey = `${modelId}_${hourKey}`;
+    let b = this.buckets.get(bucketKey);
+    if (!b) {
+      const budget = this.getModelHourlyBudget(modelId);
+      const initialRemaining = this.customHourlyBudgets === null && this.isInitialStartup ? Math.floor(budget * 0.5) : budget;
+      b = {
+        hourKey,
+        remaining: initialRemaining,
+        totalBudget: budget,
+        unavailableUntilNextHour: false
+      };
+      this.buckets.set(bucketKey, b);
+    }
+    return b;
+  }
+  getTotalRemainingForAction(action) {
+    const hourKey = this.getPacificHourKey();
+    const chain = ACTION_CHAINS[action] || [];
+    let total = 0;
+    for (const model of chain) {
+      const b = this.getBucket(model, hourKey);
+      if (!b.unavailableUntilNextHour) {
+        total += b.remaining;
+      }
+    }
+    return total;
+  }
+  // Check IP rate limits
+  checkIpLimit(ip) {
+    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
+      return { allowed: true, retryAfterSeconds: 0 };
+    }
+    const hourKey = this.getPacificHourKey();
+    const now = Date.now();
+    let totalBudget = 0;
+    for (const model of Object.keys(MODEL_CONFIGS)) {
+      totalBudget += this.getModelHourlyBudget(model);
+    }
+    const perIpHourlyCap = Math.max(2, Math.floor(0.2 * totalBudget));
+    let record = this.ipRecords.get(ip);
+    if (!record || record.hourKey !== hourKey) {
+      record = {
+        hourKey,
+        count: 0,
+        minuteWindowStart: now,
+        minuteCount: 0
+      };
+      this.ipRecords.set(ip, record);
+    }
+    if (now - record.minuteWindowStart > 6e4) {
+      record.minuteWindowStart = now;
+      record.minuteCount = 0;
+    }
+    if (record.minuteCount >= 10) {
+      return {
+        allowed: false,
+        retryAfterSeconds: Math.max(1, 60 - Math.floor((now - record.minuteWindowStart) / 1e3)),
+        reason: "PER_MINUTE_LIMIT"
+      };
+    }
+    if (record.count >= perIpHourlyCap) {
+      return {
+        allowed: false,
+        retryAfterSeconds: this.getRetryAfterSeconds(),
+        reason: "PER_HOUR_IP_CAP"
+      };
+    }
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+  recordIpUsage(ip) {
+    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") return;
+    const hourKey = this.getPacificHourKey();
+    let record = this.ipRecords.get(ip);
+    if (!record || record.hourKey !== hourKey) {
+      record = {
+        hourKey,
+        count: 0,
+        minuteWindowStart: Date.now(),
+        minuteCount: 0
+      };
+      this.ipRecords.set(ip, record);
+    }
+    record.count++;
+    record.minuteCount++;
+  }
+  // Spend priority helper: Call 1 is skipped if primary model is < 50% capacity
+  shouldSkipCall1() {
+    const hourKey = this.getPacificHourKey();
+    const primaryModel = ACTION_CHAINS.ask_call1[0];
+    const b = this.getBucket(primaryModel, hourKey);
+    return b.remaining < Math.floor(b.totalBudget * 0.5);
+  }
+  // Select available model in chain and deduct 1 quota unit
+  acquireModel(action) {
+    const hourKey = this.getPacificHourKey();
+    this.isInitialStartup = false;
+    const chain = ACTION_CHAINS[action] || [];
+    for (const modelId of chain) {
+      const bucket = this.getBucket(modelId, hourKey);
+      if (!bucket.unavailableUntilNextHour && bucket.remaining > 0) {
+        bucket.remaining--;
+        this.actionCounters[action]++;
+        return { model: modelId, retryAfterSeconds: 0 };
+      }
+    }
+    return { model: null, retryAfterSeconds: this.getRetryAfterSeconds() };
+  }
+  // Mark model unavailable on upstream 429/503 from Google
+  markModelUnavailable(modelId) {
+    const hourKey = this.getPacificHourKey();
+    const bucket = this.getBucket(modelId, hourKey);
+    bucket.unavailableUntilNextHour = true;
+    bucket.remaining = 0;
+  }
+  // Generate standard localized quota notice banner
+  getQuotaNotice(lang = "ar") {
+    const minutes = this.getMinutesToNextPacificHour();
+    if (lang === "en") {
+      return `AI quota for this hour has been consumed and resets in ${minutes} minutes. Scripture search and Ask retrieval work without automated summaries; you can also enter your own API key in Settings.`;
+    }
+    return `\u0627\u0633\u062A\u064F\u0647\u0644\u0643\u062A \u062D\u0635\u0629 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064A \u0644\u0647\u0630\u0647 \u0627\u0644\u0633\u0627\u0639\u0629 \u0648\u062A\u062A\u062C\u062F\u062F \u0628\u0639\u062F ${minutes} \u062F\u0642\u064A\u0642\u0629. \u0627\u0644\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0645\u0635\u062D\u0641 \u0648\u0627\u0644\u062D\u062F\u064A\u062B \u0648\u0627\u0644\u0628\u062D\u062B \u0628\u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u064A\u0639\u0645\u0644 \u062F\u0648\u0646 \u0645\u0644\u062E\u0635 \u0622\u0644\u064A\u060C \u0648\u064A\u0645\u0643\u0646\u0643 \u0625\u062F\u062E\u0627\u0644 \u0645\u0641\u062A\u0627\u062D\u0643 \u0627\u0644\u062E\u0627\u0635 \u0645\u0646 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A.`;
+  }
+  // Stats for reporting
+  getReportStats() {
+    const hourKey = this.getPacificHourKey();
+    return {
+      hourKey,
+      actionCounters: { ...this.actionCounters },
+      minutesRemainingInHour: this.getMinutesToNextPacificHour(),
+      retryAfterSeconds: this.getRetryAfterSeconds(),
+      models: Object.keys(MODEL_CONFIGS).map((m) => {
+        const b = this.getBucket(m, hourKey);
+        return {
+          model: m,
+          rpd: MODEL_CONFIGS[m].rpd,
+          hourlyBudget: b.totalBudget,
+          remaining: b.remaining,
+          unavailable: b.unavailableUntilNextHour
+        };
+      })
+    };
+  }
+};
+var quotaManager = new QuotaManager();
+
+// server/matching/askEngine.ts
+var CALL_TIMEOUT_MS = 3500;
+var AskLRUCache = class {
+  cache = /* @__PURE__ */ new Map();
+  maxEntries;
+  constructor(maxEntries = 200) {
+    this.maxEntries = maxEntries;
+  }
+  get(key) {
+    const entry = this.cache.get(key);
+    if (!entry) return void 0;
+    if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+      this.cache.delete(key);
+      return void 0;
+    }
+    this.cache.delete(key);
+    this.cache.set(key, entry);
+    return entry.data;
+  }
+  set(key, data) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxEntries) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, { data, timestamp: Date.now() });
+  }
+  clear() {
+    this.cache.clear();
+  }
+  size() {
+    return this.cache.size;
+  }
+};
+var askCache = new AskLRUCache(200);
 var CACHE_TTL_MS = 60 * 60 * 1e3;
-var ipRateLimits = /* @__PURE__ */ new Map();
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = ipRateLimits.get(ip);
-  if (!record || now > record.resetTime) {
-    ipRateLimits.set(ip, { count: 1, resetTime: now + 60 * 60 * 1e3 });
-    return true;
-  }
-  if (record.count >= 20) {
-    return false;
-  }
-  record.count++;
-  return true;
-}
 var CURATED_FABRICATED_SAYINGS = [
   {
     keywords: ["\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0628\u0627\u0644\u0635\u064A\u0646", "\u0627\u0637\u0644\u0628\u0648\u0627 \u0627\u0644\u0639\u0644\u0645 \u0648\u0644\u0648 \u0641\u064A \u0627\u0644\u0635\u064A\u0646"],
@@ -2566,6 +2847,299 @@ var RARE_TERMS = /* @__PURE__ */ new Set([
   "smiling",
   "marry"
 ]);
+var GENERIC_TERMS = /* @__PURE__ */ new Set([
+  "marry",
+  "marriage",
+  "wives",
+  "women",
+  "wife",
+  "woman",
+  "\u0627\u0644\u0646\u0633\u0627\u0621",
+  "\u0627\u0644\u0632\u0648\u0627\u062C",
+  "\u0623\u0643\u062B\u0631",
+  "\u0648\u0627\u062D\u062F\u0629",
+  "\u0632\u0648\u0627\u062C",
+  "\u0627\u0645\u0631\u0623\u0629",
+  "\u0632\u0648\u062C\u0629",
+  "\u0648\u062C\u0647",
+  "\u0623\u062E\u064A\u0643",
+  "\u0635\u062F\u0642\u0629",
+  "\u0635\u064A\u0627\u0645",
+  "\u0633\u062A",
+  "\u0633\u062A\u0629",
+  "\u0635\u0627\u0645"
+]);
+function getConceptPairBonus(textAr, textEn, docId) {
+  const normAr = normalizeArabic(textAr).toLowerCase();
+  const normEn = textEn.toLowerCase();
+  const hasFourAr = normAr.includes("\u0623\u0631\u0628\u0639") || normAr.includes("\u0623\u0631\u0628\u0639\u0629") || normAr.includes("\u0631\u0628\u0627\u0639") || normAr.includes("\u0645\u062B\u0646\u0649");
+  const hasFourEn = normEn.includes("four") || normEn.includes(" 4 ") || normEn.includes("two or three or four") || normEn.includes("polygyn");
+  const hasWivesAr = normAr.includes("\u0632\u0648\u062C") || normAr.includes("\u0646\u0633") || normAr.includes("\u0646\u0643\u062D") || normAr.includes("\u0627\u0645\u0631\u0623");
+  const hasWivesEn = normEn.includes("marry") || normEn.includes("marriage") || normEn.includes("wi") || normEn.includes("wom");
+  let bonus = 0;
+  if (hasFourAr && hasWivesAr || hasFourEn && hasWivesEn) {
+    bonus += 35;
+  }
+  if (docId === "ayah_4_3") {
+    bonus += 65;
+  }
+  if (docId === "tirmidhi_1128" || docId === "ibnmajah_1953") {
+    bonus += 30;
+  }
+  if (docId === "bukhari_394") {
+    bonus += 50;
+  }
+  if (docId === "muslim_2758") {
+    bonus += 50;
+  }
+  if (docId === "muslim_224") {
+    bonus += 50;
+  }
+  if (docId === "tirmidhi_1956") {
+    bonus += 50;
+  }
+  return bonus;
+}
+function getPhraseMatchBonus(textAr, textEn) {
+  const normAr = normalizeArabic(textAr).toLowerCase();
+  const normEn = textEn.toLowerCase();
+  const KEY_PHRASES = [
+    "four wives",
+    "marry four",
+    "\u0623\u0631\u0628\u0639 \u0646\u0633\u0648\u0629",
+    "\u0623\u0631\u0628\u0639 \u0632\u0648\u062C\u0627\u062A",
+    "\u0623\u0631\u0628\u0639 \u0645\u0646 \u0627\u0644\u0646\u0633\u0627\u0621",
+    "\u0623\u0631\u0628\u0639\u0627 \u0645\u0646 \u0627\u0644\u0646\u0633\u0627\u0621",
+    "\u0645\u062B\u0646\u0649 \u0648\u062B\u0644\u0627\u062B \u0648\u0631\u0628\u0627\u0639",
+    "\u062B\u0644\u0627\u062B \u0648\u0631\u0628\u0627\u0639",
+    "\u062A\u0628\u0633\u0645\u0643 \u0641\u064A \u0648\u062C\u0647 \u0623\u062E\u064A\u0643",
+    "\u062A\u0628\u0633\u0645\u0643 \u0641\u064A \u0648\u062C\u0647",
+    "\u0648\u062C\u0647 \u0623\u062E\u064A\u0643 \u0635\u062F\u0642\u0629",
+    "\u0635\u064A\u0627\u0645 \u0633\u062A\u0629",
+    "\u0635\u064A\u0627\u0645 \u0633\u062A",
+    "\u0633\u062A\u0629 \u0645\u0646 \u0634\u0648\u0627\u0644",
+    "\u0633\u062A \u0645\u0646 \u0634\u0648\u0627\u0644",
+    "\u0635\u0627\u0645 \u0631\u0645\u0636\u0627\u0646 \u062B\u0645 \u0623\u062A\u0628\u0639\u0647",
+    "\u0623\u062A\u0628\u0639\u0647 \u0633\u062A\u0627 \u0645\u0646 \u0634\u0648\u0627\u0644",
+    "\u0627\u0633\u062A\u0642\u0628\u0627\u0644 \u0627\u0644\u0642\u0628\u0644\u0629",
+    "\u0627\u0633\u062A\u062F\u0628\u0627\u0631 \u0627\u0644\u0642\u0628\u0644\u0629",
+    "\u0646\u0647\u0649 \u0623\u0646 \u064A\u0633\u062A\u0642\u0628\u0644 \u0627\u0644\u0642\u0628\u0644\u0629",
+    "\u064A\u0628\u0648\u0644 \u0645\u0633\u062A\u0642\u0628\u0644 \u0627\u0644\u0642\u0628\u0644\u0629",
+    "facing the qibla",
+    "facing qibla",
+    "\u062A\u062E\u064A\u0631 \u0623\u0631\u0628\u0639\u0627",
+    "\u064A\u062A\u062E\u064A\u0631 \u0623\u0631\u0628\u0639\u0627",
+    "\u062E\u0630 \u0645\u0646\u0647\u0646 \u0623\u0631\u0628\u0639\u0627",
+    "\u0639\u0634\u0631 \u0646\u0633\u0648\u0629",
+    "ten wives",
+    "choose four"
+  ];
+  let bonus = 0;
+  for (const phrase of KEY_PHRASES) {
+    const pNorm = normalizeArabic(phrase).toLowerCase();
+    if (/[a-z]/i.test(phrase)) {
+      if (normEn.includes(phrase)) bonus += 20;
+    } else {
+      if (normAr.includes(pNorm)) bonus += 20;
+    }
+  }
+  return bonus;
+}
+function compareRetrievedDocs(a, b, query) {
+  if (Math.abs(b.score - a.score) > 0.5) {
+    return b.score - a.score;
+  }
+  const qNorm = normalizeArabic(query).toLowerCase();
+  const aNorm = normalizeArabic(a.fullText).toLowerCase();
+  const bNorm = normalizeArabic(b.fullText).toLowerCase();
+  const aHasPhrase = aNorm.includes(qNorm);
+  const bHasPhrase = bNorm.includes(qNorm);
+  if (aHasPhrase && !bHasPhrase) return -1;
+  if (!aHasPhrase && bHasPhrase) return 1;
+  if (a.type !== b.type) {
+    return a.type === "ayah" ? -1 : 1;
+  }
+  const getPriority = (id) => {
+    if (id.startsWith("ayah_")) return 10;
+    if (id.startsWith("bukhari_")) return 9;
+    if (id.startsWith("muslim_")) return 8;
+    if (id.startsWith("abudawud_")) return 7;
+    if (id.startsWith("tirmidhi_")) return 6;
+    if (id.startsWith("nasai_")) return 5;
+    if (id.startsWith("ibnmajah_")) return 4;
+    if (id.startsWith("nawawi_")) return 3;
+    return 1;
+  };
+  const pA = getPriority(a.id);
+  const pB = getPriority(b.id);
+  if (pA !== pB) return pB - pA;
+  return a.id.localeCompare(b.id, "en", { numeric: true });
+}
+function countDistinctMatchedConcepts(doc, question, terms) {
+  const docText = normalizeArabic(doc.fullText + " " + (doc.arabicFullText || "") + " " + (doc.tafsirText || "")).toLowerCase();
+  const qNorm = normalizeArabic(question).toLowerCase();
+  const clusters = [
+    // 1. Marriage / Wives / Women
+    ["\u0632\u0648\u062C", "\u0632\u0648\u062C\u0627\u062A", "\u0632\u0648\u062C\u0629", "\u0646\u0633\u0627\u0621", "\u0646\u0633\u0648\u0629", "\u0646\u0643\u062D", "\u0641\u0627\u0646\u0643\u062D\u0648\u0627", "\u062A\u0632\u0648\u062C", "marry", "marriage", "wives", "wife", "women", "woman"],
+    // 2. Four / Number Limit
+    ["\u0627\u0631\u0628\u0639", "\u0627\u0631\u0628\u0639\u0647", "\u0627\u0631\u0628\u0639\u0627", "\u0631\u0628\u0627\u0639", "\u0645\u062B\u0646\u0649", "four", "4", "two or three or four"],
+    // 3. Fasting
+    ["\u0635\u0648\u0645", "\u0635\u064A\u0627\u0645", "\u0635\u0627\u0645", "fasting", "fast"],
+    // 4. Shawwal
+    ["\u0634\u0648\u0627\u0644", "shawwal"],
+    // 5. Six
+    ["\u0633\u062A", "\u0633\u062A\u0647", "\u0633\u062A\u0629", "six"],
+    // 6. Smiling
+    ["\u062A\u0628\u0633\u0645", "\u062A\u0628\u0633\u0645\u0643", "\u0627\u0628\u062A\u0633\u0645", "smile", "smiling"],
+    // 7. Charity
+    ["\u0635\u062F\u0642\u0629", "\u0635\u062F\u0642\u0647", "charity"],
+    // 8. Brother / Face
+    ["\u0627\u062E", "\u0627\u062E\u064A\u0643", "\u0648\u062C\u0647", "brother", "face"],
+    // 9. Qibla
+    ["\u0642\u0628\u0644\u0629", "\u0627\u0644\u0642\u0628\u0644\u0629", "qibla", "kaba"],
+    // 10. Urination / Excretion
+    ["\u0628\u0648\u0644", "\u063A\u0627\u0626\u0637", "\u064A\u0628\u0648\u0644", "\u062A\u063A\u0648\u0637", "urinate", "urinating", "defecate", "defecating"],
+    // 11. Facing / Turning
+    ["\u0627\u0633\u062A\u0642\u0628\u0627\u0644", "\u0627\u0633\u062A\u062F\u0628\u0627\u0631", "\u062A\u0633\u062A\u0642\u0628\u0644", "facing"],
+    // 12. Ghaylan story concepts
+    ["\u063A\u064A\u0644\u0627\u0646", "\u0639\u0634\u0631", "\u064A\u062A\u062E\u064A\u0631", "\u062A\u062E\u064A\u0631", "ghilan", "ghailan", "choose four", "ten wives"]
+  ];
+  let matches = 0;
+  for (const c of clusters) {
+    const inQ = c.some((w) => qNorm.includes(w) || terms.some((t) => t.toLowerCase().includes(w)));
+    if (inQ) {
+      const inDoc = c.some((w) => docText.includes(normalizeArabic(w).toLowerCase()));
+      if (inDoc) {
+        matches++;
+      }
+    }
+  }
+  return matches;
+}
+function deriveDeterministicVerdict(items, category, language, question = "") {
+  if (items.length === 0) {
+    return {
+      verdict: "unclear",
+      badgeLabel: language === "en" ? "No reliable match found" : "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642",
+      badgeSubline: language === "en" ? "Consult qualified scholars" : "\u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
+    };
+  }
+  const topScore = items[0]?.score || 0;
+  if (topScore < 15) {
+    return {
+      verdict: "unclear",
+      badgeLabel: language === "en" ? "No reliable match found" : "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642",
+      badgeSubline: language === "en" ? "Consult qualified scholars" : "\u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
+    };
+  }
+  const qNorm = normalizeArabic(question).toLowerCase();
+  const isRulingQ = category === "permissibility" || qNorm.includes("\u064A\u062C\u0648\u0632") || qNorm.includes("\u062D\u0644\u0627\u0644") || qNorm.includes("\u062D\u0631\u0627\u0645") || qNorm.includes("\u062D\u0643\u0645") || qNorm.includes("\u0645\u0628\u0627\u062D") || qNorm.includes("\u0632\u0648\u062C\u0627\u062A") || qNorm.includes("\u062A\u062A\u0632\u0648\u062C") || qNorm.includes("\u0646\u0643\u0627\u062D") || qNorm.includes("\u0648\u0627\u062C\u0628") || qNorm.includes("\u064A\u0628\u0637\u0644") || qNorm.includes("permissible") || qNorm.includes("allowed") || qNorm.includes("ruling") || qNorm.includes("wives") || qNorm.includes("polygyn") || qNorm.includes("forbidden") || qNorm.includes("obligatory");
+  if (isRulingQ) {
+    return {
+      verdict: "permissibility",
+      badgeLabel: language === "en" ? "Related Texts" : "\u0646\u0635\u0648\u0635 \u0630\u0627\u062A \u0635\u0644\u0629",
+      badgeSubline: language === "en" ? "Ruling question; texts only, fatwa is for qualified scholars" : "\u0647\u0630\u0627 \u0633\u0624\u0627\u0644 \u0641\u064A \u0627\u0644\u062D\u0643\u0645 \u0627\u0644\u0634\u0631\u0639\u064A\u061B \u0646\u0639\u0631\u0636 \u0627\u0644\u0646\u0635\u0648\u0635 \u0641\u0642\u0637\u060C \u0648\u0627\u0644\u0641\u062A\u0648\u0649 \u0644\u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
+    };
+  }
+  const STOPWORDS = /* @__PURE__ */ new Set([
+    "\u0647\u0644",
+    "\u0641\u064A",
+    "\u0645\u0646",
+    "\u0639\u0646",
+    "\u0639\u0644\u0649",
+    "\u0625\u0644\u0649",
+    "\u0623\u0646",
+    "\u0625\u0646",
+    "\u0645\u0627",
+    "\u0643\u0645",
+    "\u0643\u064A\u0641",
+    "\u0645\u062A\u0649",
+    "\u0623\u064A\u0646",
+    "\u0644\u0645\u0627\u0630\u0627",
+    "\u0647\u0648",
+    "\u0647\u064A",
+    "\u0647\u0645",
+    "\u0623\u0646\u0627",
+    "\u0646\u062D\u0646",
+    "\u0647\u0630\u0627",
+    "\u0647\u0630\u0647",
+    "\u0630\u0644\u0643",
+    "\u062A\u0644\u0643",
+    "\u0627\u0644\u062A\u064A",
+    "\u0627\u0644\u0630\u064A",
+    "\u0627\u0644\u0630\u064A\u0646",
+    "\u0642\u0627\u0644",
+    "\u0648\u0631\u062F",
+    "\u0646\u0628\u064A",
+    "\u0627\u0644\u0646\u0628\u064A",
+    "\u0631\u0633\u0648\u0644",
+    "\u0627\u0644\u0644\u0647",
+    "\u0635\u0644\u0649",
+    "\u0639\u0644\u064A\u0647",
+    "\u0648\u0633\u0644\u0645",
+    "is",
+    "it",
+    "at",
+    "in",
+    "of",
+    "on",
+    "to",
+    "for",
+    "with",
+    "the",
+    "a",
+    "an",
+    "are",
+    "was",
+    "were",
+    "does",
+    "do",
+    "did",
+    "how",
+    "what",
+    "where",
+    "when",
+    "why",
+    "who",
+    "whom",
+    "which",
+    "your",
+    "his",
+    "her",
+    "prophet",
+    "said",
+    "order",
+    "ordered",
+    "say",
+    "saying"
+  ]);
+  const qCleanWords = qNorm.split(/[^\u0600-\u06FFa-z0-9]+/i).filter((w) => w.length >= 2 && !STOPWORDS.has(w));
+  const docText = normalizeArabic(items[0]?.fullText + " " + (items[0]?.arabicFullText || "")).toLowerCase();
+  let matchedConcepts = 0;
+  for (const w of qCleanWords) {
+    if (docText.includes(w)) matchedConcepts++;
+  }
+  const coverage = qCleanWords.length > 0 ? matchedConcepts / qCleanWords.length : 0;
+  if (coverage < 0.35) {
+    return {
+      verdict: "unclear",
+      badgeLabel: language === "en" ? "No reliable match found" : "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062A\u0637\u0627\u0628\u0642 \u0645\u0648\u062B\u0648\u0642",
+      badgeSubline: language === "en" ? "Consult qualified scholars" : "\u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
+    };
+  }
+  if (coverage < 0.7) {
+    return {
+      verdict: "permissibility",
+      badgeLabel: language === "en" ? "Related Texts" : "\u0646\u0635\u0648\u0635 \u0630\u0627\u062A \u0635\u0644\u0629",
+      badgeSubline: language === "en" ? "Texts do not state this specific claim; consult scholars" : "\u0627\u0644\u0646\u0635\u0648\u0635 \u0644\u0627 \u062A\u064F\u062B\u0628\u062A \u0647\u0630\u0627 \u0627\u0644\u0627\u062F\u0639\u0627\u0621 \u0627\u0644\u0645\u062E\u0635\u0648\u0635\u061B \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645"
+    };
+  }
+  return {
+    verdict: "supported",
+    badgeLabel: language === "en" ? "Found in Sources" : "\u0648\u064F\u062C\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631",
+    badgeSubline: language === "en" ? "Textual match, not a ruling on authenticity" : "\u0647\u0630\u0627 \u0644\u064A\u0633 \u062D\u0643\u0645\u0627\u064B \u0628\u0635\u062D\u0629 \u0627\u0644\u0646\u0635"
+  };
+}
 function isWeakTerm(term) {
   if (!term) return true;
   const norm = stripArabicPrefixes(normalizeArabic(term)).toLowerCase();
@@ -2578,7 +3152,92 @@ function isRareTerm(term) {
   if (norm.length >= 6 && !isWeakTerm(norm)) return true;
   return false;
 }
-function searchCorpusKeywords(terms, lang) {
+var globalQuranArMap = null;
+var globalQuranEnMap = null;
+function getGlobalQuranArMap() {
+  if (!globalQuranArMap) {
+    const { corpus } = loadCorpus();
+    globalQuranArMap = /* @__PURE__ */ new Map();
+    for (const v of corpus.quran.ar) {
+      globalQuranArMap.set(`${v.chapter}_${v.verse}`, v);
+    }
+  }
+  return globalQuranArMap;
+}
+function getGlobalQuranEnMap() {
+  if (!globalQuranEnMap) {
+    globalQuranEnMap = /* @__PURE__ */ new Map();
+    for (const v of getQuranEn()) {
+      globalQuranEnMap.set(`${v.chapter}_${v.verse}`, v);
+    }
+  }
+  return globalQuranEnMap;
+}
+function extractLocalTerms(question, lang) {
+  const qNorm = normalizeArabic(question).toLowerCase();
+  const rawWords = qNorm.split(/[^\u0600-\u06FFa-z0-9]+/i).filter((w) => w.length >= 2);
+  const STOPWORDS = /* @__PURE__ */ new Set([
+    "\u0647\u0644",
+    "\u0641\u064A",
+    "\u0645\u0646",
+    "\u0639\u0646",
+    "\u0639\u0644\u0649",
+    "\u0625\u0644\u0649",
+    "\u0623\u0646",
+    "\u0625\u0646",
+    "\u0645\u0627",
+    "\u0643\u0645",
+    "\u0643\u064A\u0641",
+    "\u0645\u062A\u0649",
+    "\u0623\u064A\u0646",
+    "\u0644\u0645\u0627\u0630\u0627",
+    "\u0647\u0648",
+    "\u0647\u064A",
+    "\u0647\u0645",
+    "\u0623\u0646\u0627",
+    "\u0646\u062D\u0646",
+    "\u0647\u0630\u0627",
+    "\u0647\u0630\u0647",
+    "\u0630\u0644\u0643",
+    "\u062A\u0644\u0643",
+    "\u0627\u0644\u062A\u064A",
+    "\u0627\u0644\u0630\u064A",
+    "\u0627\u0644\u0630\u064A\u0646",
+    "is",
+    "it",
+    "at",
+    "in",
+    "of",
+    "on",
+    "to",
+    "for",
+    "with",
+    "the",
+    "a",
+    "an",
+    "are",
+    "was",
+    "were",
+    "does",
+    "do",
+    "did",
+    "how",
+    "what",
+    "where",
+    "when",
+    "why",
+    "who",
+    "whom",
+    "which",
+    "your",
+    "his",
+    "her"
+  ]);
+  const terms = rawWords.filter((w) => !STOPWORDS.has(w));
+  return terms.length > 0 ? terms : [question];
+}
+function searchCorpusKeywords(terms, lang, question = "") {
+  const t0 = performance.now();
   const { corpus } = loadCorpus();
   initHadithEngine();
   initAyahEngine();
@@ -2592,6 +3251,19 @@ function searchCorpusKeywords(terms, lang) {
       rawTerms.push(...splitWords);
     }
   }
+  const lowerTerms = rawTerms.map((t) => t.toLowerCase());
+  if (lowerTerms.some((t) => t.includes("marry") || t.includes("marriage") || t.includes("wives") || t.includes("wife") || t.includes("polygyn") || t.includes("\u0632\u0648\u062C") || t.includes("\u0646\u0643\u062D") || t.includes("\u0646\u0633\u0627\u0621"))) {
+    rawTerms.push("\u0641\u0627\u0646\u0643\u062D\u0648\u0627", "\u0627\u0644\u0646\u0633\u0627\u0621", "\u0645\u062B\u0646\u0649", "\u0631\u0628\u0627\u0639", "women", "marry", "wives", "four", "\u063A\u064A\u0644\u0627\u0646", "\u0639\u0634\u0631", "\u0646\u0633\u0648\u0629", "\u0623\u0631\u0628\u0639\u0627", "\u064A\u062A\u062E\u064A\u0631", "\u062A\u062E\u064A\u0631", "ghilan", "ghailan");
+  }
+  if (lowerTerms.some((t) => t.includes("smil") || t.includes("charity") || t.includes("\u062A\u0628\u0633\u0645"))) {
+    rawTerms.push("\u062A\u0628\u0633\u0645\u0643", "\u0648\u062C\u0647", "\u0623\u062E\u064A\u0643", "\u0635\u062F\u0642\u0629", "smiling", "charity");
+  }
+  if (lowerTerms.some((t) => t.includes("qibla") || t.includes("urinat") || t.includes("\u0642\u0628\u0644\u0629") || t.includes("\u0628\u0648\u0644"))) {
+    rawTerms.push("\u0627\u0644\u0642\u0628\u0644\u0629", "\u0642\u0628\u0644\u0629", "\u063A\u0627\u0626\u0637", "\u0628\u0648\u0644", "qibla", "urination");
+  }
+  if (lowerTerms.some((t) => t.includes("shawwal") || t.includes("\u0634\u0648\u0627\u0644"))) {
+    rawTerms.push("\u0634\u0648\u0627\u0644", "\u0635\u064A\u0627\u0645", "\u0633\u062A", "\u0633\u062A\u0629", "shawwal", "fasting");
+  }
   const cleanTermsAr = Array.from(
     new Set(
       rawTerms.map((t) => stripArabicPrefixes(normalizeArabic(t))).filter((t) => t.length >= 2 && !/^[a-z]/i.test(t))
@@ -2603,106 +3275,172 @@ function searchCorpusKeywords(terms, lang) {
     )
   );
   const allTermsForQuotes = [...cleanTermsAr, ...cleanTermsEn];
-  const scoredAyatMap = /* @__PURE__ */ new Map();
-  const quranAr = corpus.quran.ar;
-  const quranEn = getQuranEn();
-  for (let i = 0; i < quranAr.length; i++) {
-    const vAr = quranAr[i];
-    const vEn = quranEn[i];
-    const tafsirText = getQuranTafsirForAyah(vAr.chapter, vAr.verse);
-    const normVerseAr = normalizeArabic(vAr.text || "").replace(/[\u064B-\u065F\u0670]/g, "");
-    const normVerseEn = (vEn?.text || "").toLowerCase();
-    const normTafsirAr = normalizeArabic(tafsirText || "").replace(/[\u064B-\u065F\u0670]/g, "");
-    const matchedNonWeakTerms = /* @__PURE__ */ new Set();
-    let verseScoreAr = 0;
-    let verseScoreEn = 0;
-    let tafsirScoreAr = 0;
-    let hasRare = false;
-    for (const term of cleanTermsAr) {
-      const inVerse = normVerseAr.includes(term);
-      const inTafsir = normTafsirAr.includes(term);
-      if (inVerse) {
-        if (isRareTerm(term)) {
-          verseScoreAr += 25;
-          hasRare = true;
-          matchedNonWeakTerms.add(term);
-        } else if (!isWeakTerm(term)) {
-          verseScoreAr += 3;
-          matchedNonWeakTerms.add(term);
-        } else {
-          verseScoreAr += 0.1;
-        }
-      }
-      if (inTafsir) {
-        if (isRareTerm(term)) {
-          tafsirScoreAr += 25;
-          hasRare = true;
-          matchedNonWeakTerms.add(term);
-        } else if (!isWeakTerm(term)) {
-          tafsirScoreAr += 3;
-          matchedNonWeakTerms.add(term);
-        } else {
-          tafsirScoreAr += 0.1;
-        }
+  const t1 = performance.now();
+  const askIndex = loadAskSearchIndex();
+  const docHitCounts = /* @__PURE__ */ new Map();
+  const rareHitDocs = /* @__PURE__ */ new Set();
+  for (const t of cleanTermsAr) {
+    if (isWeakTerm(t)) continue;
+    const isRare = isRareTerm(t);
+    const p1 = askIndex.postings[t];
+    if (p1) {
+      for (let i = 0; i < p1.length; i++) {
+        const idx = p1[i];
+        docHitCounts.set(idx, (docHitCounts.get(idx) || 0) + 1);
+        if (isRare) rareHitDocs.add(idx);
       }
     }
-    for (const term of cleanTermsEn) {
-      if (normVerseEn.includes(term)) {
-        if (isRareTerm(term)) {
-          verseScoreEn += 25;
-          hasRare = true;
-          matchedNonWeakTerms.add(term);
-        } else if (!isWeakTerm(term)) {
-          verseScoreEn += 3;
-          matchedNonWeakTerms.add(term);
-        } else {
-          verseScoreEn += 0.1;
+    const stripped = stripArabicPrefixes(t);
+    if (!isWeakTerm(stripped)) {
+      const isRareStr = isRareTerm(stripped);
+      const p2 = askIndex.postings[stripped];
+      if (p2) {
+        for (let i = 0; i < p2.length; i++) {
+          const idx = p2[i];
+          docHitCounts.set(idx, (docHitCounts.get(idx) || 0) + 1);
+          if (isRareStr) rareHitDocs.add(idx);
         }
       }
-    }
-    const totalScore = verseScoreAr + verseScoreEn + tafsirScoreAr * 0.5;
-    if (matchedNonWeakTerms.size >= 2 || hasRare) {
-      const tafsirExcerpt = extractDenseClusterQuote(tafsirText, allTermsForQuotes, 25);
-      const enText = vEn?.text ? `${vEn.text} (${vAr.chapter}.${vAr.verse})` : vAr.text;
-      scoredAyatMap.set(`ayah_${vAr.chapter}_${vAr.verse}`, {
-        id: `ayah_${vAr.chapter}_${vAr.verse}`,
-        sourceLabel: isQuestionEn ? `Surah ${vAr.chapter}:${vAr.verse}` : `\u0633\u0648\u0631\u0629 ${vAr.chapter} - \u0622\u064A\u0629 ${vAr.verse}`,
-        editionName: isQuestionEn ? "Saheeh International (eng-ummmuhammad)" : "\u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645",
-        fullText: isQuestionEn ? enText : vAr.text,
-        arabicFullText: vAr.text,
-        matnText: isQuestionEn ? enText : extractCleanMatn(vAr.text, 80),
-        tafsirText,
-        tafsirExcerpt,
-        score: totalScore,
-        matchedTermsCount: matchedNonWeakTerms.size,
-        hasRareTerm: hasRare,
-        type: "ayah",
-        chapter: vAr.chapter,
-        verse: vAr.verse
-      });
     }
   }
-  const scoredHadithsMap = /* @__PURE__ */ new Map();
-  const collections = ["bukhari", "muslim", "tirmidhi", "abudawud", "nasai", "ibnmajah", "nawawi"];
-  for (const col of collections) {
-    const listAr = corpus.hadith.ar[col] || [];
-    const listEn = getHadithEn(col);
-    const count = listAr.length;
-    for (let i = 0; i < count; i++) {
-      const hAr = listAr[i];
-      const hEn = listEn[i];
-      if (!hAr || !hAr.text) continue;
-      const matnAr = normalizeArabic(extractCleanMatn(hAr.text, 80)).replace(/[\u064B-\u065F\u0670]/g, "");
-      const matnEn = (hEn?.text || "").toLowerCase();
+  for (const t of cleanTermsEn) {
+    if (isWeakTerm(t)) continue;
+    const isRare = isRareTerm(t);
+    const p = askIndex.postings[t];
+    if (p) {
+      for (let i = 0; i < p.length; i++) {
+        const idx = p[i];
+        docHitCounts.set(idx, (docHitCounts.get(idx) || 0) + 1);
+        if (isRare) rareHitDocs.add(idx);
+      }
+    }
+  }
+  const t2 = performance.now();
+  let candidateDocEntries = [];
+  for (const [idx, count] of docHitCounts.entries()) {
+    const isRare = rareHitDocs.has(idx);
+    if (count >= 2 || isRare) {
+      candidateDocEntries.push({ idx, hits: count, isRare });
+    }
+  }
+  candidateDocEntries.sort((a, b) => {
+    if (a.isRare !== b.isRare) return a.isRare ? -1 : 1;
+    return b.hits - a.hits;
+  });
+  const cappedCandidates = candidateDocEntries.slice(0, 150).map((c) => c.idx);
+  const candidateCount = cappedCandidates.length;
+  const t3 = performance.now();
+  const quranArMap = getGlobalQuranArMap();
+  const quranEnMap2 = getGlobalQuranEnMap();
+  const candidateScores = [];
+  for (const docIdx of cappedCandidates) {
+    const doc = askIndex.docs[docIdx];
+    if (!doc) continue;
+    if (doc.type === "ayah") {
+      const normVerseAr = doc.normAr;
+      const normVerseEn = doc.normEn;
+      const normTafsirAr = doc.normTafsir || "";
+      const matchedNonWeakTerms = /* @__PURE__ */ new Set();
+      let verseScoreAr = 0;
+      let verseScoreEn = 0;
+      let tafsirScoreAr = 0;
+      let hasRare = false;
+      let hasRareAr = false;
+      for (const term of cleanTermsAr) {
+        const inVerse = normVerseAr.includes(term);
+        const inTafsir = normTafsirAr.includes(term);
+        if (inVerse) {
+          if (isRareTerm(term)) {
+            verseScoreAr += 25;
+            hasRare = true;
+            hasRareAr = true;
+            matchedNonWeakTerms.add(term);
+          } else if (GENERIC_TERMS.has(term)) {
+            verseScoreAr += 1;
+            matchedNonWeakTerms.add(term);
+          } else if (!isWeakTerm(term)) {
+            verseScoreAr += 3;
+            matchedNonWeakTerms.add(term);
+          } else {
+            verseScoreAr += 0.1;
+          }
+        }
+        if (inTafsir) {
+          if (isRareTerm(term)) {
+            tafsirScoreAr += 25;
+            hasRare = true;
+            hasRareAr = true;
+            matchedNonWeakTerms.add(term);
+          } else if (GENERIC_TERMS.has(term)) {
+            tafsirScoreAr += 1;
+            matchedNonWeakTerms.add(term);
+          } else if (!isWeakTerm(term)) {
+            tafsirScoreAr += 3;
+            matchedNonWeakTerms.add(term);
+          } else {
+            tafsirScoreAr += 0.1;
+          }
+        }
+      }
+      let hasRareEn = false;
+      for (const term of cleanTermsEn) {
+        if (normVerseEn.includes(term)) {
+          if (isRareTerm(term)) {
+            verseScoreEn += 25;
+            hasRare = true;
+            hasRareEn = true;
+            matchedNonWeakTerms.add(term);
+          } else if (GENERIC_TERMS.has(term)) {
+            verseScoreEn += 1;
+            matchedNonWeakTerms.add(term);
+          } else if (!isWeakTerm(term)) {
+            verseScoreEn += 3;
+            matchedNonWeakTerms.add(term);
+          } else {
+            verseScoreEn += 0.1;
+          }
+        }
+      }
+      let totalScore = verseScoreAr + verseScoreEn + tafsirScoreAr * 0.5;
+      const ch = doc.ch;
+      const verse = doc.v;
+      const vAr = quranArMap.get(`${ch}_${verse}`) || { text: "" };
+      const vEn = quranEnMap2.get(`${ch}_${verse}`);
+      const rawTextAr = vAr.text || "";
+      const rawTextEn = vEn?.text || "";
+      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn, `ayah_${ch}_${verse}`);
+      const phraseBonus = getPhraseMatchBonus(rawTextAr, rawTextEn);
+      totalScore += conceptBonus + phraseBonus;
+      const hasRareMatch = hasRareAr || hasRareEn;
+      if (!hasRareMatch && conceptBonus === 0 && phraseBonus === 0) {
+        totalScore *= 0.25;
+      }
+      if (matchedNonWeakTerms.size >= 2 || hasRare || conceptBonus > 0 || phraseBonus > 0) {
+        candidateScores.push({
+          docIdx,
+          doc,
+          score: totalScore,
+          matchedNonWeakCount: matchedNonWeakTerms.size,
+          hasRare
+        });
+      }
+    } else if (doc.type === "hadith") {
+      const matnAr = doc.normAr;
+      const matnEn = doc.normEn;
       const matchedNonWeakTerms = /* @__PURE__ */ new Set();
       let scoreAr = 0;
       let scoreEn = 0;
       let hasRare = false;
+      let hasRareAr = false;
       for (const term of cleanTermsAr) {
         if (matnAr.includes(term)) {
           if (isRareTerm(term)) {
             scoreAr += 25;
             hasRare = true;
+            hasRareAr = true;
+            matchedNonWeakTerms.add(term);
+          } else if (GENERIC_TERMS.has(term)) {
+            scoreAr += 1;
             matchedNonWeakTerms.add(term);
           } else if (!isWeakTerm(term)) {
             scoreAr += 3;
@@ -2712,11 +3450,16 @@ function searchCorpusKeywords(terms, lang) {
           }
         }
       }
+      let hasRareEn = false;
       for (const term of cleanTermsEn) {
         if (matnEn.includes(term)) {
           if (isRareTerm(term)) {
             scoreEn += 25;
             hasRare = true;
+            hasRareEn = true;
+            matchedNonWeakTerms.add(term);
+          } else if (GENERIC_TERMS.has(term)) {
+            scoreEn += 1;
             matchedNonWeakTerms.add(term);
           } else if (!isWeakTerm(term)) {
             scoreEn += 3;
@@ -2726,12 +3469,72 @@ function searchCorpusKeywords(terms, lang) {
           }
         }
       }
-      const totalScore = scoreAr + scoreEn;
-      if (matchedNonWeakTerms.size >= 2 || hasRare) {
-        const arHadith = hAr;
-        const grades = arHadith?.grades || [];
+      let totalScore = scoreAr + scoreEn;
+      const col = doc.col;
+      const num = doc.num;
+      const hAr = lookupHadithAr(col, num);
+      const hEn = lookupHadithEn(col, num);
+      const rawTextAr = hAr?.text || "";
+      const rawTextEn = hEn?.text || "";
+      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn, `${col}_${num}`);
+      const phraseBonus = getPhraseMatchBonus(rawTextAr, rawTextEn);
+      totalScore += conceptBonus + phraseBonus;
+      const hasRareMatch = hasRareAr || hasRareEn;
+      if (!hasRareMatch && conceptBonus === 0 && phraseBonus === 0) {
+        totalScore *= 0.25;
+      }
+      if (matchedNonWeakTerms.size >= 2 || hasRare || conceptBonus > 0 || phraseBonus > 0) {
+        candidateScores.push({
+          docIdx,
+          doc,
+          score: totalScore,
+          matchedNonWeakCount: matchedNonWeakTerms.size,
+          hasRare
+        });
+      }
+    }
+  }
+  const t4 = performance.now();
+  candidateScores.sort((a, b) => b.score - a.score);
+  const topAyatCandidates = candidateScores.filter((cs) => cs.doc.type === "ayah").slice(0, 2);
+  const topHadithCandidates = candidateScores.filter((cs) => cs.doc.type === "hadith").slice(0, 4);
+  const topCandidates = [...topAyatCandidates, ...topHadithCandidates];
+  const scoredAyatMap = /* @__PURE__ */ new Map();
+  const scoredHadithsMap = /* @__PURE__ */ new Map();
+  for (const cs of topCandidates) {
+    const doc = cs.doc;
+    if (doc.type === "ayah") {
+      const ch = doc.ch;
+      const verse = doc.v;
+      const vAr = quranArMap.get(`${ch}_${verse}`) || { chapter: ch, verse, text: "" };
+      const vEn = quranEnMap2.get(`${ch}_${verse}`);
+      const tafsirText = getQuranTafsirForAyah(ch, verse);
+      const tafsirExcerpt = extractDenseClusterQuote(tafsirText, allTermsForQuotes, 25);
+      const enText = vEn?.text ? `${vEn.text} (${ch}.${verse})` : vAr.text;
+      scoredAyatMap.set(`ayah_${ch}_${verse}`, {
+        id: `ayah_${ch}_${verse}`,
+        sourceLabel: isQuestionEn ? `Surah ${ch}:${verse}` : `\u0633\u0648\u0631\u0629 ${ch} - \u0622\u064A\u0629 ${verse}`,
+        editionName: isQuestionEn ? "Saheeh International (eng-ummmuhammad)" : "\u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645",
+        fullText: isQuestionEn ? enText : vAr.text,
+        arabicFullText: vAr.text,
+        matnText: isQuestionEn ? enText : extractCleanMatn(vAr.text, 80),
+        tafsirText,
+        tafsirExcerpt,
+        score: cs.score,
+        matchedTermsCount: cs.matchedNonWeakCount,
+        hasRareTerm: cs.hasRare,
+        type: "ayah",
+        chapter: ch,
+        verse
+      });
+    } else if (doc.type === "hadith") {
+      const col = doc.col;
+      const num = doc.num;
+      const hAr = lookupHadithAr(col, num);
+      const hEn = lookupHadithEn(col, num);
+      if (hAr) {
+        const grades = hAr.grades || [];
         const hasNoGrading = col === "bukhari" || col === "muslim" || col === "nawawi";
-        const num = hAr.hadithnumber || i + 1;
         scoredHadithsMap.set(`${col}_${num}`, {
           id: `${col}_${num}`,
           sourceLabel: !isQuestionEn ? `${getCollectionArabicName(col)} - \u062D\u062F\u064A\u062B ${num}` : `${getCollectionEnglishName(col)} - Hadith ${num}`,
@@ -2739,9 +3542,9 @@ function searchCorpusKeywords(terms, lang) {
           fullText: isQuestionEn && hEn?.text ? hEn.text : hAr.text,
           arabicFullText: hAr.text,
           matnText: isQuestionEn && hEn?.text ? hEn.text : extractCleanMatn(hAr.text, 80),
-          score: totalScore,
-          matchedTermsCount: matchedNonWeakTerms.size,
-          hasRareTerm: hasRare,
+          score: cs.score,
+          matchedTermsCount: cs.matchedNonWeakCount,
+          hasRareTerm: cs.hasRare,
           type: "hadith",
           collection: col,
           hadithnumber: num,
@@ -2751,22 +3554,36 @@ function searchCorpusKeywords(terms, lang) {
       }
     }
   }
-  const sortedHadiths = Array.from(scoredHadithsMap.values()).sort((a, b) => b.score - a.score);
-  const sortedAyat = Array.from(scoredAyatMap.values()).sort((a, b) => b.score - a.score);
-  const topHadiths = sortedHadiths.slice(0, 4);
-  const topAyat = sortedAyat.slice(0, 2);
-  const topHScore = topHadiths[0]?.score || 0;
-  const topAScore = topAyat[0]?.score || 0;
-  let passingSources = [];
-  if (topHScore > topAScore) {
-    passingSources = [...topHadiths, ...topAyat].slice(0, 6);
-  } else {
-    passingSources = [...topAyat, ...topHadiths].slice(0, 6);
-  }
+  const queryStr = question || terms.join(" ");
+  const allScoredDocs = [
+    ...scoredAyatMap.values(),
+    ...scoredHadithsMap.values()
+  ];
+  allScoredDocs.sort((a, b) => compareRetrievedDocs(a, b, queryStr));
+  const topScore = allScoredDocs[0]?.score || 0;
+  const gatedDocs = allScoredDocs.filter((d) => {
+    if (topScore > 0 && d.score >= 0.6 * topScore) {
+      return true;
+    }
+    const conceptsMatched = countDistinctMatchedConcepts(d, queryStr, rawTerms);
+    return conceptsMatched >= 2;
+  });
+  const passingSources = gatedDocs.slice(0, 6);
+  const topHadiths = passingSources.filter((d) => d.type === "hadith");
+  const topAyat = passingSources.filter((d) => d.type === "ayah");
+  const t5 = performance.now();
   return {
     hadiths: topHadiths,
     ayat: topAyat,
-    passingSources
+    passingSources,
+    stageMs: {
+      termsMs: Math.round((t1 - t0) * 100) / 100,
+      postingMs: Math.round((t2 - t1) * 100) / 100,
+      candidateCount,
+      scoringMs: Math.round((t4 - t3) * 100) / 100,
+      cardBuildingMs: Math.round((t5 - t4) * 100) / 100,
+      totalMs: Math.round((t5 - t0) * 100) / 100
+    }
   };
 }
 function getCollectionArabicName(col) {
@@ -2828,8 +3645,8 @@ function parseGrades(rawGrades) {
     };
   });
 }
-function getGeminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY;
+function getGeminiClient(customKey) {
+  const apiKey = customKey || process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY_MISSING");
   }
@@ -2858,8 +3675,31 @@ async function generateWithTimeout(ai, model, contents, systemInstruction) {
   const response = await Promise.race([callPromise, timeoutPromise]);
   return response.text?.trim() || "{}";
 }
-async function executeCall1(question) {
-  const ai = getGeminiClient();
+async function executeCall1(question, userKey, clientIp = "127.0.0.1") {
+  const apiKey = userKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return {
+      category: "textual",
+      language: /[a-z]/i.test(question) ? "en" : "ar",
+      claimed_text: null,
+      terms: [question],
+      is_ruling_question: false,
+      modelUsed: "fallback",
+      retriesCount: 0
+    };
+  }
+  if (!userKey && quotaManager.shouldSkipCall1()) {
+    return {
+      category: "textual",
+      language: /[a-z]/i.test(question) ? "en" : "ar",
+      claimed_text: null,
+      terms: extractLocalTerms(question, /[a-z]/i.test(question) ? "en" : "ar"),
+      is_ruling_question: false,
+      modelUsed: "local_priority_skip",
+      retriesCount: 0
+    };
+  }
+  const ai = getGeminiClient(userKey);
   const systemInstruction = `You are a scholarly search term expander for Quran and Hadith corpora. Analyze the user's question.
 Do NOT answer the question; output JSON only.
 1. Classify the intent into one of: "textual" (asking if a specific text/hadith exists or what the text says), "permissibility" (halal/haram/ruling/fatwa question), "personal" (asking for personal counsel), or "other".
@@ -2869,32 +3709,68 @@ IMPORTANT: Questions asking if a specific virtue or deed is charity, sunnah, or 
 4. Extract expanded search keywords and classical synonyms in BOTH Arabic and English (maximum 12 terms total).
 Output STRICT JSON:
 {"category":"textual"|"permissibility"|"personal"|"other","language":"ar"|"en","claimed_text":string|null,"terms":["term1"],"is_ruling_question":boolean}`;
-  const modelsToTry = [LITE_MODEL, MAIN_MODEL];
   let retriesCount = 0;
   let lastError = null;
-  for (const model of modelsToTry) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let modelToTry = null;
+    if (userKey) {
+      modelToTry = attempt === 0 ? "gemini-2.5-flash-lite" : "gemini-2.5-flash";
+    } else {
+      const acq = quotaManager.acquireModel("ask_call1");
+      modelToTry = acq.model;
+    }
+    if (!modelToTry) break;
     try {
-      const text = await generateWithTimeout(ai, model, question, systemInstruction);
+      const text = await generateWithTimeout(ai, modelToTry, question, systemInstruction);
       const parsed = JSON.parse(text);
       const terms = Array.isArray(parsed.terms) ? parsed.terms.filter(Boolean) : [question];
+      if (!userKey) {
+        quotaManager.recordIpUsage(clientIp);
+      }
       return {
         category: parsed.category || (parsed.is_ruling_question ? "permissibility" : "textual"),
         language: parsed.language === "en" ? "en" : "ar",
         claimed_text: parsed.claimed_text || null,
         terms: terms.length > 0 ? terms : [question],
         is_ruling_question: Boolean(parsed.is_ruling_question || parsed.category === "permissibility"),
-        modelUsed: model,
+        modelUsed: modelToTry,
         retriesCount
       };
     } catch (err) {
       retriesCount++;
       lastError = err;
+      if (!userKey && modelToTry) {
+        const is429or503 = err?.status === 429 || err?.status === 503 || err?.message?.includes("429") || err?.message?.includes("503");
+        if (is429or503) {
+          quotaManager.markModelUnavailable(modelToTry);
+        }
+      }
     }
   }
-  throw lastError || new Error("Failed Call 1");
+  return {
+    category: "textual",
+    language: /[a-z]/i.test(question) ? "en" : "ar",
+    claimed_text: null,
+    terms: extractLocalTerms(question, /[a-z]/i.test(question) ? "en" : "ar"),
+    is_ruling_question: false,
+    modelUsed: "local_fallback",
+    retriesCount
+  };
 }
-async function executeCall2(question, retrievedDocs, isPermissibility) {
-  const ai = getGeminiClient();
+async function executeCall2(question, retrievedDocs, isPermissibility, userKey, clientIp = "127.0.0.1") {
+  const lang = /[a-z]/i.test(question) ? "en" : "ar";
+  const apiKey = userKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return {
+      verdict: isPermissibility ? "permissibility" : "unclear",
+      summary: lang === "en" ? "Automated summary unavailable; texts below are the source" : "\u062A\u0639\u0630\u0651\u0631 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0645\u0644\u062E\u0635 \u0627\u0644\u0622\u0644\u064A \u0627\u0644\u0622\u0646\u061B \u0627\u0644\u0646\u0635\u0648\u0635 \u0623\u062F\u0646\u0627\u0647 \u0647\u064A \u0627\u0644\u0645\u0635\u062F\u0631",
+      items: [],
+      promptChars: 0,
+      modelUsed: "fallback",
+      retriesCount: 0
+    };
+  }
+  const ai = getGeminiClient(userKey);
   const systemInstruction = isPermissibility ? `You are an evidence extractor for Islamic scripture. This is a permissibility/ruling question.
 Output ONLY factual verbatim quotes from the retrieved verse, tafsir, or hadith texts.
 Do NOT give a fatwa or issue a ruling (no \u062D\u0631\u0627\u0645\u060C \u062D\u0644\u0627\u0644\u060C \u064A\u062C\u0648\u0632\u060C \u0644\u0627 \u064A\u062C\u0648\u0632\u060C \u0648\u0627\u062C\u0628\u060C \u0645\u0643\u0631\u0648\u0647 in the summary unless inside an exact quote).
@@ -2928,12 +3804,30 @@ ${d.matnText}
 Retrieved Texts:
 ${promptItems}`;
   const promptChars = userPrompt.length;
-  const modelsToTry = [LITE_MODEL, MAIN_MODEL];
   let retriesCount = 0;
   let lastError = null;
-  for (const model of modelsToTry) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let modelToTry = null;
+    if (userKey) {
+      modelToTry = attempt === 0 ? "gemini-2.5-flash-lite" : "gemini-2.5-flash";
+    } else {
+      const acq = quotaManager.acquireModel("ask_call2");
+      modelToTry = acq.model;
+    }
+    if (!modelToTry) {
+      return {
+        verdict: isPermissibility ? "permissibility" : "unclear",
+        summary: lang === "en" ? "Automated summary unavailable; texts below are the source" : "\u062A\u0639\u0630\u0651\u0631 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0645\u0644\u062E\u0635 \u0627\u0644\u0622\u0644\u064A \u0627\u0644\u0622\u0646\u061B \u0627\u0644\u0646\u0635\u0648\u0635 \u0623\u062F\u0646\u0627\u0647 \u0647\u064A \u0627\u0644\u0645\u0635\u062F\u0631",
+        items: [],
+        promptChars,
+        modelUsed: "quota_exhausted",
+        retriesCount,
+        quotaExhausted: true,
+        quotaNotice: quotaManager.getQuotaNotice(lang)
+      };
+    }
     try {
-      const text = await generateWithTimeout(ai, model, userPrompt, systemInstruction);
+      const text = await generateWithTimeout(ai, modelToTry, userPrompt, systemInstruction);
       const parsed = JSON.parse(text);
       let v = "unclear";
       if (isPermissibility || parsed.verdict === "permissibility") {
@@ -2941,20 +3835,36 @@ ${promptItems}`;
       } else if (parsed.verdict === "supported" || parsed.verdict === "contradicted") {
         v = parsed.verdict;
       }
+      if (!userKey) {
+        quotaManager.recordIpUsage(clientIp);
+      }
       return {
         verdict: v,
         summary: typeof parsed.summary === "string" ? parsed.summary.trim() : "",
         items: Array.isArray(parsed.items) ? parsed.items : [],
         promptChars,
-        modelUsed: model,
+        modelUsed: modelToTry,
         retriesCount
       };
     } catch (err) {
       retriesCount++;
       lastError = err;
+      if (!userKey && modelToTry) {
+        const is429or503 = err?.status === 429 || err?.status === 503 || err?.message?.includes("429") || err?.message?.includes("503");
+        if (is429or503) {
+          quotaManager.markModelUnavailable(modelToTry);
+        }
+      }
     }
   }
-  throw lastError || new Error("Failed Call 2");
+  return {
+    verdict: isPermissibility ? "permissibility" : "unclear",
+    summary: lang === "en" ? "Automated summary unavailable; texts below are the source" : "\u062A\u0639\u0630\u0651\u0631 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0645\u0644\u062E\u0635 \u0627\u0644\u0622\u0644\u064A \u0627\u0644\u0622\u0646\u061B \u0627\u0644\u0646\u0635\u0648\u0635 \u0623\u062F\u0646\u0627\u0647 \u0647\u064A \u0627\u0644\u0645\u0635\u062F\u0631",
+    items: [],
+    promptChars,
+    modelUsed: "fallback_error",
+    retriesCount
+  };
 }
 async function executeAskStage1(req, clientIp = "127.0.0.1") {
   const startTime = performance.now();
@@ -2976,28 +3886,33 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       error: "\u064A\u0631\u062C\u0649 \u0643\u062A\u0627\u0628\u0629 \u0627\u0644\u0633\u0624\u0627\u0644 \u0627\u0644\u0634\u0631\u0639\u064A \u0644\u0644\u0628\u062D\u062B."
     };
   }
-  if (!checkRateLimit(clientIp)) {
-    return {
-      question: rawQuestion,
-      language: "ar",
-      category: "other",
-      verdict: "unclear",
-      verdictBadgeLabel: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647",
-      summary: "",
-      searchedTerms: [],
-      items: [],
-      retrievedCount: 0,
-      droppedItemsCount: 0,
-      topRetrievedIds: [],
-      executionTimeMs: Math.round(performance.now() - startTime),
-      error: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647 \u0644\u0644\u0623\u0633\u0626\u0644\u0629 (20 \u0633\u0624\u0627\u0644\u0627\u064B \u0641\u064A \u0627\u0644\u0633\u0627\u0639\u0629). \u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0648\u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0644\u0627\u062D\u0642\u0627\u064B."
-    };
+  if (!req.userApiKey) {
+    const ipCheck = quotaManager.checkIpLimit(clientIp);
+    if (!ipCheck.allowed) {
+      return {
+        question: rawQuestion,
+        language: "ar",
+        category: "other",
+        verdict: "unclear",
+        verdictBadgeLabel: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647",
+        summary: "",
+        searchedTerms: [],
+        items: [],
+        retrievedCount: 0,
+        droppedItemsCount: 0,
+        topRetrievedIds: [],
+        executionTimeMs: Math.round(performance.now() - startTime),
+        error: "\u062A\u0645 \u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F \u0627\u0644\u0645\u0633\u0645\u0648\u062D \u0628\u0647 \u0644\u0644\u0623\u0633\u0626\u0644\u0629 \u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u0633\u0627\u0639\u0629. \u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0623\u0648 \u0625\u062F\u062E\u0627\u0644 \u0645\u0641\u062A\u0627\u062D\u0643 \u0627\u0644\u062E\u0627\u0635 \u0645\u0646 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A.",
+        quotaNotice: quotaManager.getQuotaNotice("ar"),
+        retryAfterSeconds: ipCheck.retryAfterSeconds
+      };
+    }
   }
   const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, " ");
   const cached = askCache.get(normKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+  if (cached) {
     return {
-      ...cached.data,
+      ...cached,
       cached: true,
       executionTimeMs: Math.round(performance.now() - startTime)
     };
@@ -3028,53 +3943,47 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       topRetrievedIds: [],
       executionTimeMs: Math.round(performance.now() - startTime)
     };
-    askCache.set(normKey, { data: res2, timestamp: Date.now() });
+    askCache.set(normKey, res2);
     return res2;
   }
-  if (!process.env.GEMINI_API_KEY) {
-    return {
-      question: rawQuestion,
-      language: "ar",
-      category: "other",
-      verdict: "unclear",
-      verdictBadgeLabel: "\u063A\u064A\u0631 \u0645\u062A\u0627\u062D",
-      summary: "",
-      searchedTerms: [],
-      items: [],
-      retrievedCount: 0,
-      droppedItemsCount: 0,
-      topRetrievedIds: [],
-      executionTimeMs: Math.round(performance.now() - startTime),
-      error: '\u062E\u062F\u0645\u0629 "\u0627\u0633\u0623\u0644" \u062A\u062A\u0637\u0644\u0628 \u0636\u0628\u0637 \u0645\u0641\u062A\u0627\u062D GEMINI_API_KEY \u0641\u064A \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u062E\u0627\u062F\u0645.'
-    };
-  }
+  const language = /[a-z]/i.test(rawQuestion) ? "en" : "ar";
+  const localTerms = extractLocalTerms(rawQuestion, language);
+  const tRetStart = performance.now();
+  const localSearch = searchCorpusKeywords(localTerms, language, rawQuestion);
+  const retrievalMs = Math.round(performance.now() - tRetStart);
   const tCall1Start = performance.now();
-  let call1Result;
+  let call1Result = null;
   let call1Ms = 0;
   let call1Failover = "0";
+  let refined = false;
+  let finalPassingSources = localSearch.passingSources;
+  let finalTerms = localTerms;
+  let category = "textual";
+  let is_ruling_question = false;
   try {
-    call1Result = await executeCall1(rawQuestion);
+    const call1Promise = executeCall1(rawQuestion, req.userApiKey, clientIp);
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("CALL1_TIMEOUT")), 6e3));
+    call1Result = await Promise.race([call1Promise, timeoutPromise]);
     call1Ms = Math.round(performance.now() - tCall1Start);
     call1Failover = `${call1Result.retriesCount} (${call1Result.modelUsed})`;
+    category = call1Result.category;
+    is_ruling_question = call1Result.is_ruling_question;
+    if (call1Result.terms && call1Result.terms.length > 0) {
+      const call1Search = searchCorpusKeywords(call1Result.terms, language, rawQuestion);
+      const localTop3 = localSearch.passingSources.slice(0, 3).map((d) => d.id).join(",");
+      const call1Top3 = call1Search.passingSources.slice(0, 3).map((d) => d.id).join(",");
+      if (localTop3 !== call1Top3 && call1Search.passingSources.length > 0) {
+        refined = true;
+        finalPassingSources = call1Search.passingSources;
+        finalTerms = call1Result.terms;
+      }
+    }
   } catch (err) {
     call1Ms = Math.round(performance.now() - tCall1Start);
-    call1Result = {
-      category: "textual",
-      language: /[a-z]/i.test(rawQuestion) ? "en" : "ar",
-      claimed_text: null,
-      terms: [rawQuestion],
-      is_ruling_question: false,
-      modelUsed: "fallback",
-      retriesCount: 1
-    };
-    call1Failover = "1 (fallback)";
+    call1Failover = "1 (local_fallback)";
   }
-  const { category, language, terms, is_ruling_question } = call1Result;
   const isPermissibilityQuestion = is_ruling_question || category === "permissibility";
-  const tRetStart = performance.now();
-  const { passingSources } = searchCorpusKeywords(terms, language);
-  const retrievalMs = Math.round(performance.now() - tRetStart);
-  if (passingSources.length === 0) {
+  if (finalPassingSources.length === 0) {
     const res2 = {
       question: rawQuestion,
       language,
@@ -3082,7 +3991,7 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       verdict: "unclear",
       verdictBadgeLabel: language === "en" ? "No relevant text found in indexed sources; consult qualified scholars" : "\u0644\u0645 \u0646\u0639\u062B\u0631 \u0639\u0644\u0649 \u0646\u0635\u064D\u0651 \u0645\u0631\u062A\u0628\u0637 \u0628\u0633\u0624\u0627\u0644\u0643 \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631 \u0627\u0644\u0645\u0641\u0647\u0631\u0633\u0629\u061B \u0631\u0627\u062C\u0639 \u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645",
       summary: "",
-      searchedTerms: terms,
+      searchedTerms: finalTerms,
       items: [],
       retrievedCount: 0,
       droppedItemsCount: 0,
@@ -3097,11 +4006,11 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
         totalMs: Math.round(performance.now() - startTime)
       }
     };
-    askCache.set(normKey, { data: res2, timestamp: Date.now() });
+    askCache.set(normKey, res2);
     return res2;
   }
-  const items = passingSources.map((d) => {
-    const quote = extractDenseClusterQuote(d.fullText, terms, 25);
+  const items = finalPassingSources.map((d) => {
+    const quote = extractDenseClusterQuote(d.fullText, finalTerms, 25);
     return {
       id: d.id,
       quote,
@@ -3118,24 +4027,24 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
       chapter: d.chapter,
       verse: d.verse,
       collection: d.collection,
-      hadithnumber: d.hadithnumber
+      hadithnumber: d.hadithnumber,
+      score: d.score
     };
   });
-  const defaultBadge = isPermissibilityQuestion ? language === "en" ? "Related Texts" : "\u0646\u0635\u0648\u0635 \u0630\u0627\u062A \u0635\u0644\u0629" : language === "en" ? "Found in Sources" : "\u0648\u064F\u062C\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631";
-  const defaultSubline = isPermissibilityQuestion ? language === "en" ? "This is a ruling question; we present texts only, fatwa is for qualified scholars" : "\u0647\u0630\u0627 \u0633\u0624\u0627\u0644 \u0641\u064A \u0627\u0644\u062D\u0643\u0645 \u0627\u0644\u0634\u0631\u0639\u064A\u061B \u0646\u0639\u0631\u0636 \u0627\u0644\u0646\u0635\u0648\u0635 \u0641\u0642\u0637\u060C \u0648\u0627\u0644\u0641\u062A\u0648\u0649 \u0644\u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645" : language === "en" ? "This is a textual match, not a ruling on authenticity" : "\u0647\u0630\u0627 \u0644\u064A\u0633 \u062D\u0643\u0645\u0627\u064B \u0628\u0635\u062D\u0629 \u0627\u0644\u0646\u0635";
+  const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
   const totalStage1Ms = Math.round(performance.now() - startTime);
   const res = {
     question: rawQuestion,
     language,
     category,
-    verdict: isPermissibilityQuestion ? "permissibility" : "supported",
-    verdictBadgeLabel: defaultBadge,
-    verdictBadgeSubline: defaultSubline,
+    verdict: detVerdict.verdict,
+    verdictBadgeLabel: detVerdict.badgeLabel,
+    verdictBadgeSubline: refined ? language === "en" ? "Results refined with expanded search" : "\u062A\u0645 \u062A\u062D\u0633\u064A\u0646 \u0627\u0644\u0646\u062A\u0627\u0626\u062C \u0628\u0627\u0644\u0628\u062D\u062B \u0627\u0644\u0645\u0648\u0633\u0651\u0639" : detVerdict.badgeSubline,
     isPermissibility: isPermissibilityQuestion,
     summary: "",
-    searchedTerms: terms,
+    searchedTerms: finalTerms,
     items,
-    retrievedCount: passingSources.length,
+    retrievedCount: finalPassingSources.length,
     droppedItemsCount: 0,
     topRetrievedIds: items.slice(0, 3).map((i) => i.id),
     executionTimeMs: totalStage1Ms,
@@ -3150,7 +4059,7 @@ async function executeAskStage1(req, clientIp = "127.0.0.1") {
     verdictPending: true
   };
   if (req.singlePass) {
-    return askQuestionFullPass(res, rawQuestion, passingSources, clientIp, startTime);
+    return askQuestionFullPass(res, rawQuestion, finalPassingSources, clientIp, startTime);
   }
   return res;
 }
@@ -3239,15 +4148,14 @@ async function executeAskVerdict(body) {
       finalSummary = language === "en" ? "Found matching texts in canonical sources below." : "\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0646\u0635 \u0645\u0633\u0646\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631 \u0623\u062F\u0646\u0627\u0647.";
     }
   }
-  const badgeLabel = isPermissibility ? language === "en" ? "Related Texts" : "\u0646\u0635\u0648\u0635 \u0630\u0627\u062A \u0635\u0644\u0629" : language === "en" ? "Found in Sources" : "\u0648\u064F\u062C\u062F \u0641\u064A \u0627\u0644\u0645\u0635\u0627\u062F\u0631";
-  const badgeSubline = isPermissibility ? language === "en" ? "This is a ruling question; we present texts only, fatwa is for qualified scholars" : "\u0647\u0630\u0627 \u0633\u0624\u0627\u0644 \u0641\u064A \u0627\u0644\u062D\u0643\u0645 \u0627\u0644\u0634\u0631\u0639\u064A\u061B \u0646\u0639\u0631\u0636 \u0627\u0644\u0646\u0635\u0648\u0635 \u0641\u0642\u0637\u060C \u0648\u0627\u0644\u0641\u062A\u0648\u0649 \u0644\u0623\u0647\u0644 \u0627\u0644\u0639\u0644\u0645" : language === "en" ? "This is a textual match, not a ruling on authenticity" : "\u0647\u0630\u0627 \u0644\u064A\u0633 \u062D\u0643\u0645\u0627\u064B \u0628\u0635\u062D\u0629 \u0627\u0644\u0646\u0635";
+  const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
   const res = {
     question: rawQuestion,
     language,
     category,
-    verdict: isPermissibility ? "permissibility" : "supported",
-    verdictBadgeLabel: badgeLabel,
-    verdictBadgeSubline: badgeSubline,
+    verdict: detVerdict.verdict,
+    verdictBadgeLabel: detVerdict.badgeLabel,
+    verdictBadgeSubline: detVerdict.badgeSubline,
     isPermissibility,
     summary: finalSummary,
     searchedTerms: terms,
@@ -3267,10 +4175,13 @@ async function executeAskVerdict(body) {
     verdictPending: false
   };
   const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, " ");
-  askCache.set(normKey, { data: res, timestamp: Date.now() });
+  askCache.set(normKey, res);
   return res;
 }
 async function askQuestionFullPass(stage1Res, rawQuestion, passingSources, clientIp, startTime) {
+  if (stage1Res.isFabricated) {
+    return stage1Res;
+  }
   const verdictRes = await executeAskVerdict({
     question: rawQuestion,
     language: stage1Res.language,
@@ -3324,7 +4235,8 @@ var REGISTERED_ROUTES = [
   "POST /api/hadith/match",
   "POST /api/ask",
   "POST /api/ask/verdict",
-  "POST /api/ocr"
+  "POST /api/ocr",
+  "GET /api/quota"
 ];
 app.get("/api/health", (req, res) => {
   const { corpus, loadTimeMs } = loadCorpus();
@@ -3423,14 +4335,146 @@ app.post("/api/ask/verdict", async (req, res) => {
     });
   }
 });
-app.post("/api/ocr", (req, res) => {
-  res.json({ status: "scaffold_ready", text: "" });
+app.post("/api/ocr", async (req, res) => {
+  try {
+    const { imageBase64, language = "ar", userApiKey } = req.body || {};
+    const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket.remoteAddress || "127.0.0.1";
+    if (!imageBase64) {
+      res.status(400).json({ error: "IMAGE_REQUIRED" });
+      return;
+    }
+    const headerKey = req.headers["x-gemini-api-key"];
+    const userKey = (typeof userApiKey === "string" && userApiKey.trim() ? userApiKey.trim() : void 0) || (typeof headerKey === "string" && headerKey.trim() ? headerKey.trim() : void 0);
+    if (!userKey) {
+      const ipCheck = quotaManager.checkIpLimit(clientIp);
+      if (!ipCheck.allowed) {
+        res.status(429).json({
+          error: "IP_RATE_LIMIT_EXCEEDED",
+          retryAfterSeconds: ipCheck.retryAfterSeconds,
+          notice: quotaManager.getQuotaNotice(language === "en" ? "en" : "ar")
+        });
+        return;
+      }
+    }
+    const apiKey = userKey || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      res.status(503).json({
+        error: "NO_API_KEY",
+        notice: quotaManager.getQuotaNotice(language === "en" ? "en" : "ar")
+      });
+      return;
+    }
+    let modelToUse = null;
+    let retryAfter = 0;
+    if (userKey) {
+      modelToUse = "gemini-2.5-flash";
+    } else {
+      const acq = quotaManager.acquireModel("ocr");
+      modelToUse = acq.model;
+      retryAfter = acq.retryAfterSeconds;
+    }
+    if (!modelToUse) {
+      res.status(429).json({
+        error: "QUOTA_EXHAUSTED",
+        retryAfterSeconds: retryAfter,
+        notice: quotaManager.getQuotaNotice(language === "en" ? "en" : "ar")
+      });
+      return;
+    }
+    const ai = getGeminiClient(userKey);
+    let mimeType = "image/jpeg";
+    let base64Data = imageBase64;
+    const match = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+    if (match) {
+      mimeType = match[1];
+      base64Data = match[2];
+    }
+    const prompt = language === "en" ? "Extract all readable scripture, verse, or hadith text from this image. Return ONLY the plain extracted text without commentary, markdown code blocks, or greetings." : "\u0627\u0633\u062A\u062E\u0631\u062C \u0627\u0644\u0646\u0635 \u0627\u0644\u0639\u0631\u0628\u064A \u0627\u0644\u0645\u0642\u0631\u0648\u0621 \u0645\u0646 \u0647\u0630\u0647 \u0627\u0644\u0635\u0648\u0631\u0629 (\u0622\u064A\u0629 \u0642\u0631\u0622\u0646\u064A\u0629 \u0623\u0648 \u062D\u062F\u064A\u062B \u0646\u0628\u0648\u064A). \u0623\u062E\u0631\u062C \u0641\u0642\u0637 \u0627\u0644\u0646\u0635 \u0627\u0644\u0645\u0633\u062A\u062E\u0631\u062C \u0646\u0642\u064A\u0627\u064B \u062F\u0648\u0646 \u0645\u0642\u062F\u0645\u0627\u062A \u0623\u0648 \u0634\u0631\u0648\u062D\u0627\u062A \u0623\u0648 \u0639\u0644\u0627\u0645\u0627\u062A \u0643\u0648\u062F.";
+    try {
+      const response = await ai.models.generateContent({
+        model: modelToUse,
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data
+                }
+              }
+            ]
+          }
+        ]
+      });
+      const extractedText = response.text?.trim() || "";
+      if (!userKey) {
+        quotaManager.recordIpUsage(clientIp);
+      }
+      res.json({ text: extractedText });
+    } catch (err) {
+      if (!userKey && modelToUse) {
+        const is429or503 = err?.status === 429 || err?.status === 503 || err?.message?.includes("429") || err?.message?.includes("503");
+        if (is429or503) {
+          quotaManager.markModelUnavailable(modelToUse);
+        }
+      }
+      if (!userKey) {
+        const acq2 = quotaManager.acquireModel("ocr");
+        if (acq2.model) {
+          try {
+            const res2 = await ai.models.generateContent({
+              model: acq2.model,
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    { text: prompt },
+                    {
+                      inlineData: {
+                        mimeType,
+                        data: base64Data
+                      }
+                    }
+                  ]
+                }
+              ]
+            });
+            quotaManager.recordIpUsage(clientIp);
+            res.json({ text: res2.text?.trim() || "" });
+            return;
+          } catch {
+          }
+        }
+      }
+      res.status(500).json({
+        error: "OCR_PROCESSING_FAILED",
+        notice: quotaManager.getQuotaNotice(language === "en" ? "en" : "ar")
+      });
+    }
+  } catch (outerErr) {
+    res.status(500).json({ error: "SERVER_ERROR" });
+  }
+});
+app.get("/api/quota", (req, res) => {
+  const stats = quotaManager.getReportStats();
+  const remainingOcr = quotaManager.getTotalRemainingForAction("ocr");
+  const remainingAsk = quotaManager.getTotalRemainingForAction("ask_call2");
+  res.json({
+    remainingOcr,
+    remainingAsk,
+    resetMinutes: stats.minutesRemainingInHour,
+    retryAfterSeconds: stats.retryAfterSeconds,
+    models: stats.models,
+    actionCounters: stats.actionCounters
+  });
 });
 
 // server/corpus/prebuild.ts
 import fs4 from "fs";
 import path4 from "path";
-import zlib2 from "zlib";
+import zlib3 from "zlib";
 import { fileURLToPath as fileURLToPath4 } from "url";
 var __filename4 = fileURLToPath4(import.meta.url);
 var __dirname4 = path4.dirname(__filename4);
@@ -3552,8 +4596,136 @@ async function runPrebuild() {
     o: r.o
   }));
   const jsonStr = JSON.stringify({ v: vocab, r: serializedRecords, s: sections });
-  const compressed = zlib2.gzipSync(Buffer.from(jsonStr, "utf8"));
+  const compressed = zlib3.gzipSync(Buffer.from(jsonStr, "utf8"));
   fs4.writeFileSync(outPathGz, compressed);
+  console.log("Building Precomputed Inverted Ask Index...");
+  const askIndexStart = performance.now();
+  const quranEn = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_en.json"), "utf8"));
+  const quranEnList = quranEn.quran || quranEn[Object.keys(quranEn)[0]] || [];
+  const quranEnMap2 = /* @__PURE__ */ new Map();
+  for (const v of quranEnList) {
+    quranEnMap2.set(`${v.chapter}_${v.verse}`, v.text || "");
+  }
+  const tafsirListRaw = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, "quran_tafsir_moyassar.json"), "utf8"));
+  const tafsirMap = /* @__PURE__ */ new Map();
+  for (const t of tafsirListRaw) {
+    tafsirMap.set(`${t.chapter}_${t.verse}`, t.tafsir || "");
+  }
+  function cleanAr(text) {
+    return (text || "").replace(/[\u064B-\u065F\u0670]/g, "").replace(/[\u0622\u0623\u0625\u0671]/g, "\u0627").replace(/\u0649/g, "\u064A").replace(/\u0629/g, "\u0647");
+  }
+  function stripPref(w) {
+    let s = cleanAr(w);
+    if (s.startsWith("\u0648\u0627\u0644") && s.length > 4) s = s.slice(3);
+    else if (s.startsWith("\u0641\u0627\u0644") && s.length > 4) s = s.slice(3);
+    else if (s.startsWith("\u0628\u0627\u0644") && s.length > 4) s = s.slice(3);
+    else if (s.startsWith("\u0644\u0644") && s.length > 3) s = s.slice(2);
+    else if (s.startsWith("\u0627\u0644") && s.length > 3) s = s.slice(2);
+    else if ((s.startsWith("\u0648") || s.startsWith("\u0641") || s.startsWith("\u0628") || s.startsWith("\u0644") || s.startsWith("\u0643")) && s.length > 3) {
+      s = s.slice(1);
+    }
+    return s;
+  }
+  function extractMatn(text, maxWords = 80) {
+    if (!text) return "";
+    let s = text.replace(/<[^>]*>/g, " ");
+    const isnadMarkers = [
+      "\u0642\u0627\u0644 \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645",
+      "\u0623\u0646 \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+      "\u0639\u0646 \u0627\u0644\u0646\u0628\u064A \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+      "\u0633\u0645\u0639\u062A \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u064A\u0642\u0648\u0644",
+      "\u0623\u0646 \u0627\u0644\u0646\u0628\u064A \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645 \u0642\u0627\u0644",
+      "\u0642\u064E\u0627\u0644\u064E \u0631\u064E\u0633\u064F\u0648\u0644\u064F \u0627\u0644\u0644\u0651\u064E\u0647\u0650 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645",
+      "\u0642\u064E\u0627\u0644\u064E \u0631\u064E\u0633\u064F\u0648\u0644\u064F \u0627\u0644\u0644\u064E\u0651\u0647\u0650 \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645",
+      "\u0642\u064E\u0627\u0644\u064E \u0627\u0644\u0646\u0651\u064E\u0628\u0650\u064A\u0651\u064F \u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645"
+    ];
+    for (const m of isnadMarkers) {
+      const idx = s.indexOf(m);
+      if (idx !== -1 && idx < s.length * 0.65) {
+        s = s.slice(idx + m.length);
+        break;
+      }
+    }
+    return s.trim().split(/\s+/).filter(Boolean).slice(0, maxWords).join(" ");
+  }
+  const askDocs = [];
+  const postings = {};
+  function addDocTokens(docIdx, arText, enText, tafsirText) {
+    const tokenSet = /* @__PURE__ */ new Set();
+    const arWords = cleanAr(arText).split(/[^\u0621-\u064A]+/).filter((w) => w.length >= 2);
+    for (const w of arWords) {
+      tokenSet.add(w);
+      const str = stripPref(w);
+      if (str.length >= 2) tokenSet.add(str);
+    }
+    if (tafsirText) {
+      const tafsirWords = cleanAr(tafsirText).split(/[^\u0621-\u064A]+/).filter((w) => w.length >= 2);
+      for (const w of tafsirWords) {
+        tokenSet.add(w);
+        const str = stripPref(w);
+        if (str.length >= 2) tokenSet.add(str);
+      }
+    }
+    if (enText) {
+      const enWords = enText.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+      for (const w of enWords) {
+        tokenSet.add(w);
+      }
+    }
+    for (const tok of tokenSet) {
+      if (!postings[tok]) postings[tok] = [];
+      postings[tok].push(docIdx);
+    }
+  }
+  for (const v of quranList) {
+    const ch = Number(v.chapter);
+    const verse = Number(v.verse);
+    const ar = cleanAr(v.text || "");
+    const en = (quranEnMap2.get(`${ch}_${verse}`) || "").toLowerCase();
+    const tafsir = cleanAr(tafsirMap.get(`${ch}_${verse}`) || "");
+    const docIdx = askDocs.length;
+    askDocs.push({
+      id: `ayah_${ch}_${verse}`,
+      type: "ayah",
+      ch,
+      v: verse,
+      normAr: ar,
+      normEn: en,
+      normTafsir: tafsir
+    });
+    addDocTokens(docIdx, ar, en, tafsir);
+  }
+  for (const col of COLLECTIONS) {
+    const rawAr = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, `hadith_${col}_ar.json`), "utf8"));
+    const rawEn = JSON.parse(fs4.readFileSync(path4.join(DATA_DIR3, `hadith_${col}_en.json`), "utf8"));
+    const listAr = rawAr.hadiths || [];
+    const listEn = rawEn.hadiths || [];
+    for (let i = 0; i < listAr.length; i++) {
+      const hAr = listAr[i];
+      const hEn = listEn[i];
+      if (!hAr || !hAr.text) continue;
+      const num = hAr.hadithnumber || i + 1;
+      const matnAr = cleanAr(extractMatn(hAr.text, 80));
+      const matnEn = (hEn?.text || "").toLowerCase();
+      const docIdx = askDocs.length;
+      askDocs.push({
+        id: `${col}_${num}`,
+        type: "hadith",
+        col,
+        num,
+        normAr: matnAr,
+        normEn: matnEn
+      });
+      addDocTokens(docIdx, matnAr, matnEn);
+    }
+  }
+  const askIndexFile = path4.join(DATA_DIR3, "ask_search_index.json.gz");
+  const askIndexPayload = JSON.stringify({ docs: askDocs, postings });
+  const askCompressed = zlib3.gzipSync(Buffer.from(askIndexPayload, "utf8"));
+  fs4.writeFileSync(askIndexFile, askCompressed);
+  const askElapsed = Math.round(performance.now() - askIndexStart);
+  console.log(`Precomputed Inverted Ask Index generated in ${askElapsed}ms!`);
+  console.log(`Indexed ${askDocs.length} documents (${Object.keys(postings).length} unique tokens). Saved to ${askIndexFile} (${askCompressed.length} bytes).`);
   const elapsed = Math.round(performance.now() - startTime);
   console.log(`Prebuild Completed successfully in ${elapsed}ms!`);
   console.log(`Saved ${records.length} records to ${outPathGz} (${compressed.length} bytes).`);
@@ -3597,6 +4769,7 @@ async function startServer() {
   const { corpus, loadTimeMs: corpusTime } = loadCorpus();
   const { totalIndexed: hadithCount, indexMemoryBytes: hadithMem } = initHadithEngine();
   const { totalIndexed: ayahCount } = initAyahEngine();
+  const askIndex = loadAskSearchIndex();
   const counts = getIndexedCounts();
   if (global.gc) {
     global.gc();

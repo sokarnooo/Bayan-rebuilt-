@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { InterfaceLanguage } from '../../types';
+import { OcrButton } from '../common/OcrButton';
 import {
   Search,
   BookOpen,
@@ -17,6 +18,7 @@ import {
 
 interface AyahModeProps {
   language: InterfaceLanguage;
+  onQuotaNotice?: (notice: string) => void;
 }
 
 interface AyahBreakdownItem {
@@ -83,7 +85,7 @@ interface SearchResponse {
   executionTimeMs: number;
 }
 
-export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
+export const AyahMode: React.FC<AyahModeProps> = ({ language, onQuotaNotice }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchResponse, setSearchResponse] = useState<SearchResponse | null>(null);
@@ -279,6 +281,14 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language }) => {
           <label className="text-sm font-medium text-[#F2F4FF]/90">
             {isAr ? 'نص الآية الكريمة أو نطاق الآيات:' : 'Verse text or multi-ayah quote:'}
           </label>
+          <OcrButton
+            language={language}
+            onTextExtracted={(extractedText) => {
+              setQuery(extractedText);
+              handleSearch(extractedText);
+            }}
+            onQuotaNotice={onQuotaNotice}
+          />
         </div>
 
         <div className="relative">

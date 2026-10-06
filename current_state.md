@@ -1,11 +1,35 @@
 # Current Project State - Bayan (بيان)
 
 ## Status
+- **GitHub Import & AI Studio Runtime Migration**:
+  - Full build pipeline (`prebuild`, `vite build`, `esbuild server/server.ts`) verified and passing cleanly.
+  - Server runs on Express + Vite middleware listening on `http://0.0.0.0:3000`.
+  - All 34,195 Hadiths across 7 books and 6,236 Quranic Ayat indexed in memory at server startup.
+  - Evaluation harness: **133/133 (100%)** core test cases passing under `--quiet --runs 1` against `http://localhost:3000`.
+  - Zero secret leaks; `compile_applet` and `lint_applet` clean.
+- **Server Key & Hourly Quota Rate Limiting (Part 10)**:
+  - 24 Pacific clock hour buckets (`America/Los_Angeles`) with SAFETY factor $0.8$.
+  - Hourly budgets: `gemini-2.5-flash-lite` (RPD 500 $\rightarrow$ 16 req/hr), `gemini-2.5-flash` (RPD 1500 $\rightarrow$ 50 req/hr), `gemma-2-27b-it` (RPD 14,400 $\rightarrow$ 480 req/hr).
+  - Failover chains per action: OCR (`gemini-2.5-flash` $\rightarrow$ `gemini-2.5-flash-lite`), Ask Call 1/Call 2 (`gemini-2.5-flash-lite` $\rightarrow$ `gemini-2.5-flash`).
+  - Spend priority: Call 2 Summary $>$ OCR $>$ Call 1 Expansion (skipped if primary bucket $< 50\%$).
+  - Graceful degradation: Ask never fails when quota is exhausted; returns local search cards with «تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر».
+  - Fairness: Per-IP hourly cap $\max(2, \lfloor 0.2 \times \text{totalHourlyBudget} \rfloor)$ plus 10 req/min guard.
+  - Endpoints: `POST /api/ocr` and `GET /api/quota`. UI displays remaining requests badges and dismissible banner.
+  - Security audit: Grepped `/dist` and `/dist-server` with 0 secret leaks found.
 - **Ask Mode (اسأل بالدليل)**:
   - Precomputed inverted index `ask_search_index.json.gz` (17.6 MB gzipped, 40,431 documents indexed across 110,812 unique tokens). Loaded at server startup in **1.26 s** ($1,263$ ms $< 5$ s target).
-  - Posting-hit candidate pre-filter reduces evaluated candidates from 3,574 to $\sim 15$ in $< 9$ ms.
-  - Zero full-corpus scans per request; `AskLRUCache` (200 entries) in place.
-  - Warm retrieval latency across 133 cases: **$p50 = 4.04$ ms**, **$p95 = 8.28$ ms** ($< 300$ ms target met).
+  - Global Quran Maps (`globalQuranArMap`, `globalQuranEnMap`) pre-cached once globally in memory.
+  - Candidate document capping: Top 150 candidates per query by posting-list hits.
+  - Two-pass candidate scoring: Pass 1 calculates scores on pre-normalized tokens; Pass 2 builds rich cards, extracts dense quotes, and parses grades ONLY for top 6 candidates (top 4 Hadiths + top 2 Ayat).
+  - Cold retrieval latency over 30 real Ask questions: **$p50 = 136$ ms**, **$p95 = 194$ ms** ($< 300$ ms target met).
+  - Unified Score-Based Sorting: Documents sorted strictly by `b.score - a.score` descending; tie-breaking rules (scripture type, canonical collection order) apply only when scores are equal within $\pm 0.5$.
+  - Relevance Gating: Shown cards must score $\ge 60\%$ of top score OR match $\ge 2$ distinct content concepts (`countDistinctMatchedConcepts`). Eliminated off-topic Ayat (`ayah_35_1`, `ayah_2_234`).
+  - Ghaylan ibn Salama Hadith: Located in corpus (`tirmidhi_1128` and `ibnmajah_1953`). Surfaced in top 3 alongside `ayah_4_3` for polygyny queries.
+  - False-Positive Guard: Claim concept coverage $< 70\%$ prevents "supported" verdict, returning «نصوص ذات صلة» (`permissibility`) or `unclear`. Evaluated across 20 adversarial test cases (10 AR, 10 EN) with 100% false-positive rejection (0 / 20 supported).
+  - Call 1 taken off the critical path: Immediate cards served via local terms (`extractLocalTerms`) in $< 200$ ms. Call 1 runs in parallel; if its expansion changes top 3, cards update with «تم تحسين النتائج بالبحث الموسّع» without layout jump. If Call 1 fails or times out ($> 6$ s), user keeps local cards.
+  - Cold time-to-cards: **$83$ ms – $184$ ms** ($< 2$ s target met).
+  - Cold time-to-summary: **$3.04$ s – $8.00$ s** ($< 12$ s target met).
+  - Baseline comparison on 133 core cases: **0 / 133 differences** (100.0% matching).
   - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
   - Al-Tafsir Al-Muyassar integrated into build-time prebuild (6,236 entries verified) and indexed alongside verse text.
   - Ayah cards display a dedicated «التفسير الميسر» block with single best sentence chosen by code and attribution «التفسير الميسر — مجمع الملك فهد، عبر QuranEnc».

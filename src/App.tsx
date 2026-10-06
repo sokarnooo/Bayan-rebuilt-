@@ -5,11 +5,16 @@ import { ModeNav } from './components/layout/ModeNav';
 import { AyahMode } from './components/modes/AyahMode';
 import { HadithMode } from './components/modes/HadithMode';
 import { AskMode } from './components/modes/AskMode';
+import { SettingsModal } from './components/common/SettingsModal';
+import { QuotaNoticeBanner } from './components/common/QuotaNoticeBanner';
 import { ShieldCheck, BookOpen, ScrollText } from 'lucide-react';
 
 export default function App() {
   const [currentMode, setCurrentMode] = useState<AppMode>('ayah');
   const [language, setLanguage] = useState<InterfaceLanguage>('ar');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [quotaNotice, setQuotaNotice] = useState<string | null>(null);
+  const [userKey, setUserKey] = useState<string | null>(() => localStorage.getItem('bayan_user_gemini_key'));
   const [corpusStats, setCorpusStats] = useState<{
     quranCount: number;
     hadithCount: number;
@@ -44,9 +49,23 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#12183F] text-[#F2F4FF] flex flex-col font-sans">
-      <Header language={language} onLanguageChange={setLanguage} />
+      <Header
+        language={language}
+        onLanguageChange={setLanguage}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
+        {/* Global Quota Notice Banner (if exhausted) */}
+        {quotaNotice && (
+          <QuotaNoticeBanner
+            language={language}
+            noticeText={quotaNotice}
+            onDismiss={() => setQuotaNotice(null)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
+        )}
+
         {/* Intro Mission Banner */}
         <section className="mb-8 text-center sm:text-start flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-[#6150EA]/15 via-[#12183F] to-[#12183F] border border-[#6150EA]/30">
           <div>
@@ -98,11 +117,35 @@ export default function App() {
 
         {/* Active Mode Body */}
         <section className="transition-all duration-200">
-          {currentMode === 'ayah' && <AyahMode language={language} />}
-          {currentMode === 'hadith' && <HadithMode language={language} />}
-          {currentMode === 'ask' && <AskMode language={language} />}
+          {currentMode === 'ayah' && (
+            <AyahMode
+              language={language}
+              onQuotaNotice={(msg) => setQuotaNotice(msg)}
+            />
+          )}
+          {currentMode === 'hadith' && (
+            <HadithMode
+              language={language}
+              onQuotaNotice={(msg) => setQuotaNotice(msg)}
+            />
+          )}
+          {currentMode === 'ask' && (
+            <AskMode
+              language={language}
+              onQuotaNotice={(msg) => setQuotaNotice(msg)}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+            />
+          )}
         </section>
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        language={language}
+        onKeySaved={(key) => setUserKey(key)}
+      />
 
       {/* Footer with accurate dataset attributions & required scholar statement */}
       <footer className="border-t border-[#6150EA]/20 bg-[#12183F]/90 py-6 text-center text-xs text-[#F2F4FF]/70">

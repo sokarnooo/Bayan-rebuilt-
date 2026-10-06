@@ -197,6 +197,24 @@ function checkPass(expected: any, actual: any) {
     }
   }
 
+  // requireTopRetrievedMatch validation (shown == retrieval top-k ranking)
+  if (expected.requireTopRetrievedMatch) {
+    if (!actual.topRetrievedIds || !actual.results || actual.results.length === 0) {
+      return { passed: false, reason: 'REF' };
+    }
+    if (actual.topRetrievedIds[0] !== actual.results[0].id) {
+      return { passed: false, reason: 'REF' };
+    }
+  }
+
+  // excludeRefs validation (e.g. no off-topic card in top 3)
+  if (expected.excludeRefs && Array.isArray(expected.excludeRefs)) {
+    const top3Ids = (actual.results || []).slice(0, 3).map((r: any) => r.id);
+    if (top3Ids.some((id: string) => expected.excludeRefs.includes(id))) {
+      return { passed: false, reason: 'REF' };
+    }
+  }
+
   if (expected.containsEnglishSlice) {
     if (!topResult?.translation) {
       refMatch = false;

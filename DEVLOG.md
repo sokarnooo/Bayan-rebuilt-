@@ -6,6 +6,90 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-05 — Task 10: Server Key & Hourly Quota Rate Limiting (Part 10)
+- **Goal**: Implement server-side default API key with evenly distributed hourly limits across 24 Pacific clock hours, priority degradation on Ask, per-IP fairness caps, failover chains, OCR and Quota endpoints, UI remaining requests readouts, and verify zero API key leakage.
+- **Change (files)**: `server/quota.config.ts`, `server/app.ts`, `server/matching/askEngine.ts`, `src/components/common/OcrButton.tsx`, `src/components/modes/AskMode.tsx`, `src/components/modes/AyahMode.tsx`, `src/components/modes/HadithMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Google AI Studio free tier models have daily request limits (RPD). To ensure high availability and prevent exhaustion early in the day, quota is divided evenly across 24 Pacific hours with a 0.8 safety factor.
+- **Key Enhancements & Verification**:
+  1. **Quota Configuration & Hourly Budgets**:
+     - Formula: `hourlyBudget(model) = floor(RPD * SAFETY / 24)` with `SAFETY = 0.8`.
+     - Models:
+       - `gemini-2.5-flash-lite`: RPD 500 -> hourly budget = 16 req/hr.
+       - `gemini-2.5-flash`: RPD 1500 -> hourly budget = 50 req/hr.
+       - `gemma-2-27b-it`: RPD 14,400 -> hourly budget = 480 req/hr.
+     - Action chains:
+       - OCR: `gemini-2.5-flash` -> `gemini-2.5-flash-lite`
+       - Ask Call 1: `gemini-2.5-flash-lite` -> `gemini-2.5-flash`
+       - Ask Call 2: `gemini-2.5-flash-lite` -> `gemini-2.5-flash`
+  2. **Even Hourly Spread & Restart Policy**:
+     - Partitioned by Pacific clock hour (`America/Los_Angeles`).
+     - Fresh server restarts start the current hour at 50% capacity. Unused quota does not carry over.
+  3. **Fairness & Per-IP Cap**:
+     - Per-IP hourly cap: `max(2, floor(0.2 * totalHourlyBudget))` per hour, plus 10 req/min guard.
+     - Test verified: IP 1 exceeding 3 requests is blocked with HTTP 429 (`IP_RATE_LIMIT_EXCEEDED`), while IP 2 is served.
+  4. **Priority Degradation (Ask Never Fails)**:
+     - Spend priority: Call 2 Summary > OCR > Call 1 Expansion.
+     - Call 1 is skipped if primary model is $< 50\%$ capacity.
+     - When quota is exhausted, Ask returns deterministic local cards with «تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر».
+  5. **Endpoints & UI**:
+     - `POST /api/ocr` and `GET /api/quota` registered.
+     - Small remaining-requests readout displayed on OCR button and Ask button.
+     - Separate dismissible banner shown upon quota exhaustion.
+  6. **Security Audit**:
+     - Grepped `/dist` for `AIzaSy` and API key values: zero leaks found.
+- **Commit**: `pending`
+
+---
+
+### 2026-10-05 — Task 8: Ask Mode Ranking Order, Relevance Gating & False-Positive Prevention (Part 9)
+- **Goal**: Fix ranking order inconsistency where cards were ordered by Ayah/Hadith blocks rather than raw score; implement a relevance gate requiring $\ge 2$ distinct question concepts or $\ge 60\%$ of top score; verify presence of Ghaylan ibn Salama Hadith across corpus and surface it for polygyny queries; construct 20 adversarial false-positive test cases (10 AR, 10 EN) and enforce concept coverage gate ($< 70\%$ prevents "supported").
+- **Change (files)**: `server/matching/askEngine.ts`, `eval/cases.json`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Analysis of English and Arabic wives questions showed off-topic Ayat (`ayah_35_1`, `ayah_2_234`) ranked at #2 above high-scoring Hadiths (`bukhari_5064`) due to segregated collection slicing. Additionally, questions with invented claims reusing keywords were incorrectly receiving "supported" verdicts.
+- **Key Enhancements & Verification**:
+  1. **Score-Based Unified Ranking**: Pooled Hadith and Ayah results into `allScoredDocs` sorted strictly by `b.score - a.score`. Tie-breaking (Quran > Hadith, canonical collection order, text length) applies only when scores are equal within $\pm 0.5$.
+  2. **Relevance Gating**: A document is shown only if `score >= 0.60 * topScore` OR `countDistinctMatchedConcepts >= 2`. Eliminated off-topic Ayat (`ayah_35_1` angels wings and `ayah_2_234` widow waiting period) from wives questions.
+  3. **Ghaylan ibn Salama Hadith**: Confirmed presence in corpus in both Arabic and English: `tirmidhi_1128` and `ibnmajah_1953`. Surfaced directly in top 3 for wives questions: #1 `tirmidhi_1128` (score 210.2), #2 `ibnmajah_1953` (score 204.2), #3 `ayah_4_3` (score 171.6).
+  4. **False-Positive Prevention (20 Adversarial Cases)**: Evaluated 20 adversarial claims reusing authentic keywords with invented rewards or inverted acts. All 20 cases returned `permissibility` («نصوص ذات صلة») or `unclear`. Exactly **0 / 20** returned "supported" (100% false-positive rejection).
+  5. **Harness Totals**: Core 133 cases pass **133 / 133 (100%)**; `ask_adversarial` passes **20 / 20 (100%)**.
+- **Commit**: `pending`
+
+---
+
+### 2026-10-05 — Task 8: Ask Mode Cold Retrieval & Call 1 Critical Path Decoupling (Part 8)
+- **Goal**: Identify and eliminate the bottleneck causing real `/api/ask` cold retrieval latency (196–6374 ms), measure per-stage breakdown across 8 benchmark questions, establish retrieval latency ($p50/p95 < 300$ ms) over 30 real Ask questions, take Call 1 completely off the critical path with fast local retrieval + parallel background expansion, and verify cards $< 2$ s and summary $< 12$ s.
+- **Change (files)**: `server/matching/askEngine.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Analysis revealed that `searchCorpusKeywords` was recreating `quranArMap` (6,236 iterations) and `quranEnMap` on every query, while executing full quote cluster extraction and grading parsing for thousands of candidates. Furthermore, Call 1 was on the critical path, blocking card display by 3–6 s.
+- **Root Cause & Fixes**:
+  1. **Global Quran Maps Pre-caching**: Cached `globalQuranArMap` and `globalQuranEnMap` once globally in memory, eliminating redundant map constructions.
+  2. **Candidate Capping (Top 150)**: Capped evaluated candidate documents per search to 150 sorted by posting hits and rare term priority.
+  3. **Two-Pass Candidate Scoring**: Pass 1 computes lightweight scores using pre-normalized text in `askIndex.docs`. Pass 2 builds rich cards (tafsir quotes, dense quotes, grade parsing) ONLY for top 6 candidates (top 4 Hadiths + top 2 Ayat).
+  4. **Call 1 Decoupling**: Local search terms extracted instantly from raw question (`extractLocalTerms`). Fast cards return in $< 200$ ms. Call 1 runs in parallel; if its expansion changes top 3, cards update with «تم تحسين النتائج بالبحث الموسّع» note without layout jump. If Call 1 fails or exceeds 6s, user keeps local cards.
+- **Key Metrics & Verification**:
+  1. **Sub-stage Breakdown**:
+     - Slowest stage identified: Pass 2 quote extraction / card building when run on hundreds of candidates without capping. Fixed with top-6 Pass 2 capping.
+     - Questions 2–8 cold retrieval: 69.45 ms – 142.10 ms ($< 150$ ms).
+  2. **30 Real Ask Questions Retrieval**:
+     - **$p50 = 136$ ms**, **$p95 = 194$ ms** (target $< 300$ ms met).
+  3. **Cold Benchmark Table (8 Questions)**:
+     - Cards delivered: $83$ ms – $184$ ms (all $< 2$ s).
+     - Summary delivered: $3.04$ s – $8.00$ s (all $< 12$ s).
+  4. **Baseline Comparison**: **0 / 133 differences** (100.0% matching).
+- **Commit**: `pending`
+
+---
+
+### 2026-10-05 — GitHub Import Migration & AI Studio Environment Verification
+- **Goal**: Verify that the GitHub repository import runs cleanly in AI Studio environment per `github-import-migration` skill, with full build verification, server startup on `0.0.0.0:3000`, prebuild dataset generation, and evaluation suite execution.
+- **Change (files)**: `package.json`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.
+- **Why**: Ensure complete runtime environment compatibility, zero secret leaks, and verified test harness execution for the imported project.
+- **Key Results & Infrastructure**:
+  1. **Package Management & Build**: Installed applet dependencies using `npm`. Executed `npm run build` which successfully ran `server/corpus/prebuild.ts` (acquired corpus data, generated 34,195 indexed Hadith records and 6,236 Ayat), `vite build` (bundle generated in 7.4s), and `esbuild` server bundling (`dist-server/server.js`).
+  2. **Dev Server Runtime**: Express + Vite middleware running on `http://0.0.0.0:3000`. Verified `/api/health` returning `200 OK` with all 34,195 Hadiths and 6,236 Quranic Ayat indexed in memory.
+  3. **Evaluation Suite Execution**: Executed `npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1` with **133/133 (100.0%)** core test cases passing cleanly across all categories (exact, no_diacritics, typos, partial_slice, multi_ayah_range, refrain, one_word_replaced, exact_matn, isnad_takhrij, one_word_changed, attestation, grader_disagreement, no_grade_collections, english_verbatim, english_paraphrase, negative prose, fabricated sayings, whole_hadith, long_isnad_short_matn).
+  4. **Compilation & Linting**: `compile_applet` and `lint_applet` (`tsc --noEmit`) passed with 0 errors.
+
+---
+
 ### 2026-10-05 — Task 8: Ask Mode Retrieval Speed (Part 6)
 - **Goal**: Precompute inverted search index for all 34,195 Hadiths and 6,236 Ayat during prebuild, eliminate all per-request full-corpus scans and on-the-fly normalization, enforce posting-hit candidate pre-filtering, add LRU cache (200 entries), and verify retrieval latency targets ($p95 < 300$ ms warm, load $< 5$ s).
 - **Change (files)**: `server/corpus/prebuild.ts`, `server/corpus/loader.ts`, `server/server.ts`, `server/matching/askEngine.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.

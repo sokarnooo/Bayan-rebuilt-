@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { InterfaceLanguage } from '../../types';
 import {
   MessageSquareQuote,
@@ -17,6 +17,8 @@ import {
 
 interface AskModeProps {
   language: InterfaceLanguage;
+  onQuotaNotice?: (notice: string) => void;
+  onOpenSettings?: () => void;
 }
 
 interface AskCitationItem {
@@ -73,14 +75,26 @@ interface AskResponse {
   verdictPending?: boolean;
 }
 
-export const AskMode: React.FC<AskModeProps> = ({ language }) => {
+export const AskMode: React.FC<AskModeProps> = ({ language, onQuotaNotice, onOpenSettings }) => {
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AskResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
 
   const isAr = language === 'ar';
+
+  useEffect(() => {
+    fetch('/api/quota')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (typeof data?.remainingAsk === 'number') {
+          setRemainingQuota(data.remainingAsk);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -189,23 +203,30 @@ export const AskMode: React.FC<AskModeProps> = ({ language }) => {
               : 'Cross-language retrieval over canonical text, English translations, and Al-Tafsir Al-Muyassar.'}
           </p>
 
-          <button
-            type="submit"
-            disabled={!question.trim() || isLoading}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#6150EA] hover:bg-[#6150EA]/90 text-[#F2F4FF] font-medium text-sm transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer shrink-0"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-[#2EF2C2] border-t-transparent rounded-full animate-spin" />
-                <span>{isAr ? 'جاري الاسترجاع والتحقق...' : 'Verifying...'}</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 text-[#2EF2C2]" />
-                <span>{isAr ? 'ابحث بالدليل' : 'Ask with Proof'}</span>
-              </>
+          <div className="flex items-center gap-3 shrink-0">
+            {remainingQuota !== null && (
+              <span className="text-xs text-[#F2F4FF]/50 bg-[#12183F]/60 px-2.5 py-1.5 rounded-lg border border-[#6150EA]/20 font-mono text-center">
+                {isAr ? `${remainingQuota} استفسار ذكي متبقٍ هذه الساعة` : `${remainingQuota} AI queries left this hour`}
+              </span>
             )}
-          </button>
+            <button
+              type="submit"
+              disabled={!question.trim() || isLoading}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#6150EA] hover:bg-[#6150EA]/90 text-[#F2F4FF] font-medium text-sm transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md cursor-pointer shrink-0"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[#2EF2C2] border-t-transparent rounded-full animate-spin" />
+                  <span>{isAr ? 'جاري الاسترجاع والتحقق...' : 'Verifying...'}</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-[#2EF2C2]" />
+                  <span>{isAr ? 'ابحث بالدليل' : 'Ask with Proof'}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
 

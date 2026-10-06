@@ -1,13 +1,14 @@
 import React from 'react';
 import type { InterfaceLanguage } from '../../types';
-import { BookMarked, Globe, Shield } from 'lucide-react';
+import { BookMarked, Globe, Shield, Settings } from 'lucide-react';
 
 interface HeaderProps {
   language: InterfaceLanguage;
   onLanguageChange: (lang: InterfaceLanguage) => void;
+  onOpenSettings?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) => {
+export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange, onOpenSettings }) => {
   const isAr = language === 'ar';
 
   return (
@@ -33,12 +34,24 @@ export const Header: React.FC<HeaderProps> = ({ language, onLanguageChange }) =>
           </div>
         </div>
 
-        {/* Header Right: Badges & Language Switcher */}
-        <div className="flex items-center gap-3">
+        {/* Header Right: Badges, Settings & Language Switcher */}
+        <div className="flex items-center gap-2.5">
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#6150EA]/15 border border-[#6150EA]/30 text-xs text-[#F2F4FF]/80">
             <Shield className="w-3.5 h-3.5 text-[#2EF2C2]" />
             <span>{isAr ? 'بيانات أصلية غير مولدة' : 'Grounded Authentic Data'}</span>
           </div>
+
+          {onOpenSettings && (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#6150EA]/30 bg-[#12183F] hover:bg-[#6150EA]/20 text-xs font-medium text-[#F2F4FF] transition"
+              title={isAr ? 'الإعدادات والمفتاح' : 'Settings & API Key'}
+            >
+              <Settings className="w-3.5 h-3.5 text-[#2EF2C2]" />
+              <span className="hidden sm:inline">{isAr ? 'الإعدادات' : 'Settings'}</span>
+            </button>
+          )}
 
           <button
             type="button"

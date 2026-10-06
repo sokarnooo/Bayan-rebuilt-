@@ -99,9 +99,10 @@ interface HadithSearchResponse {
 
 interface HadithModeProps {
   language: InterfaceLanguage;
+  onQuotaNotice?: (notice: string) => void;
 }
 
-export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
+export const HadithMode: React.FC<HadithModeProps> = ({ language, onQuotaNotice }) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isNotReadyRetry, setIsNotReadyRetry] = useState(false);
@@ -245,6 +246,7 @@ export const HadithMode: React.FC<HadithModeProps> = ({ language }) => {
               setQuery(extractedText);
               handleSearch(extractedText);
             }}
+            onQuotaNotice={onQuotaNotice}
           />
         </div>
 

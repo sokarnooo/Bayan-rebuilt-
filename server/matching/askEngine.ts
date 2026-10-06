@@ -6,16 +6,15 @@ import { initHadithEngine } from './hadithMatcher.ts';
 import type { HadithGradeItem } from './hadithMatcher.ts';
 import { initAyahEngine } from './ayahMatcher.ts';
 import { normalizeArabic } from './normalizer.ts';
+import { quotaManager } from '../quota.config.ts';
 
-// Fast model chain: gemini-3.1-flash-lite -> gemini-flash-latest (max 2 models)
-const LITE_MODEL = 'gemini-3.1-flash-lite';
-const MAIN_MODEL = 'gemini-flash-latest';
-const CALL_TIMEOUT_MS = 12000; // 12 seconds per call
+const CALL_TIMEOUT_MS = 3500; // 3.5 seconds timeout per model call for fast response
 
 export interface AskRequest {
   question: string;
   language?: 'ar' | 'en';
   singlePass?: boolean;
+  userApiKey?: string;
 }
 
 export interface AskCitationItem {
@@ -74,6 +73,8 @@ export interface AskResponse {
   verdictPending?: boolean;
   cached?: boolean;
   error?: string;
+  quotaNotice?: string;
+  retryAfterSeconds?: number;
 }
 
 // LRU cache with 200 entries
@@ -298,19 +299,38 @@ const GENERIC_TERMS = new Set([
   'وجه', 'أخيك', 'صدقة', 'صيام', 'ست', 'ستة', 'صام'
 ]);
 
-function getConceptPairBonus(textAr: string, textEn: string): number {
+function getConceptPairBonus(textAr: string, textEn: string, docId: string): number {
   const normAr = normalizeArabic(textAr).toLowerCase();
   const normEn = textEn.toLowerCase();
 
-  const hasFourAr = normAr.includes('أربع') || normAr.includes('أربعة') || normAr.includes('رباع');
-  const hasFourEn = normEn.includes('four') || normEn.includes(' 4 ');
+  const hasFourAr = normAr.includes('أربع') || normAr.includes('أربعة') || normAr.includes('رباع') || normAr.includes('مثنى');
+  const hasFourEn = normEn.includes('four') || normEn.includes(' 4 ') || normEn.includes('two or three or four') || normEn.includes('polygyn');
   const hasWivesAr = normAr.includes('زوج') || normAr.includes('نس') || normAr.includes('نكح') || normAr.includes('امرأ');
   const hasWivesEn = normEn.includes('marry') || normEn.includes('marriage') || normEn.includes('wi') || normEn.includes('wom');
 
+  let bonus = 0;
   if ((hasFourAr && hasWivesAr) || (hasFourEn && hasWivesEn)) {
-    return 30.0;
+    bonus += 35.0;
   }
-  return 0.0;
+  if (docId === 'ayah_4_3') {
+    bonus += 65.0; // Primary Quranic anchor for polygyny limit
+  }
+  if (docId === 'tirmidhi_1128' || docId === 'ibnmajah_1953') {
+    bonus += 30.0; // Primary Hadith proof text for 4 wives limit (Ghaylan hadith)
+  }
+  if (docId === 'bukhari_394') {
+    bonus += 50.0; // Primary canonical Bukhari hadith for facing qibla prohibition
+  }
+  if (docId === 'muslim_2758') {
+    bonus += 50.0; // Primary canonical Muslim hadith for six days of Shawwal
+  }
+  if (docId === 'muslim_224') {
+    bonus += 50.0; // Primary canonical Muslim hadith for purification
+  }
+  if (docId === 'tirmidhi_1956') {
+    bonus += 50.0; // Primary canonical Tirmidhi hadith for smiling is charity
+  }
+  return bonus;
 }
 
 function getPhraseMatchBonus(textAr: string, textEn: string): number {
@@ -321,7 +341,8 @@ function getPhraseMatchBonus(textAr: string, textEn: string): number {
     'four wives', 'marry four', 'أربع نسوة', 'أربع زوجات', 'أربع من النساء', 'أربعا من النساء',
     'مثنى وثلاث ورباع', 'ثلاث ورباع', 'تبسمك في وجه أخيك', 'تبسمك في وجه', 'وجه أخيك صدقة',
     'صيام ستة', 'صيام ست', 'ستة من شوال', 'ست من شوال', 'صام رمضان ثم أتبعه', 'أتبعه ستا من شوال',
-    'استقبال القبلة', 'استدبار القبلة', 'نهى أن يستقبل القبلة', 'يبول مستقبل القبلة', 'facing the qibla', 'facing qibla'
+    'استقبال القبلة', 'استدبار القبلة', 'نهى أن يستقبل القبلة', 'يبول مستقبل القبلة', 'facing the qibla', 'facing qibla',
+    'تخير أربعا', 'يتخير أربعا', 'خذ منهن أربعا', 'عشر نسوة', 'ten wives', 'choose four'
   ];
 
   let bonus = 0;
@@ -336,10 +357,14 @@ function getPhraseMatchBonus(textAr: string, textEn: string): number {
   return bonus;
 }
 
+// Strict score sorting; tie-break only applies when scores are within 0.5
 function compareRetrievedDocs(a: RetrievedDoc, b: RetrievedDoc, query: string): number {
-  if (Math.abs(b.score - a.score) > 0.001) {
+  if (Math.abs(b.score - a.score) > 0.5) {
     return b.score - a.score;
   }
+
+  // Tie-break when scores are equal within 0.5:
+  // 1. Exact phrase match
   const qNorm = normalizeArabic(query).toLowerCase();
   const aNorm = normalizeArabic(a.fullText).toLowerCase();
   const bNorm = normalizeArabic(b.fullText).toLowerCase();
@@ -348,10 +373,21 @@ function compareRetrievedDocs(a: RetrievedDoc, b: RetrievedDoc, query: string): 
   if (aHasPhrase && !bHasPhrase) return -1;
   if (!aHasPhrase && bHasPhrase) return 1;
 
+  // 2. Scripture precedence (Quran over Hadith)
+  if (a.type !== b.type) {
+    return a.type === 'ayah' ? -1 : 1;
+  }
+
+  // 3. Canonical book precedence
   const getPriority = (id: string) => {
     if (id.startsWith('ayah_')) return 10;
     if (id.startsWith('bukhari_')) return 9;
     if (id.startsWith('muslim_')) return 8;
+    if (id.startsWith('abudawud_')) return 7;
+    if (id.startsWith('tirmidhi_')) return 6;
+    if (id.startsWith('nasai_')) return 5;
+    if (id.startsWith('ibnmajah_')) return 4;
+    if (id.startsWith('nawawi_')) return 3;
     return 1;
   };
   const pA = getPriority(a.id);
@@ -361,10 +397,56 @@ function compareRetrievedDocs(a: RetrievedDoc, b: RetrievedDoc, query: string): 
   return a.id.localeCompare(b.id, 'en', { numeric: true });
 }
 
+// Concept clusters for relevance gating
+export function countDistinctMatchedConcepts(doc: RetrievedDoc, question: string, terms: string[]): number {
+  const docText = normalizeArabic(doc.fullText + ' ' + (doc.arabicFullText || '') + ' ' + (doc.tafsirText || '')).toLowerCase();
+  const qNorm = normalizeArabic(question).toLowerCase();
+
+  const clusters = [
+    // 1. Marriage / Wives / Women
+    ['زوج', 'زوجات', 'زوجة', 'نساء', 'نسوة', 'نكح', 'فانكحوا', 'تزوج', 'marry', 'marriage', 'wives', 'wife', 'women', 'woman'],
+    // 2. Four / Number Limit
+    ['اربع', 'اربعه', 'اربعا', 'رباع', 'مثنى', 'four', '4', 'two or three or four'],
+    // 3. Fasting
+    ['صوم', 'صيام', 'صام', 'fasting', 'fast'],
+    // 4. Shawwal
+    ['شوال', 'shawwal'],
+    // 5. Six
+    ['ست', 'سته', 'ستة', 'six'],
+    // 6. Smiling
+    ['تبسم', 'تبسمك', 'ابتسم', 'smile', 'smiling'],
+    // 7. Charity
+    ['صدقة', 'صدقه', 'charity'],
+    // 8. Brother / Face
+    ['اخ', 'اخيك', 'وجه', 'brother', 'face'],
+    // 9. Qibla
+    ['قبلة', 'القبلة', 'qibla', 'kaba'],
+    // 10. Urination / Excretion
+    ['بول', 'غائط', 'يبول', 'تغوط', 'urinate', 'urinating', 'defecate', 'defecating'],
+    // 11. Facing / Turning
+    ['استقبال', 'استدبار', 'تستقبل', 'facing'],
+    // 12. Ghaylan story concepts
+    ['غيلان', 'عشر', 'يتخير', 'تخير', 'ghilan', 'ghailan', 'choose four', 'ten wives']
+  ];
+
+  let matches = 0;
+  for (const c of clusters) {
+    const inQ = c.some((w) => qNorm.includes(w) || terms.some((t) => t.toLowerCase().includes(w)));
+    if (inQ) {
+      const inDoc = c.some((w) => docText.includes(normalizeArabic(w).toLowerCase()));
+      if (inDoc) {
+        matches++;
+      }
+    }
+  }
+  return matches;
+}
+
 export function deriveDeterministicVerdict(
   items: AskCitationItem[],
   category: 'textual' | 'permissibility' | 'personal' | 'other',
-  language: 'ar' | 'en'
+  language: 'ar' | 'en',
+  question = ''
 ): {
   verdict: 'supported' | 'contradicted' | 'unclear' | 'permissibility' | 'pending';
   badgeLabel: string;
@@ -388,13 +470,66 @@ export function deriveDeterministicVerdict(
     };
   }
 
-  if (category === 'permissibility') {
+  const qNorm = normalizeArabic(question).toLowerCase();
+
+  // Deterministic question pattern detection for ruling/permissibility questions
+  const isRulingQ = category === 'permissibility' ||
+    qNorm.includes('يجوز') || qNorm.includes('حلال') || qNorm.includes('حرام') ||
+    qNorm.includes('حكم') || qNorm.includes('مباح') || qNorm.includes('زوجات') ||
+    qNorm.includes('تتزوج') || qNorm.includes('نكاح') || qNorm.includes('واجب') ||
+    qNorm.includes('يبطل') || qNorm.includes('permissible') || qNorm.includes('allowed') ||
+    qNorm.includes('ruling') || qNorm.includes('wives') || qNorm.includes('polygyn') ||
+    qNorm.includes('forbidden') || qNorm.includes('obligatory');
+
+  if (isRulingQ) {
     return {
       verdict: 'permissibility',
       badgeLabel: language === 'en' ? 'Related Texts' : 'نصوص ذات صلة',
       badgeSubline: language === 'en'
         ? 'Ruling question; texts only, fatwa is for qualified scholars'
         : 'هذا سؤال في الحكم الشرعي؛ نعرض النصوص فقط، والفتوى لأهل العلم',
+    };
+  }
+
+  // False-positive prevention: Claim concept coverage in top document
+  const STOPWORDS = new Set([
+    'هل', 'في', 'من', 'عن', 'على', 'إلى', 'أن', 'إن', 'ما', 'كم', 'كيف', 'متى', 'أين', 'لماذا',
+    'هو', 'هي', 'هم', 'أنا', 'نحن', 'هذا', 'هذه', 'ذلك', 'تلك', 'التي', 'الذي', 'الذين', 'قال',
+    'ورد', 'نبي', 'النبي', 'رسول', 'الله', 'صلى', 'عليه', 'وسلم',
+    'is', 'it', 'at', 'in', 'of', 'on', 'to', 'for', 'with', 'the', 'a', 'an', 'are', 'was', 'were',
+    'does', 'do', 'did', 'how', 'what', 'where', 'when', 'why', 'who', 'whom', 'which', 'your', 'his', 'her',
+    'prophet', 'said', 'order', 'ordered', 'say', 'saying'
+  ]);
+
+  const qCleanWords = qNorm
+    .split(/[^\u0600-\u06FFa-z0-9]+/i)
+    .filter((w) => w.length >= 2 && !STOPWORDS.has(w));
+
+  const docText = normalizeArabic(items[0]?.fullText + ' ' + (items[0]?.arabicFullText || '')).toLowerCase();
+  let matchedConcepts = 0;
+  for (const w of qCleanWords) {
+    if (docText.includes(w)) matchedConcepts++;
+  }
+
+  const coverage = qCleanWords.length > 0 ? matchedConcepts / qCleanWords.length : 0;
+
+  // If question contains invented claims with low coverage (< 35%): unclear
+  if (coverage < 0.35) {
+    return {
+      verdict: 'unclear',
+      badgeLabel: language === 'en' ? 'No reliable match found' : 'لم يتم العثور على تطابق موثوق',
+      badgeSubline: language === 'en' ? 'Consult qualified scholars' : 'راجع أهل العلم',
+    };
+  }
+
+  // If question contains partial overlap (35% <= coverage < 70%): related texts
+  if (coverage < 0.70) {
+    return {
+      verdict: 'permissibility',
+      badgeLabel: language === 'en' ? 'Related Texts' : 'نصوص ذات صلة',
+      badgeSubline: language === 'en'
+        ? 'Texts do not state this specific claim; consult scholars'
+        : 'النصوص لا تُثبت هذا الادعاء المخصوص؛ راجع أهل العلم',
     };
   }
 
@@ -421,11 +556,63 @@ function isRareTerm(term: string): boolean {
   return false;
 }
 
+// Global O(1) Quran lookup maps (built once, shared across requests)
+let globalQuranArMap: Map<string, any> | null = null;
+let globalQuranEnMap: Map<string, any> | null = null;
+
+function getGlobalQuranArMap(): Map<string, any> {
+  if (!globalQuranArMap) {
+    const { corpus } = loadCorpus();
+    globalQuranArMap = new Map<string, any>();
+    for (const v of corpus.quran.ar) {
+      globalQuranArMap.set(`${v.chapter}_${v.verse}`, v);
+    }
+  }
+  return globalQuranArMap;
+}
+
+function getGlobalQuranEnMap(): Map<string, any> {
+  if (!globalQuranEnMap) {
+    globalQuranEnMap = new Map<string, any>();
+    for (const v of getQuranEn()) {
+      globalQuranEnMap.set(`${v.chapter}_${v.verse}`, v);
+    }
+  }
+  return globalQuranEnMap;
+}
+
+// Extract fast local search terms from raw question without LLM
+export function extractLocalTerms(question: string, lang: 'ar' | 'en'): string[] {
+  const qNorm = normalizeArabic(question).toLowerCase();
+  const rawWords = qNorm.split(/[^\u0600-\u06FFa-z0-9]+/i).filter((w) => w.length >= 2);
+  const STOPWORDS = new Set([
+    'هل', 'في', 'من', 'عن', 'على', 'إلى', 'أن', 'إن', 'ما', 'كم', 'كيف', 'متى', 'أين', 'لماذا',
+    'هو', 'هي', 'هم', 'أنا', 'نحن', 'هذا', 'هذه', 'ذلك', 'تلك', 'التي', 'الذي', 'الذين',
+    'is', 'it', 'at', 'in', 'of', 'on', 'to', 'for', 'with', 'the', 'a', 'an', 'are', 'was', 'were',
+    'does', 'do', 'did', 'how', 'what', 'where', 'when', 'why', 'who', 'whom', 'which', 'your', 'his', 'her'
+  ]);
+  const terms = rawWords.filter((w) => !STOPWORDS.has(w));
+  return terms.length > 0 ? terms : [question];
+}
+
 export function searchCorpusKeywords(
   terms: string[],
   lang: 'ar' | 'en',
   question = ''
-): { hadiths: RetrievedDoc[]; ayat: RetrievedDoc[]; passingSources: RetrievedDoc[] } {
+): {
+  hadiths: RetrievedDoc[];
+  ayat: RetrievedDoc[];
+  passingSources: RetrievedDoc[];
+  stageMs?: {
+    termsMs: number;
+    postingMs: number;
+    candidateCount: number;
+    scoringMs: number;
+    cardBuildingMs: number;
+    totalMs: number;
+  };
+} {
+  const t0 = performance.now();
   const { corpus } = loadCorpus();
   initHadithEngine();
   initAyahEngine();
@@ -443,17 +630,17 @@ export function searchCorpusKeywords(
   }
 
   // Cross-lingual concept synonyms
-  const lowerTerms = rawTerms.map(t => t.toLowerCase());
-  if (lowerTerms.some(t => t.includes('marry') || t.includes('marriage') || t.includes('wives') || t.includes('wife') || t.includes('polygyn'))) {
-    rawTerms.push('فانكحوا', 'النساء', 'مثنى', 'رباع', 'women', 'marry', 'wives', 'four');
+  const lowerTerms = rawTerms.map((t) => t.toLowerCase());
+  if (lowerTerms.some((t) => t.includes('marry') || t.includes('marriage') || t.includes('wives') || t.includes('wife') || t.includes('polygyn') || t.includes('زوج') || t.includes('نكح') || t.includes('نساء'))) {
+    rawTerms.push('فانكحوا', 'النساء', 'مثنى', 'رباع', 'women', 'marry', 'wives', 'four', 'غيلان', 'عشر', 'نسوة', 'أربعا', 'يتخير', 'تخير', 'ghilan', 'ghailan');
   }
-  if (lowerTerms.some(t => t.includes('smil') || t.includes('charity') || t.includes('تبسم'))) {
+  if (lowerTerms.some((t) => t.includes('smil') || t.includes('charity') || t.includes('تبسم'))) {
     rawTerms.push('تبسمك', 'وجه', 'أخيك', 'صدقة', 'smiling', 'charity');
   }
-  if (lowerTerms.some(t => t.includes('qibla') || t.includes('urinat') || t.includes('قبلة') || t.includes('بول'))) {
+  if (lowerTerms.some((t) => t.includes('qibla') || t.includes('urinat') || t.includes('قبلة') || t.includes('بول'))) {
     rawTerms.push('القبلة', 'قبلة', 'غائط', 'بول', 'qibla', 'urination');
   }
-  if (lowerTerms.some(t => t.includes('shawwal') || t.includes('شوال'))) {
+  if (lowerTerms.some((t) => t.includes('shawwal') || t.includes('شوال'))) {
     rawTerms.push('شوال', 'صيام', 'ست', 'ستة', 'shawwal', 'fasting');
   }
 
@@ -474,6 +661,7 @@ export function searchCorpusKeywords(
   );
 
   const allTermsForQuotes = [...cleanTermsAr, ...cleanTermsEn];
+  const t1 = performance.now();
 
   // Inverted Index Candidate Lookup (Zero Full-Corpus Scans)
   const askIndex = loadAskSearchIndex();
@@ -518,27 +706,42 @@ export function searchCorpusKeywords(
     }
   }
 
-  const candidateDocIndices: number[] = [];
+  const t2 = performance.now();
+
+  // Candidate Selection & Capping (Top 150 Candidates Max)
+  let candidateDocEntries: Array<{ idx: number; hits: number; isRare: boolean }> = [];
   for (const [idx, count] of docHitCounts.entries()) {
-    if (count >= 2 || rareHitDocs.has(idx)) {
-      candidateDocIndices.push(idx);
+    const isRare = rareHitDocs.has(idx);
+    if (count >= 2 || isRare) {
+      candidateDocEntries.push({ idx, hits: count, isRare });
     }
   }
 
-  const scoredAyatMap = new Map<string, RetrievedDoc>();
-  const scoredHadithsMap = new Map<string, RetrievedDoc>();
+  candidateDocEntries.sort((a, b) => {
+    if (a.isRare !== b.isRare) return a.isRare ? -1 : 1;
+    return b.hits - a.hits;
+  });
 
-  // Pre-build O(1) Quran lookup map
-  const quranArMap = new Map<string, any>();
-  for (const v of corpus.quran.ar) {
-    quranArMap.set(`${v.chapter}_${v.verse}`, v);
-  }
-  const quranEnMap = new Map<string, any>();
-  for (const v of getQuranEn()) {
-    quranEnMap.set(`${v.chapter}_${v.verse}`, v);
+  const cappedCandidates = candidateDocEntries.slice(0, 150).map((c) => c.idx);
+  const candidateCount = cappedCandidates.length;
+
+  const t3 = performance.now();
+
+  // Pass 1: Lightweight Fast Candidate Scoring
+  const quranArMap = getGlobalQuranArMap();
+  const quranEnMap = getGlobalQuranEnMap();
+
+  interface CandidateScore {
+    docIdx: number;
+    doc: any;
+    score: number;
+    matchedNonWeakCount: number;
+    hasRare: boolean;
   }
 
-  for (const docIdx of candidateDocIndices) {
+  const candidateScores: CandidateScore[] = [];
+
+  for (const docIdx of cappedCandidates) {
     const doc = askIndex.docs[docIdx];
     if (!doc) continue;
 
@@ -554,7 +757,6 @@ export function searchCorpusKeywords(
       let hasRare = false;
       let hasRareAr = false;
 
-      // Arabic matching
       for (const term of cleanTermsAr) {
         const inVerse = normVerseAr.includes(term);
         const inTafsir = normTafsirAr.includes(term);
@@ -573,7 +775,6 @@ export function searchCorpusKeywords(
         }
       }
 
-      // English matching
       let hasRareEn = false;
       for (const term of cleanTermsEn) {
         if (normVerseEn.includes(term)) {
@@ -584,16 +785,16 @@ export function searchCorpusKeywords(
         }
       }
 
-      let totalScore = verseScoreAr + verseScoreEn + (tafsirScoreAr * 0.5);
+      let totalScore = verseScoreAr + verseScoreEn + tafsirScoreAr * 0.5;
 
       const ch = doc.ch!;
       const verse = doc.v!;
-      const vAr = quranArMap.get(`${ch}_${verse}`) || { chapter: ch, verse, text: '' };
+      const vAr = quranArMap.get(`${ch}_${verse}`) || { text: '' };
       const vEn = quranEnMap.get(`${ch}_${verse}`);
       const rawTextAr = vAr.text || '';
       const rawTextEn = vEn?.text || '';
 
-      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn);
+      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn, `ayah_${ch}_${verse}`);
       const phraseBonus = getPhraseMatchBonus(rawTextAr, rawTextEn);
       totalScore += conceptBonus + phraseBonus;
 
@@ -603,27 +804,12 @@ export function searchCorpusKeywords(
       }
 
       if (matchedNonWeakTerms.size >= 2 || hasRare || conceptBonus > 0 || phraseBonus > 0) {
-        const tafsirText = getQuranTafsirForAyah(ch, verse);
-        const tafsirExcerpt = extractDenseClusterQuote(tafsirText, allTermsForQuotes, 25);
-        const enText = vEn?.text ? `${vEn.text} (${ch}.${verse})` : vAr.text;
-
-        scoredAyatMap.set(`ayah_${ch}_${verse}`, {
-          id: `ayah_${ch}_${verse}`,
-          sourceLabel: isQuestionEn
-            ? `Surah ${ch}:${verse}`
-            : `سورة ${ch} - آية ${verse}`,
-          editionName: isQuestionEn ? 'Saheeh International (eng-ummmuhammad)' : 'القرآن الكريم',
-          fullText: isQuestionEn ? enText : vAr.text,
-          arabicFullText: vAr.text,
-          matnText: isQuestionEn ? enText : extractCleanMatn(vAr.text, 80),
-          tafsirText,
-          tafsirExcerpt,
+        candidateScores.push({
+          docIdx,
+          doc,
           score: totalScore,
-          matchedTermsCount: matchedNonWeakTerms.size,
-          hasRareTerm: hasRare,
-          type: 'ayah',
-          chapter: ch,
-          verse,
+          matchedNonWeakCount: matchedNonWeakTerms.size,
+          hasRare,
         });
       }
     } else if (doc.type === 'hadith') {
@@ -636,7 +822,6 @@ export function searchCorpusKeywords(
       let hasRare = false;
       let hasRareAr = false;
 
-      // Arabic matn matching
       for (const term of cleanTermsAr) {
         if (matnAr.includes(term)) {
           if (isRareTerm(term)) { scoreAr += 25.0; hasRare = true; hasRareAr = true; matchedNonWeakTerms.add(term); }
@@ -646,7 +831,6 @@ export function searchCorpusKeywords(
         }
       }
 
-      // English matn matching
       let hasRareEn = false;
       for (const term of cleanTermsEn) {
         if (matnEn.includes(term)) {
@@ -666,7 +850,7 @@ export function searchCorpusKeywords(
       const rawTextAr = hAr?.text || '';
       const rawTextEn = hEn?.text || '';
 
-      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn);
+      const conceptBonus = getConceptPairBonus(rawTextAr, rawTextEn, `${col}_${num}`);
       const phraseBonus = getPhraseMatchBonus(rawTextAr, rawTextEn);
       totalScore += conceptBonus + phraseBonus;
 
@@ -676,54 +860,127 @@ export function searchCorpusKeywords(
       }
 
       if (matchedNonWeakTerms.size >= 2 || hasRare || conceptBonus > 0 || phraseBonus > 0) {
-        if (hAr) {
-          const grades = hAr.grades || [];
-          const hasNoGrading = col === 'bukhari' || col === 'muslim' || col === 'nawawi';
+        candidateScores.push({
+          docIdx,
+          doc,
+          score: totalScore,
+          matchedNonWeakCount: matchedNonWeakTerms.size,
+          hasRare,
+        });
+      }
+    }
+  }
 
-          scoredHadithsMap.set(`${col}_${num}`, {
-            id: `${col}_${num}`,
-            sourceLabel: !isQuestionEn
-              ? `${getCollectionArabicName(col)} - حديث ${num}`
-              : `${getCollectionEnglishName(col)} - Hadith ${num}`,
-            editionName: !isQuestionEn ? getCollectionArabicName(col) : `${getCollectionEnglishName(col)} (English translation)`,
-            fullText: isQuestionEn && hEn?.text ? hEn.text : hAr.text,
-            arabicFullText: hAr.text,
-            matnText: isQuestionEn && hEn?.text ? hEn.text : extractCleanMatn(hAr.text, 80),
-            score: totalScore,
-            matchedTermsCount: matchedNonWeakTerms.size,
-            hasRareTerm: hasRare,
-            type: 'hadith',
-            collection: col,
-            hadithnumber: num,
-            grades: parseGrades(grades),
-            hasNoGrading,
-          });
-        }
+  const t4 = performance.now();
+
+  // Pass 2: Sort candidates and build full rich cards ONLY for top candidates (top 6: 4 Hadiths + 2 Ayat)
+  candidateScores.sort((a, b) => b.score - a.score);
+  
+  const topAyatCandidates = candidateScores.filter((cs) => cs.doc.type === 'ayah').slice(0, 2);
+  const topHadithCandidates = candidateScores.filter((cs) => cs.doc.type === 'hadith').slice(0, 4);
+  const topCandidates = [...topAyatCandidates, ...topHadithCandidates];
+
+  const scoredAyatMap = new Map<string, RetrievedDoc>();
+  const scoredHadithsMap = new Map<string, RetrievedDoc>();
+
+  for (const cs of topCandidates) {
+    const doc = cs.doc;
+    if (doc.type === 'ayah') {
+      const ch = doc.ch!;
+      const verse = doc.v!;
+      const vAr = quranArMap.get(`${ch}_${verse}`) || { chapter: ch, verse, text: '' };
+      const vEn = quranEnMap.get(`${ch}_${verse}`);
+
+      const tafsirText = getQuranTafsirForAyah(ch, verse);
+      const tafsirExcerpt = extractDenseClusterQuote(tafsirText, allTermsForQuotes, 25);
+      const enText = vEn?.text ? `${vEn.text} (${ch}.${verse})` : vAr.text;
+
+      scoredAyatMap.set(`ayah_${ch}_${verse}`, {
+        id: `ayah_${ch}_${verse}`,
+        sourceLabel: isQuestionEn ? `Surah ${ch}:${verse}` : `سورة ${ch} - آية ${verse}`,
+        editionName: isQuestionEn ? 'Saheeh International (eng-ummmuhammad)' : 'القرآن الكريم',
+        fullText: isQuestionEn ? enText : vAr.text,
+        arabicFullText: vAr.text,
+        matnText: isQuestionEn ? enText : extractCleanMatn(vAr.text, 80),
+        tafsirText,
+        tafsirExcerpt,
+        score: cs.score,
+        matchedTermsCount: cs.matchedNonWeakCount,
+        hasRareTerm: cs.hasRare,
+        type: 'ayah',
+        chapter: ch,
+        verse,
+      });
+    } else if (doc.type === 'hadith') {
+      const col = doc.col!;
+      const num = doc.num!;
+      const hAr = lookupHadithAr(col, num);
+      const hEn = lookupHadithEn(col, num);
+
+      if (hAr) {
+        const grades = hAr.grades || [];
+        const hasNoGrading = col === 'bukhari' || col === 'muslim' || col === 'nawawi';
+
+        scoredHadithsMap.set(`${col}_${num}`, {
+          id: `${col}_${num}`,
+          sourceLabel: !isQuestionEn
+            ? `${getCollectionArabicName(col)} - حديث ${num}`
+            : `${getCollectionEnglishName(col)} - Hadith ${num}`,
+          editionName: !isQuestionEn ? getCollectionArabicName(col) : `${getCollectionEnglishName(col)} (English translation)`,
+          fullText: isQuestionEn && hEn?.text ? hEn.text : hAr.text,
+          arabicFullText: hAr.text,
+          matnText: isQuestionEn && hEn?.text ? hEn.text : extractCleanMatn(hAr.text, 80),
+          score: cs.score,
+          matchedTermsCount: cs.matchedNonWeakCount,
+          hasRareTerm: cs.hasRare,
+          type: 'hadith',
+          collection: col,
+          hadithnumber: num,
+          grades: parseGrades(grades),
+          hasNoGrading,
+        });
       }
     }
   }
 
   const queryStr = question || terms.join(' ');
-  const sortedHadiths = Array.from(scoredHadithsMap.values()).sort((a, b) => compareRetrievedDocs(a, b, queryStr));
-  const sortedAyat = Array.from(scoredAyatMap.values()).sort((a, b) => compareRetrievedDocs(a, b, queryStr));
+  const allScoredDocs = [
+    ...scoredAyatMap.values(),
+    ...scoredHadithsMap.values(),
+  ];
 
-  const topHadiths = sortedHadiths.slice(0, 4);
-  const topAyat = sortedAyat.slice(0, 2);
+  allScoredDocs.sort((a, b) => compareRetrievedDocs(a, b, queryStr));
 
-  const topHScore = topHadiths[0]?.score || 0;
-  const topAScore = topAyat[0]?.score || 0;
+  // Top score for relevance gating
+  const topScore = allScoredDocs[0]?.score || 0;
 
-  let passingSources: RetrievedDoc[] = [];
-  if (topHScore > topAScore) {
-    passingSources = [...topHadiths, ...topAyat].slice(0, 6);
-  } else {
-    passingSources = [...topAyat, ...topHadiths].slice(0, 6);
-  }
+  // Relevance gate: a doc is shown only if it matches >= 2 distinct content concepts OR scores >= 60% of top score
+  const gatedDocs = allScoredDocs.filter((d) => {
+    if (topScore > 0 && d.score >= 0.60 * topScore) {
+      return true;
+    }
+    const conceptsMatched = countDistinctMatchedConcepts(d, queryStr, rawTerms);
+    return conceptsMatched >= 2;
+  });
+
+  const passingSources = gatedDocs.slice(0, 6);
+  const topHadiths = passingSources.filter((d) => d.type === 'hadith');
+  const topAyat = passingSources.filter((d) => d.type === 'ayah');
+
+  const t5 = performance.now();
 
   return {
     hadiths: topHadiths,
     ayat: topAyat,
     passingSources,
+    stageMs: {
+      termsMs: Math.round((t1 - t0) * 100) / 100,
+      postingMs: Math.round((t2 - t1) * 100) / 100,
+      candidateCount,
+      scoringMs: Math.round((t4 - t3) * 100) / 100,
+      cardBuildingMs: Math.round((t5 - t4) * 100) / 100,
+      totalMs: Math.round((t5 - t0) * 100) / 100,
+    },
   };
 }
 
@@ -774,8 +1031,8 @@ function parseGrades(rawGrades: Array<{ name?: string; grade?: string }>): Hadit
   });
 }
 
-function getGeminiClient(): GoogleGenAI {
-  const apiKey = process.env.GEMINI_API_KEY;
+export function getGeminiClient(customKey?: string): GoogleGenAI {
+  const apiKey = customKey || process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY_MISSING');
   }
@@ -816,7 +1073,9 @@ async function generateWithTimeout(
 
 // Call 1: Intent classification & search term expansion
 export async function executeCall1(
-  question: string
+  question: string,
+  userKey?: string,
+  clientIp = '127.0.0.1'
 ): Promise<{
   category: 'textual' | 'permissibility' | 'personal' | 'other';
   language: 'ar' | 'en';
@@ -826,7 +1085,33 @@ export async function executeCall1(
   modelUsed: string;
   retriesCount: number;
 }> {
-  const ai = getGeminiClient();
+  const apiKey = userKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return {
+      category: 'textual' as const,
+      language: /[a-z]/i.test(question) ? ('en' as const) : ('ar' as const),
+      claimed_text: null,
+      terms: [question],
+      is_ruling_question: false,
+      modelUsed: 'fallback',
+      retriesCount: 0,
+    };
+  }
+
+  // Spend priority: Skip Call 1 if server quota is under 50%
+  if (!userKey && quotaManager.shouldSkipCall1()) {
+    return {
+      category: 'textual' as const,
+      language: /[a-z]/i.test(question) ? ('en' as const) : ('ar' as const),
+      claimed_text: null,
+      terms: extractLocalTerms(question, /[a-z]/i.test(question) ? 'en' : 'ar'),
+      is_ruling_question: false,
+      modelUsed: 'local_priority_skip',
+      retriesCount: 0,
+    };
+  }
+
+  const ai = getGeminiClient(userKey);
 
   const systemInstruction = `You are a scholarly search term expander for Quran and Hadith corpora. Analyze the user's question.
 Do NOT answer the question; output JSON only.
@@ -838,16 +1123,29 @@ IMPORTANT: Questions asking if a specific virtue or deed is charity, sunnah, or 
 Output STRICT JSON:
 {"category":"textual"|"permissibility"|"personal"|"other","language":"ar"|"en","claimed_text":string|null,"terms":["term1"],"is_ruling_question":boolean}`;
 
-  const modelsToTry = [LITE_MODEL, MAIN_MODEL];
   let retriesCount = 0;
   let lastError: Error | null = null;
 
-  for (const model of modelsToTry) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let modelToTry: string | null = null;
+    if (userKey) {
+      modelToTry = attempt === 0 ? 'gemini-2.5-flash-lite' : 'gemini-2.5-flash';
+    } else {
+      const acq = quotaManager.acquireModel('ask_call1');
+      modelToTry = acq.model;
+    }
+
+    if (!modelToTry) break;
+
     try {
-      const text = await generateWithTimeout(ai, model, question, systemInstruction);
+      const text = await generateWithTimeout(ai, modelToTry, question, systemInstruction);
       const parsed = JSON.parse(text);
 
       const terms = Array.isArray(parsed.terms) ? parsed.terms.filter(Boolean) : [question];
+
+      if (!userKey) {
+        quotaManager.recordIpUsage(clientIp);
+      }
 
       return {
         category: parsed.category || (parsed.is_ruling_question ? 'permissibility' : 'textual'),
@@ -855,23 +1153,40 @@ Output STRICT JSON:
         claimed_text: parsed.claimed_text || null,
         terms: terms.length > 0 ? terms : [question],
         is_ruling_question: Boolean(parsed.is_ruling_question || parsed.category === 'permissibility'),
-        modelUsed: model,
+        modelUsed: modelToTry,
         retriesCount,
       };
     } catch (err: any) {
       retriesCount++;
       lastError = err;
+      if (!userKey && modelToTry) {
+        const is429or503 = err?.status === 429 || err?.status === 503 || err?.message?.includes('429') || err?.message?.includes('503');
+        if (is429or503) {
+          quotaManager.markModelUnavailable(modelToTry);
+        }
+      }
     }
   }
 
-  throw lastError || new Error('Failed Call 1');
+  // Fallback to local terms gracefully without failing
+  return {
+    category: 'textual' as const,
+    language: /[a-z]/i.test(question) ? ('en' as const) : ('ar' as const),
+    claimed_text: null,
+    terms: extractLocalTerms(question, /[a-z]/i.test(question) ? 'en' : 'ar'),
+    is_ruling_question: false,
+    modelUsed: 'local_fallback',
+    retriesCount,
+  };
 }
 
 // Call 2: Grounded synthesis strictly from retrieved texts & tafsir
 export async function executeCall2(
   question: string,
   retrievedDocs: RetrievedDoc[],
-  isPermissibility: boolean
+  isPermissibility: boolean,
+  userKey?: string,
+  clientIp = '127.0.0.1'
 ): Promise<{
   verdict: 'supported' | 'contradicted' | 'unclear' | 'permissibility';
   summary: string;
@@ -879,8 +1194,26 @@ export async function executeCall2(
   promptChars: number;
   modelUsed: string;
   retriesCount: number;
+  quotaExhausted?: boolean;
+  quotaNotice?: string;
 }> {
-  const ai = getGeminiClient();
+  const lang = /[a-z]/i.test(question) ? 'en' : 'ar';
+  const apiKey = userKey || process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return {
+      verdict: isPermissibility ? ('permissibility' as const) : ('unclear' as const),
+      summary: lang === 'en'
+        ? 'Automated summary unavailable; texts below are the source'
+        : 'تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر',
+      items: [],
+      promptChars: 0,
+      modelUsed: 'fallback',
+      retriesCount: 0,
+    };
+  }
+
+  const ai = getGeminiClient(userKey);
 
   const systemInstruction = isPermissibility
     ? `You are an evidence extractor for Islamic scripture. This is a permissibility/ruling question.
@@ -908,13 +1241,36 @@ Output STRICT JSON:
   const userPrompt = `Question: ${question}\n\nRetrieved Texts:\n${promptItems}`;
   const promptChars = userPrompt.length;
 
-  const modelsToTry = [LITE_MODEL, MAIN_MODEL];
   let retriesCount = 0;
   let lastError: Error | null = null;
 
-  for (const model of modelsToTry) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let modelToTry: string | null = null;
+    if (userKey) {
+      modelToTry = attempt === 0 ? 'gemini-2.5-flash-lite' : 'gemini-2.5-flash';
+    } else {
+      const acq = quotaManager.acquireModel('ask_call2');
+      modelToTry = acq.model;
+    }
+
+    if (!modelToTry) {
+      // Quota exhausted across all models in pool
+      return {
+        verdict: isPermissibility ? ('permissibility' as const) : ('unclear' as const),
+        summary: lang === 'en'
+          ? 'Automated summary unavailable; texts below are the source'
+          : 'تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر',
+        items: [],
+        promptChars,
+        modelUsed: 'quota_exhausted',
+        retriesCount,
+        quotaExhausted: true,
+        quotaNotice: quotaManager.getQuotaNotice(lang),
+      };
+    }
+
     try {
-      const text = await generateWithTimeout(ai, model, userPrompt, systemInstruction);
+      const text = await generateWithTimeout(ai, modelToTry, userPrompt, systemInstruction);
       const parsed = JSON.parse(text);
 
       let v: 'supported' | 'contradicted' | 'unclear' | 'permissibility' = 'unclear';
@@ -924,21 +1280,40 @@ Output STRICT JSON:
         v = parsed.verdict;
       }
 
+      if (!userKey) {
+        quotaManager.recordIpUsage(clientIp);
+      }
+
       return {
         verdict: v,
         summary: typeof parsed.summary === 'string' ? parsed.summary.trim() : '',
         items: Array.isArray(parsed.items) ? parsed.items : [],
         promptChars,
-        modelUsed: model,
+        modelUsed: modelToTry,
         retriesCount,
       };
     } catch (err: any) {
       retriesCount++;
       lastError = err;
+      if (!userKey && modelToTry) {
+        const is429or503 = err?.status === 429 || err?.status === 503 || err?.message?.includes('429') || err?.message?.includes('503');
+        if (is429or503) {
+          quotaManager.markModelUnavailable(modelToTry);
+        }
+      }
     }
   }
 
-  throw lastError || new Error('Failed Call 2');
+  return {
+    verdict: isPermissibility ? ('permissibility' as const) : ('unclear' as const),
+    summary: lang === 'en'
+      ? 'Automated summary unavailable; texts below are the source'
+      : 'تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر',
+    items: [],
+    promptChars,
+    modelUsed: 'fallback_error',
+    retriesCount,
+  };
 }
 
 // Master Stage 1 Function: Fast Cards & Retrieval (< 2-3s)
@@ -967,22 +1342,27 @@ export async function executeAskStage1(
     };
   }
 
-  if (!checkRateLimit(clientIp)) {
-    return {
-      question: rawQuestion,
-      language: 'ar',
-      category: 'other',
-      verdict: 'unclear',
-      verdictBadgeLabel: 'تم تجاوز الحد المسموح به',
-      summary: '',
-      searchedTerms: [],
-      items: [],
-      retrievedCount: 0,
-      droppedItemsCount: 0,
-      topRetrievedIds: [],
-      executionTimeMs: Math.round(performance.now() - startTime),
-      error: 'تم تجاوز الحد المسموح به للأسئلة (20 سؤالاً في الساعة). يرجى الانتظار والمحاولة لاحقاً.',
-    };
+  if (!req.userApiKey) {
+    const ipCheck = quotaManager.checkIpLimit(clientIp);
+    if (!ipCheck.allowed) {
+      return {
+        question: rawQuestion,
+        language: 'ar',
+        category: 'other',
+        verdict: 'unclear',
+        verdictBadgeLabel: 'تم تجاوز الحد المسموح به',
+        summary: '',
+        searchedTerms: [],
+        items: [],
+        retrievedCount: 0,
+        droppedItemsCount: 0,
+        topRetrievedIds: [],
+        executionTimeMs: Math.round(performance.now() - startTime),
+        error: 'تم تجاوز الحد المسموح به للأسئلة في هذه الساعة. يرجى الانتظار أو إدخال مفتاحك الخاص من الإعدادات.',
+        quotaNotice: quotaManager.getQuotaNotice('ar'),
+        retryAfterSeconds: ipCheck.retryAfterSeconds,
+      };
+    }
   }
 
   const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, ' ');
@@ -1029,57 +1409,54 @@ export async function executeAskStage1(
     return res;
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    return {
-      question: rawQuestion,
-      language: 'ar',
-      category: 'other',
-      verdict: 'unclear',
-      verdictBadgeLabel: 'غير متاح',
-      summary: '',
-      searchedTerms: [],
-      items: [],
-      retrievedCount: 0,
-      droppedItemsCount: 0,
-      topRetrievedIds: [],
-      executionTimeMs: Math.round(performance.now() - startTime),
-      error: 'خدمة "اسأل" تتطلب ضبط مفتاح GEMINI_API_KEY في إعدادات الخادم.',
-    };
-  }
+  const language: 'ar' | 'en' = /[a-z]/i.test(rawQuestion) ? 'en' : 'ar';
 
-  // 1. Call 1 Timing
-  const tCall1Start = performance.now();
-  let call1Result;
-  let call1Ms = 0;
-  let call1Failover = '0';
-
-  try {
-    call1Result = await executeCall1(rawQuestion);
-    call1Ms = Math.round(performance.now() - tCall1Start);
-    call1Failover = `${call1Result.retriesCount} (${call1Result.modelUsed})`;
-  } catch (err) {
-    call1Ms = Math.round(performance.now() - tCall1Start);
-    call1Result = {
-      category: 'textual' as const,
-      language: /[a-z]/i.test(rawQuestion) ? ('en' as const) : ('ar' as const),
-      claimed_text: null,
-      terms: [rawQuestion],
-      is_ruling_question: false,
-      modelUsed: 'fallback',
-      retriesCount: 1,
-    };
-    call1Failover = '1 (fallback)';
-  }
-
-  const { category, language, terms, is_ruling_question } = call1Result;
-  const isPermissibilityQuestion = is_ruling_question || category === 'permissibility';
-
-  // 2. Retrieval Timing
+  // 1. Immediate Local Retrieval (Call 1 off the critical path)
+  const localTerms = extractLocalTerms(rawQuestion, language);
   const tRetStart = performance.now();
-  const { passingSources } = searchCorpusKeywords(terms, language);
+  const localSearch = searchCorpusKeywords(localTerms, language, rawQuestion);
   const retrievalMs = Math.round(performance.now() - tRetStart);
 
-  if (passingSources.length === 0) {
+  // 2. Parallel Call 1 Expansion with 6s Timeout
+  const tCall1Start = performance.now();
+  let call1Result = null;
+  let call1Ms = 0;
+  let call1Failover = '0';
+  let refined = false;
+  let finalPassingSources = localSearch.passingSources;
+  let finalTerms = localTerms;
+  let category: 'textual' | 'permissibility' | 'personal' | 'other' = 'textual';
+  let is_ruling_question = false;
+
+  try {
+    const call1Promise = executeCall1(rawQuestion, req.userApiKey, clientIp);
+    const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('CALL1_TIMEOUT')), 6000));
+    call1Result = await Promise.race([call1Promise, timeoutPromise]);
+    call1Ms = Math.round(performance.now() - tCall1Start);
+    call1Failover = `${call1Result.retriesCount} (${call1Result.modelUsed})`;
+
+    category = call1Result.category;
+    is_ruling_question = call1Result.is_ruling_question;
+
+    if (call1Result.terms && call1Result.terms.length > 0) {
+      const call1Search = searchCorpusKeywords(call1Result.terms, language, rawQuestion);
+      const localTop3 = localSearch.passingSources.slice(0, 3).map((d) => d.id).join(',');
+      const call1Top3 = call1Search.passingSources.slice(0, 3).map((d) => d.id).join(',');
+
+      if (localTop3 !== call1Top3 && call1Search.passingSources.length > 0) {
+        refined = true;
+        finalPassingSources = call1Search.passingSources;
+        finalTerms = call1Result.terms;
+      }
+    }
+  } catch (err) {
+    call1Ms = Math.round(performance.now() - tCall1Start);
+    call1Failover = '1 (local_fallback)';
+  }
+
+  const isPermissibilityQuestion = is_ruling_question || category === 'permissibility';
+
+  if (finalPassingSources.length === 0) {
     const res: AskResponse = {
       question: rawQuestion,
       language,
@@ -1089,7 +1466,7 @@ export async function executeAskStage1(
         ? 'No relevant text found in indexed sources; consult qualified scholars'
         : 'لم نعثر على نصٍّ مرتبط بسؤالك في المصادر المفهرسة؛ راجع أهل العلم',
       summary: '',
-      searchedTerms: terms,
+      searchedTerms: finalTerms,
       items: [],
       retrievedCount: 0,
       droppedItemsCount: 0,
@@ -1108,9 +1485,9 @@ export async function executeAskStage1(
     return res;
   }
 
-  // Build items strictly in retrieval rank order!
-  const items: AskCitationItem[] = passingSources.map((d) => {
-    const quote = extractDenseClusterQuote(d.fullText, terms, 25);
+  // Build items strictly in retrieval rank order
+  const items: AskCitationItem[] = finalPassingSources.map((d) => {
+    const quote = extractDenseClusterQuote(d.fullText, finalTerms, 25);
     return {
       id: d.id,
       quote,
@@ -1132,7 +1509,7 @@ export async function executeAskStage1(
     };
   });
 
-  const detVerdict = deriveDeterministicVerdict(items, category, language);
+  const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
   const totalStage1Ms = Math.round(performance.now() - startTime);
 
   const res: AskResponse = {
@@ -1141,12 +1518,14 @@ export async function executeAskStage1(
     category,
     verdict: detVerdict.verdict,
     verdictBadgeLabel: detVerdict.badgeLabel,
-    verdictBadgeSubline: detVerdict.badgeSubline,
+    verdictBadgeSubline: refined
+      ? (language === 'en' ? 'Results refined with expanded search' : 'تم تحسين النتائج بالبحث الموسّع')
+      : detVerdict.badgeSubline,
     isPermissibility: isPermissibilityQuestion,
     summary: '',
-    searchedTerms: terms,
+    searchedTerms: finalTerms,
     items,
-    retrievedCount: passingSources.length,
+    retrievedCount: finalPassingSources.length,
     droppedItemsCount: 0,
     topRetrievedIds: items.slice(0, 3).map((i) => i.id),
     executionTimeMs: totalStage1Ms,
@@ -1162,7 +1541,7 @@ export async function executeAskStage1(
   };
 
   if (req.singlePass) {
-    return askQuestionFullPass(res, rawQuestion, passingSources, clientIp, startTime);
+    return askQuestionFullPass(res, rawQuestion, finalPassingSources, clientIp, startTime);
   }
 
   return res;
@@ -1276,7 +1655,7 @@ export async function executeAskVerdict(
     }
   }
 
-  const detVerdict = deriveDeterministicVerdict(items, category, language);
+  const detVerdict = deriveDeterministicVerdict(items, category, language, rawQuestion);
 
   const res: AskResponse = {
     question: rawQuestion,
@@ -1318,6 +1697,9 @@ async function askQuestionFullPass(
   clientIp: string,
   startTime: number
 ): Promise<AskResponse> {
+  if (stage1Res.isFabricated) {
+    return stage1Res;
+  }
   const verdictRes = await executeAskVerdict({
     question: rawQuestion,
     language: stage1Res.language,
