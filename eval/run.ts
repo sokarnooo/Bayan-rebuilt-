@@ -128,6 +128,7 @@ async function runTest(mode: string, input: string) {
         state: data.verdict,
         query: input,
         query_mode: 'ask',
+        topRetrievedIds: data.topRetrievedIds || [],
         results: (data.items || []).map((i: any) => ({
           id: i.id,
           collection: i.collection || 'ayah',

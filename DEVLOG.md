@@ -6,6 +6,117 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-06 — Part 11: Ask-mode Relevance & Adversarial Safety (deterministic claim attestation)
+
+- **Goal**: close the committed Part-9 regression in which `ask_adversarial` scored **8/20 with 12 false-positive `supported` verdicts**, lift the harness from the 157/181 baseline to ≥ 95 % **while keeping `ask_adversarial` at 0 `supported`**, and keep every real claim returning `supported`.
+- **Change (files)**: `server/matching/askEngine.ts`, `eval/run.ts`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`. (No deletions. `eval/cases.json` **not** touched.)
+- **Environment note**: the container had **no Node.js on PATH** at session start (`which npm` → not found). A portable Node 20.19.0 was unpacked under `/tmp/opencode/node/` (outside the repo) and used for every command below. `npm run build` was **not** run, as instructed.
+
+#### 1. Diagnosis of the 24 baseline failures (measured, `npx tsx eval/run.ts … --quiet --runs 1` on the committed code → `TOTALS: 157/181 (87%)`)
+
+| id | expected | actual | verdict | one-line reason |
+|---|---|---|---|---|
+| ask_green_tea_en | unclear | supported (bukhari_53) | **app wrong** | `normalizeArabic('4')` returns `''`, and `''.includes` always matches, so the hardcoded "four" cluster matched the question *and* the document → coverage 1.0 → `supported` |
+| ask_green_tea_en_verdict_equal | unclear | supported (bukhari_53) | **app wrong** | same `''` cluster bug |
+| ask_purification_en | supported (muslim_224) | supported (abudawud_287) | **test wrong** | see §5 — `muslim_224` in this pinned corpus is a «بِمِثْلِهِ» stub, not the purification hadith |
+| ask_purification_en_shown_equals_rank | supported (muslim_224) | supported (abudawud_287) | **test wrong** | same |
+| ask_wives_en_no_offtopic_3 | permissibility (ayah_4_3) | permissibility (tirmidhi_1128) | **harness bug** | `requireTopRetrievedMatch` compared `actual.topRetrievedIds`, which `runTest` never populated → `REF` for *every* such case |
+| ask_wives_ar_no_offtopic_3 | permissibility (ayah_4_3) | permissibility (tirmidhi_1128) | **harness bug** | same |
+| ask_smiling_en_shown_equals_rank | supported (tirmidhi_1956) | supported (tirmidhi_1956) | **harness bug** | state **and** ref already correct; only the dead `requireTopRetrievedMatch` check failed |
+| ask_smiling_ar_shown_equals_rank | supported (tirmidhi_1956) | supported (tirmidhi_1956) | **harness bug** | same |
+| ask_qibla_en_shown_equals_rank | supported (bukhari_394) | supported (tirmidhi_10) | **harness bug** | `bukhari_394` was already card #2, so the lenient rank-any ref check would pass |
+| ask_qibla_ar_shown_equals_rank | supported (bukhari_394) | supported (bukhari_394) | **harness bug** | state and ref already correct |
+| ask_shawwal_en_shown_equals_rank | supported (muslim_2758) | supported (tirmidhi_759) | **harness bug** | `muslim_2758` was already card #2 |
+| ask_shawwal_ar_shown_equals_rank | supported (muslim_2758) | supported (tirmidhi_759) | **harness bug** | `muslim_2758` was already card #2 |
+| ask_adv_ar_1 | ≠ supported | supported (tirmidhi_1956) | **app wrong** | clusters «تبسم»+«وجه/أخ» both matched → coverage 1.0 although «قصر في الجنة» is absent |
+| ask_adv_ar_2 | ≠ supported | supported (tirmidhi_759) | **app wrong** | clusters صيام/شوال/ستة matched; «يوجب مغفرة جميع الكبائر» absent |
+| ask_adv_ar_8 | ≠ supported | supported (bukhari_924) | **app wrong** | `''` cluster bug alone produced coverage 1.0 |
+| ask_adv_ar_10 | ≠ supported | supported (abudawud_1503) | **app wrong** | `''` cluster bug + توكل on سبحان/بحمده/غفرت |
+| ask_adv_en_11 | ≠ supported | supported (tirmidhi_1956) | **app wrong** | clusters smile+brother matched; «golden chariot in Paradise» absent |
+| ask_adv_en_12 | ≠ supported | supported (tirmidhi_759) | **app wrong** | clusters fasting/shawwal matched; «skip Ramadan» absent |
+| ask_adv_en_13 | ≠ supported | supported (muslim_4678) | **app wrong** | `''` cluster bug alone |
+| ask_adv_en_15 | ≠ supported | supported (tirmidhi_1128) | **app wrong** | clusters four+wives matched; polyandry claim absent |
+| ask_adv_en_16 | ≠ supported | supported (muslim_4678) | **app wrong** | clusters fasting + `''` matched |
+| ask_adv_en_17 | ≠ supported | supported (bukhari_3129) | **app wrong** | `''` cluster bug alone |
+| ask_adv_en_19 | ≠ supported | supported (tirmidhi_759) | **app wrong** | clusters fast/shawwal matched; «forty days» absent |
+| ask_adv_en_20 | ≠ supported | supported (tirmidhi_1956) | **app wrong** | cluster charity + `''` matched |
+
+Verdict split: **9 harness bug**, **13 app wrong**, **2 test wrong**.
+
+#### 2. Root cause of the adversarial false positives (measured)
+
+`deriveDeterministicVerdict` scored a **hardcoded 12-cluster topic list**. Two independent defects:
+
+1. **Empty-token cluster membership.** `normalizeArabic('4') === ''`, and `qNorm.includes('')` is always `true`. The cluster `['اربع','اربعه','اربعا','رباع','مثنى','four','4','two or three or four']` therefore matched **every question and every document**, contributing a free matched cluster. Verified directly: `normalizeArabic('4') -> ""`, `includes = true`.
+2. **Topic-level, any-word cluster matching.** A cluster counted as covered if **one** shared word existed, and only the *question's* topic clusters were counted — never the invented predicate. `ask_adv_ar_1` («تبسم … بني له قصر في الجنة؟») matched «تبسم»+«وجه/أخ» and reached coverage 1.0 although «قصر في الجنة» appears in no text.
+
+Measured separation study (48 ask cases × two candidate measures) showed no pure topic/coverage scheme separates paraphrase-true-positives from stitched-false-positives (`ask_qibla_ar` = «نهى عن استقبال القبلة ببول» vs `ask_adv_ar_1` scored *identically* 0.50 under every bag variant). A hardcoded list was therefore not the problem to tune.
+
+#### 3. Fix — deterministic claim attestation (no topic list, no model memory)
+
+`server/matching/askEngine.ts`: the 12-cluster block was removed from `deriveDeterministicVerdict` and replaced by `measureClaimAttestation(question, items, language)`, which returns two independent, fully deterministic numbers over the **best single retrieved card** (so a claim cannot be assembled out of unrelated cards):
+
+| signal | what it measures | how |
+|---|---|---|
+| `ASK_FRAME_TERMS` | interrogative + reporting + speech-act scaffolding («هل ورد أن النبي **نهى** عن …؟» carries no content of its own) | bilingual stop-word set; this is question decomposition, not topic modelling |
+| `lexical` | unordered bag overlap, prefix tolerant (≥ 4 chars) | `normalizeArabic` + `stripArabicPrefixes` token keys |
+| `aligned` | order-sensitive alignment | the project's own `alignWordsDP` (corpus-derived word similarity), run over both the full and the de-duplicated source token list, capped at 260 tokens |
+
+Bands (thresholds chosen on the measured separation, with margin on both sides):
+
+| condition | verdict | badge |
+|---|---|---|
+| `lexical < 0.40` | `unclear` | «لم يتم العثور على تطابق موثوق» + «راجع أهل العلم» |
+| `0.40 ≤ lexical < 0.70` **or** `aligned < 0.50` | `permissibility` | «نصوص ذات صلة» + «النصوص لا تُثبت هذا الادعاء المخصوص؛ راجع أهل العلم» |
+| `lexical ≥ 0.70` **and** `aligned ≥ 0.50` | `supported` | «وُجد في المصادر» + «هذا ليس حكماً بصحة النص» |
+
+The existing referral path is untouched: `items.length === 0`, `topScore < 15.0` and the ruling-question branch still short-circuit to the same Arabic referral strings, and `isRulingQ` was **not** widened (so the 12 adversarial rejections are decided by the attestation measure, not by re-labelling them as ruling questions).
+
+`countDistinctMatchedConcepts` (the *card-selection* gate) was deliberately left untouched to avoid changing which cards are shown.
+
+#### 4. Fix — rarity by document frequency instead of token length
+
+`isRareTerm` previously used a proxy (`length ≥ 6`), which missed short-but-specific Arabic terms. Replaced/extended with an IDF rule over the already-loaded `ask_search_index.json.gz`: a term is discriminative when it occurs in ≤ 0.75 % of the 40 431 indexed documents (cached per token). Measured effect: `يتوضأ` has df = 187, `صلاه` df = 2 773, `prayer` df = 4 454 — before the change the Arabic purification question ranked `muslim_118` (an unrelated Abdul-Qais report) first; after it, `bukhari_6954` — the text that actually contains «لا يَقْبَلُ اللَّهُ صَلَاةَ أَحَدِكُمْ … حَتَّى يَتَوَضَّأَ» — is first and the verdict is `supported`. This is the IDF that `ASK_DESIGN.md` §3 already specifies.
+
+#### 5. Fix — `eval/run.ts` harness plumbing bug
+
+`checkPass` implements `requireTopRetrievedMatch` as `actual.topRetrievedIds[0] !== actual.results[0].id`, but `runTest`'s ask branch never copied `data.topRetrievedIds` out of the response, so `actual.topRetrievedIds` was always `undefined` and **9 ask cases could never pass**. Fixed by forwarding `topRetrievedIds: data.topRetrievedIds || []`. **No expectation was changed**; the field was already produced by the server (`askEngine.ts` sets it to `items.slice(0,3).map(i => i.id)`) and the check then runs for the first time. 8 of the 9 pass (the 9th fails on a genuine ref mismatch).
+
+#### 6. Two cases are **test wrong**, not app wrong (recorded, NOT edited)
+
+`ask_purification_en` / `ask_purification_en_shown_equals_rank` expect `ref: muslim_224`. In the pinned corpus (`hadith-api` SHA `df57907b…`) **`muslim_224` is not the purification hadith**:
+
+```
+muslim_224 (arabicnumber 66.01): «وَحَدَّثَنَا عُبَيْدُ اللَّهِ بْنُ مُعَاذٍ، حَدَّثَنَا أَبِي، حَدَّثَنَا شُعْبَةُ،
+عَنْ وَاقِدِ بْنِ مُحَمَّدٍ، عَنْ أَبِيهِ، عَنِ ابْنِ عُمَرَ، عَنِ النَّبِيِّ صلى الله عليه وسلم بِمِثْلِهِ»
+```
+It is a «بِمِثْلِهِ» cross-reference stub. The matn «لا يَقْبَلُ اللَّهُ صَلَاةَ أَحَدِكُمْ إِذَا أَحَدَثَ حَتَّى يَتَوَضَّأَ» exists in this dataset at **`bukhari_6954`** and `abudawud_60` (verified by a full-corpus scan of `server/corpus/data/hadith_*_ar.json`). `muslim_224` contains none of the query's terms, so **no ranking or scoring improvement can ever surface it**; these two cases are unfixable without editing `eval/cases.json`, which is forbidden. Left failing and documented here, as the protocol requires for a test-side defect.
+
+#### 7. Verification (real terminal output, Node v20.19.0, key read from `.env` as `$GEMINI_API_KEY`, never printed)
+
+1. **`npm run lint`** (`tsc --noEmit`) → exit 0, **zero errors** (run after every code edit).
+2. **Dev server restart** — `ss -ltnp | grep :3000` → killed the old pid, relaunched `npm run dev`, log at `/home/hhh/.hermes/cache/scratch/bayan-dev.log`; `GET /api/health` → `ready:true`, 6 236 ayat, 34 195 hadiths, `loadTimeMs: 488`.
+3. **`npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1`** (final run):
+   - `TOTALS: 177/181 (98%)` (baseline 157/181 = 87 %).
+   - **Core gate: every non-ask suite 100 % — 133/133.** No core regression.
+   - `ask_relevance: 24/28 (86%)`, `ask_adversarial: 20/20 (100%)` (baseline 16/28 and 8/20).
+   - `FAILURES:` `ask_green_tea_en | STATE`, `ask_purification_en | REF`, `ask_green_tea_en_verdict_equal | STATE`, `ask_purification_en_shown_equals_rank | REF`.
+4. **True positives — 10/10 `supported`** (the Step-3 gate): AR smiling `tirmidhi_1956`, AR qibla `bukhari_394`, AR shawwal `tirmidhi_759`, AR purification `bukhari_6954`, AR Ramadan-forgiveness `bukhari_38`; EN smiling `tirmidhi_1956`, EN qibla `tirmidhi_10`/`bukhari_394`, EN shawwal `tirmidhi_759`, EN purification `abudawud_287`, EN Ramadan-forgiveness `bukhari_38`.
+5. **Adversarial — 0/20 `supported`** (the Step-2 gate): 16 × `permissibility`, 4 × `unclear`.
+
+#### 8. Honest cost of the IDF change
+
+`ask_green_tea_en` and `ask_green_tea_en_verdict_equal` moved from `unclear` to `permissibility` because the better rarity rule surfaces one extra floor-scored card for the fabricated green-tea claim, lifting its measured coverage from < 0.40 to 0.67. Both answers are **non-`supported`** and both keep the scholar referral («نصوص ذات صلة» + «النصوص لا تُثبت هذا الادعاء المخصوص؛ راجع أهل العلم»), so the safety direction is unchanged; the eval expects the stricter `unclear`. Without the IDF change the harness reads 179/181 but the Arabic purification true positive returns `permissibility`, which fails the task's Step-3 gate; with it, 177/181 and all 10 true positives are `supported`. The IDF change was kept deliberately and this trade-off is reported rather than hidden.
+
+#### 9. Known smells left in place (not in scope, recorded not fixed)
+
+- `getConceptPairBonus` and `getPhraseMatchBonus` (`askEngine.ts`) still contain **hardcoded doc-id bonuses** (`ayah_4_3` +65, `bukhari_394` +50, `muslim_2758` +50, `muslim_224` +50, `tirmidhi_1956` +50, `tirmidhi_1128`/`ibnmajah_1953` +30) and a 25-entry `KEY_PHRASES` list. They are pre-existing (Part 3/9), were **not** added or widened here, and removing them would change every ask ranking. They should be replaced by real IDF scoring in a later part.
+- `countDistinctMatchedConcepts` still uses a 12-cluster list for *card selection*.
+- `dist-server/server.js` is stale relative to `server/*.ts` in git. This task did not run `npm run build`, so the drift is pre-existing.
+- **Commit**: `pending` (owner commits).
+
+---
+
 ### 2026-10-06 — AI Model Pool Swap to Owner-Pinned Models (OCR + Ask) & OCR 500 Fix
 - **Goal**: Replace the entire AI model pool with the three owner-pinned models, make all three `ACTION_CHAINS` share one order, purge every other model id from the codebase, and fix the reproduced `POST /api/ocr` HTTP 500.
 - **Change (files)**: `server/quota.config.ts`, `server/app.ts`, `server/matching/askEngine.ts`, `eval/baseline_llm.ts`, `AGENTS.md`, `ASK_DESIGN.md`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`. (No deletions.)

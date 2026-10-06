@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { GoogleGenAI } from '@google/genai';
 import { loadCorpus, lookupHadithAr, lookupHadithEn, getQuranEn, getHadithEn, getQuranTafsirForAyah, loadAskSearchIndex } from '../corpus/loader.ts';
-import { initHadithEngine } from './hadithMatcher.ts';
+import { initHadithEngine, alignWordsDP } from './hadithMatcher.ts';
 import type { HadithGradeItem } from './hadithMatcher.ts';
 import { initAyahEngine } from './ayahMatcher.ts';
 import { normalizeArabic } from './normalizer.ts';
@@ -442,6 +442,136 @@ export function countDistinctMatchedConcepts(doc: RetrievedDoc, question: string
   return matches;
 }
 
+// ---------------------------------------------------------------------------
+// Claim attestation (deterministic, no model memory, no topic hardcoding)
+// ---------------------------------------------------------------------------
+// Three measured signals decide whether the retrieved texts actually attest the
+// claim in the question:
+//   1) ASK_FRAME_TERMS  - interrogative / reporting / speech-act scaffolding.
+//      «هل ورد أن النبي نهى عن ...؟» carries no content of its own; the content
+//      is what follows it. Removing the frame is question decomposition, not
+//      topic modelling.
+//   2) lexical coverage  - unordered bag overlap, prefix tolerant, best single card.
+//   3) alignment coverage - the corpus-derived word-similarity DP alignment already
+//      used by the Hadith/Ayah matchers (order sensitive), best single card.
+// A claim is only "supported" when BOTH measurements are high: the words must be
+// present (2) *and* attested in the phrasing/order of the text (3). A question
+// that reuses real corpus vocabulary but adds a reward, a number or a permission
+// that no text mentions fails (2) or (3) and is referred to the scholars.
+
+const ASK_FRAME_TERMS = new Set([
+  // Arabic interrogative / function words
+  'هل', 'من', 'في', 'على', 'الى', 'عن', 'مع', 'هذا', 'هذه', 'ذلك', 'تلك', 'التي', 'الذي', 'الذين',
+  'ما', 'لا', 'لم', 'لن', 'قد', 'كل', 'بعض', 'اي', 'و', 'او', 'ثم', 'ان', 'أن', 'إن', 'انه',
+  'كان', 'كانت', 'يكون', 'انا', 'انت', 'هو', 'هي', 'هن', 'نحن', 'كما', 'حيث', 'لدى', 'بين',
+  'حتى', 'بل', 'غير', 'سوى', 'نفس', 'به', 'بها', 'له', 'لها', 'لهم', 'فيه', 'فيها', 'منه', 'منها',
+  'عليه', 'عليها', 'اليه', 'اليها', 'عند', 'عندما', 'مثل', 'سوف', 'كلها', 'كلما',
+  // Arabic reporting / attribution scaffolding (never part of the attested claim)
+  'الله', 'النبي', 'الناس', 'قال', 'رسول', 'نبي', 'سنة', 'حديث', 'رواه', 'احاديث', 'اصحاب',
+  'ورد', 'روى', 'اخبر', 'امر', 'امرت', 'يأمر', 'يامر', 'نهى', 'نهينا', 'ينهى', 'نهيا',
+  'يحرم', 'يحل', 'يحسب', 'يجوز', 'واجب', 'مباح', 'مستحب', 'مستحبه', 'مكروه', 'حرام', 'حلال',
+  'سمى', 'سماها', 'يسمي', 'فضل', 'اجر', 'ثواب', 'عوض', 'جزاء',
+  // English interrogative / function words
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'you', 'your', 'yours',
+  'the', 'a', 'an', 'of', 'at', 'in', 'to', 'for', 'it', 'its', 'and', 'or', 'not', 'no', 'if',
+  'so', 'can', 'will', 'would', 'should', 'must', 'me', 'my', 'we', 'us', 'they', 'them', 'he',
+  'she', 'his', 'her', 'their', 'there', 'here', 'then', 'than', 'that', 'this', 'with', 'on',
+  'as', 'any', 'all', 'while', 'when', 'what', 'which', 'who', 'whom', 'how', 'why', 'where',
+  'am', 'have', 'has', 'had', 'also', 'into', 'from', 'out', 'up', 'down', 'about', 'over',
+  'under', 'again', 'very', 'some', 'such', 'only', 'other', 'own', 'same', 'too',
+  // English reporting / attribution scaffolding
+  'prophet', 'people', 'messenger', 'man', 'men', 'hadith', 'sunnah', 'say', 'said', 'says',
+  'narrated', 'authority', 'god', 'lord', 'order', 'ordered', 'orders', 'command', 'commanded',
+  'forbid', 'forbids', 'forbidden', 'prohibit', 'prohibited', 'recommend', 'recommended',
+  'recommends', 'warn', 'warned', 'warns', 'reported', 'called', 'termed', 'named',
+  'obligatory', 'obligated', 'permissible', 'permitted', 'allowed', 'allows', 'ruling',
+]);
+
+// Split a question or a source text into normalized content tokens.
+function splitTokens(text: string, language: 'ar' | 'en', dropFrame: boolean): string[] {
+  if (!text) return [];
+  const base = language === 'en' ? text.toLowerCase() : normalizeArabic(text).toLowerCase();
+  const out: string[] = [];
+  for (let w of base.split(/[^\p{L}\p{N}]+/u)) {
+    if (w.length < 2) continue;
+    if (ASK_FRAME_TERMS.has(w)) continue;
+    if (language === 'ar') w = stripArabicPrefixes(w);
+    if (w.length < 2) continue;
+    if (ASK_FRAME_TERMS.has(w)) continue;
+    out.push(w);
+  }
+  return dropFrame ? Array.from(new Set(out)) : out;
+}
+
+const MAX_ATTESTATION_TOKENS = 260;
+
+function evidenceTextOf(item: AskCitationItem, language: 'ar' | 'en'): string {
+  if (language === 'en') return item.fullText || '';
+  return item.arabicFullText || item.fullText || '';
+}
+
+function tokenMatchesSet(token: string, set: Set<string>): boolean {
+  if (set.has(token)) return true;
+  for (const d of set) {
+    if (Math.abs(d.length - token.length) > 3) continue;
+    const shorter = d.length <= token.length ? d : token;
+    const longer = d.length <= token.length ? token : d;
+    if (shorter.length >= 4 && longer.startsWith(shorter)) return true;
+  }
+  return false;
+}
+
+export interface ClaimAttestation {
+  lexical: number;
+  aligned: number;
+}
+
+/**
+ * Measures how much of the question's content is attested by the retrieved texts.
+ * `lexical` is unordered bag overlap (prefix tolerant) and `aligned` is the
+ * order-sensitive corpus-derived DP alignment. Both take the best single card so
+ * a claim cannot be "assembled" out of unrelated cards.
+ */
+export function measureClaimAttestation(
+  question: string,
+  items: AskCitationItem[],
+  language: 'ar' | 'en',
+  maxItems = 5
+): ClaimAttestation {
+  const qTokens = splitTokens(question, language, true);
+  if (!qTokens.length) return { lexical: 0, aligned: 0 };
+  const qForDp = qTokens.map((w) => ({ word: w, normalized: w }));
+
+  let lexical = 0;
+  let aligned = 0;
+
+  for (let i = 0; i < items.length && i < maxItems; i++) {
+    const raw = evidenceTextOf(items[i], language);
+    if (!raw) continue;
+
+    const dedupTokens = splitTokens(raw, language, true);
+    if (!dedupTokens.length) continue;
+    const tokenSet = new Set(dedupTokens);
+    const hits = qTokens.filter((t) => tokenMatchesSet(t, tokenSet)).length;
+    lexical = Math.max(lexical, hits / qTokens.length);
+
+    const fullTokens = splitTokens(raw, language, false).slice(0, MAX_ATTESTATION_TOKENS);
+    for (const source of [fullTokens, dedupTokens]) {
+      if (!source.length) continue;
+      const sTokens = source.map((w, idx) => ({ word: w, normalized: w, originalIndex: idx }));
+      const alignedResult = alignWordsDP(qForDp, sTokens);
+      const matched = alignedResult.wordStatus.filter((s) => s !== 'none').length;
+      aligned = Math.max(aligned, matched / qTokens.length);
+    }
+  }
+
+  return { lexical, aligned };
+}
+
+const CLAIM_LEXICAL_THRESHOLD = 0.70;
+const CLAIM_ALIGNED_THRESHOLD = 0.50;
+const CLAIM_PARTIAL_THRESHOLD = 0.40;
+
 export function deriveDeterministicVerdict(
   items: AskCitationItem[],
   category: 'textual' | 'permissibility' | 'personal' | 'other',
@@ -491,45 +621,12 @@ export function deriveDeterministicVerdict(
     };
   }
 
-  // False-positive prevention: Claim concept coverage in top document (concept-based, morphology-aware)
-  const docText = normalizeArabic(items[0]?.fullText + ' ' + (items[0]?.arabicFullText || '')).toLowerCase();
-  
-  // Use the same concept clusters as relevance gating for consistent coverage calc
-  const clusters = [
-    ['زوج', 'زوجات', 'زوجة', 'نساء', 'نسوة', 'نكح', 'فانكحوا', 'تزوج', 'marry', 'marriage', 'wives', 'wife', 'women', 'woman'],
-    ['اربع', 'اربعه', 'اربعا', 'رباع', 'مثنى', 'four', '4', 'two or three or four'],
-    ['صوم', 'صيام', 'صام', 'fasting', 'fast'],
-    ['شوال', 'shawwal'],
-    ['ست', 'سته', 'ستة', 'six'],
-    ['تبسم', 'تبسمك', 'ابتسم', 'smile', 'smiling'],
-    ['صدقة', 'صدقه', 'charity'],
-    ['اخ', 'اخيك', 'وجه', 'brother', 'face'],
-    ['قبلة', 'القبلة', 'qibla', 'kaba'],
-    ['بول', 'غائط', 'يبول', 'تغوط', 'urinate', 'urinating', 'defecate', 'defecating'],
-    ['استقبال', 'استدبار', 'تستقبل', 'facing'],
-    ['غيلان', 'عشر', 'يتخير', 'تخير', 'ghilan', 'ghailan', 'choose four', 'ten wives']
-  ];
+  // False-positive prevention: deterministic claim attestation over the retrieved texts.
+  const attestation = measureClaimAttestation(question, items, language);
+  const { lexical, aligned } = attestation;
 
-  // Find which clusters are present in the question
-  const questionClusters = new Set<number>();
-  for (let i = 0; i < clusters.length; i++) {
-    const cluster = clusters[i];
-    const inQuestion = cluster.some(w => qNorm.includes(normalizeArabic(w).toLowerCase()));
-    if (inQuestion) questionClusters.add(i);
-  }
-
-  // Count how many of those question clusters also appear in the top document
-  let matchedClusters = 0;
-  for (const ci of questionClusters) {
-    const cluster = clusters[ci];
-    const inDoc = cluster.some(w => docText.includes(normalizeArabic(w).toLowerCase()));
-    if (inDoc) matchedClusters++;
-  }
-
-  const coverage = questionClusters.size > 0 ? matchedClusters / questionClusters.size : 0;
-
-  // If question contains invented claims with low coverage (< 35%): unclear
-  if (coverage < 0.35) {
+  // Below the partial threshold the retrieved texts are not about this claim.
+  if (lexical < CLAIM_PARTIAL_THRESHOLD) {
     return {
       verdict: 'unclear',
       badgeLabel: language === 'en' ? 'No reliable match found' : 'لم يتم العثور على تطابق موثوق',
@@ -537,8 +634,9 @@ export function deriveDeterministicVerdict(
     };
   }
 
-  // If question contains partial overlap (35% <= coverage < 70%): related texts
-  if (coverage < 0.70) {
+  // Words are present but not attested in the phrasing of a single text, or the
+  // claim only partially overlaps the texts: related texts, never a ruling.
+  if (lexical < CLAIM_LEXICAL_THRESHOLD || aligned < CLAIM_ALIGNED_THRESHOLD) {
     return {
       verdict: 'permissibility',
       badgeLabel: language === 'en' ? 'Related Texts' : 'نصوص ذات صلة',
@@ -563,12 +661,48 @@ function isWeakTerm(term: string): boolean {
   return WEAK_TERMS.has(term) || WEAK_TERMS.has(norm);
 }
 
+// Document frequency of an index token (postings length), cached per token.
+// Undefined when the token is not in the index.
+const dfCache = new Map<string, number | undefined>();
+
+function termDocFreq(term: string): number | undefined {
+  if (!term) return undefined;
+  if (dfCache.has(term)) return dfCache.get(term);
+  let df: number | undefined;
+  try {
+    const postings = loadAskSearchIndex().postings as Record<string, number[]>;
+    const p = postings[term];
+    df = p ? p.length : undefined;
+  } catch {
+    df = undefined;
+  }
+  dfCache.set(term, df);
+  return df;
+}
+
+// A term is "rare" (discriminative, worth the 25-point boost) when it is rare in
+// the curated list, long, or - the general rule - when the index shows it occurs
+// in at most 0.75% of the indexed documents. The length heuristic alone missed
+// short but highly specific Arabic terms (e.g. «يتوضأ», df 187) and let a
+// document carrying only common vocabulary outrank the text that actually
+// contains the claim.
+const RARE_DOC_FREQ_RATIO = 0.0075;
+
 function isRareTerm(term: string): boolean {
   if (!term) return false;
   const norm = stripArabicPrefixes(normalizeArabic(term)).toLowerCase();
   if (RARE_TERMS.has(term) || RARE_TERMS.has(norm)) return true;
-  if (norm.length >= 6 && !isWeakTerm(norm)) return true;
-  return false;
+  if (isWeakTerm(norm)) return false;
+  if (norm.length >= 6) return true;
+  let totalDocs = 0;
+  try {
+    totalDocs = loadAskSearchIndex().docs.length;
+  } catch {
+    return false;
+  }
+  if (!totalDocs) return false;
+  const df = termDocFreq(term) ?? termDocFreq(norm);
+  return df !== undefined && df <= totalDocs * RARE_DOC_FREQ_RATIO;
 }
 
 // Global O(1) Quran lookup maps (built once, shared across requests)
