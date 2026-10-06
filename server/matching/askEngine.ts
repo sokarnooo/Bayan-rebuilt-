@@ -144,19 +144,19 @@ export function checkRateLimit(ip: string): boolean {
 // Fabricated sayings verified on dorar.net/fake-hadith
 export const CURATED_FABRICATED_SAYINGS = [
   {
-    keywords: ['الصين', 'اطلبوا العلم ولو بالصين', 'اطلبوا العلم ولو في الصين'],
+    keywords: ['الصين', 'اطلبوا العلم ولو بالصين', 'اطلبوا العلم ولو في الصين', 'seek knowledge even in china', 'seek knowledge even if in china'],
     matn: 'اطلبوا العلم ولو بالصين',
     ruling: 'لا يصح',
     url: 'https://dorar.net/fake-hadith/38',
   },
   {
-    keywords: ['حب الوطن من الإيمان'],
+    keywords: ['حب الوطن من الإيمان', 'love of homeland is part of faith'],
     matn: 'حب الوطن من الإيمان',
     ruling: 'ليس بحديث',
     url: 'https://dorar.net/fake-hadith/74',
   },
   {
-    keywords: ['المعدة بيت الداء', 'الحمية رأس الدواء', 'الحمية رأس كل دواء'],
+    keywords: ['المعدة بيت الداء', 'الحمية رأس الدواء', 'الحمية رأس كل دواء', 'the stomach is the home of disease', 'diet is the head of medicine', 'diet is the head of all medicine'],
     matn: 'المعِدة بيت الداء، والحمية رأس الدواء',
     ruling: 'لا أصل له',
     url: 'https://dorar.net/fake-hadith/557',
@@ -491,27 +491,42 @@ export function deriveDeterministicVerdict(
     };
   }
 
-  // False-positive prevention: Claim concept coverage in top document
-  const STOPWORDS = new Set([
-    'هل', 'في', 'من', 'عن', 'على', 'إلى', 'أن', 'إن', 'ما', 'كم', 'كيف', 'متى', 'أين', 'لماذا',
-    'هو', 'هي', 'هم', 'أنا', 'نحن', 'هذا', 'هذه', 'ذلك', 'تلك', 'التي', 'الذي', 'الذين', 'قال',
-    'ورد', 'نبي', 'النبي', 'رسول', 'الله', 'صلى', 'عليه', 'وسلم',
-    'is', 'it', 'at', 'in', 'of', 'on', 'to', 'for', 'with', 'the', 'a', 'an', 'are', 'was', 'were',
-    'does', 'do', 'did', 'how', 'what', 'where', 'when', 'why', 'who', 'whom', 'which', 'your', 'his', 'her',
-    'prophet', 'said', 'order', 'ordered', 'say', 'saying'
-  ]);
-
-  const qCleanWords = qNorm
-    .split(/[^\u0600-\u06FFa-z0-9]+/i)
-    .filter((w) => w.length >= 2 && !STOPWORDS.has(w));
-
+  // False-positive prevention: Claim concept coverage in top document (concept-based, morphology-aware)
   const docText = normalizeArabic(items[0]?.fullText + ' ' + (items[0]?.arabicFullText || '')).toLowerCase();
-  let matchedConcepts = 0;
-  for (const w of qCleanWords) {
-    if (docText.includes(w)) matchedConcepts++;
+  
+  // Use the same concept clusters as relevance gating for consistent coverage calc
+  const clusters = [
+    ['زوج', 'زوجات', 'زوجة', 'نساء', 'نسوة', 'نكح', 'فانكحوا', 'تزوج', 'marry', 'marriage', 'wives', 'wife', 'women', 'woman'],
+    ['اربع', 'اربعه', 'اربعا', 'رباع', 'مثنى', 'four', '4', 'two or three or four'],
+    ['صوم', 'صيام', 'صام', 'fasting', 'fast'],
+    ['شوال', 'shawwal'],
+    ['ست', 'سته', 'ستة', 'six'],
+    ['تبسم', 'تبسمك', 'ابتسم', 'smile', 'smiling'],
+    ['صدقة', 'صدقه', 'charity'],
+    ['اخ', 'اخيك', 'وجه', 'brother', 'face'],
+    ['قبلة', 'القبلة', 'qibla', 'kaba'],
+    ['بول', 'غائط', 'يبول', 'تغوط', 'urinate', 'urinating', 'defecate', 'defecating'],
+    ['استقبال', 'استدبار', 'تستقبل', 'facing'],
+    ['غيلان', 'عشر', 'يتخير', 'تخير', 'ghilan', 'ghailan', 'choose four', 'ten wives']
+  ];
+
+  // Find which clusters are present in the question
+  const questionClusters = new Set<number>();
+  for (let i = 0; i < clusters.length; i++) {
+    const cluster = clusters[i];
+    const inQuestion = cluster.some(w => qNorm.includes(normalizeArabic(w).toLowerCase()));
+    if (inQuestion) questionClusters.add(i);
   }
 
-  const coverage = qCleanWords.length > 0 ? matchedConcepts / qCleanWords.length : 0;
+  // Count how many of those question clusters also appear in the top document
+  let matchedClusters = 0;
+  for (const ci of questionClusters) {
+    const cluster = clusters[ci];
+    const inDoc = cluster.some(w => docText.includes(normalizeArabic(w).toLowerCase()));
+    if (inDoc) matchedClusters++;
+  }
+
+  const coverage = questionClusters.size > 0 ? matchedClusters / questionClusters.size : 0;
 
   // If question contains invented claims with low coverage (< 35%): unclear
   if (coverage < 0.35) {
@@ -1129,7 +1144,7 @@ Output STRICT JSON:
   for (let attempt = 0; attempt < 2; attempt++) {
     let modelToTry: string | null = null;
     if (userKey) {
-      modelToTry = attempt === 0 ? 'gemini-2.5-flash-lite' : 'gemini-2.5-flash';
+      modelToTry = attempt === 0 ? 'gemini-3.5-flash-lite' : 'gemini-3.1-flash-lite';
     } else {
       const acq = quotaManager.acquireModel('ask_call1');
       modelToTry = acq.model;
@@ -1247,7 +1262,7 @@ Output STRICT JSON:
   for (let attempt = 0; attempt < 2; attempt++) {
     let modelToTry: string | null = null;
     if (userKey) {
-      modelToTry = attempt === 0 ? 'gemini-2.5-flash-lite' : 'gemini-2.5-flash';
+      modelToTry = attempt === 0 ? 'gemini-3.5-flash-lite' : 'gemini-3.1-flash-lite';
     } else {
       const acq = quotaManager.acquireModel('ask_call2');
       modelToTry = acq.model;
@@ -1365,22 +1380,21 @@ export async function executeAskStage1(
     }
   }
 
-  const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, ' ');
-  const cached = askCache.get(normKey);
-  if (cached) {
-    return {
-      ...cached,
-      cached: true,
-      executionTimeMs: Math.round(performance.now() - startTime),
-    };
-  }
-
-  // Check Fabricated Sayings first
-  const normCleanQuestion = stripArabicPrefixes(rawQuestion);
+  // Check Fabricated Sayings first (before cache)
+  const normCleanQuestionAr = normalizeArabic(rawQuestion).toLowerCase().replace(/[،،]/g, '');
+  const normCleanQuestionEn = rawQuestion.toLowerCase().replace(/[،،]/g, '');
   const matchedFake = CURATED_FABRICATED_SAYINGS.find(
     (f) =>
-      normCleanQuestion.includes(normalizeArabic(f.matn)) ||
-      f.keywords.some((k) => normCleanQuestion.includes(normalizeArabic(k)))
+      normCleanQuestionAr.includes(normalizeArabic(f.matn).toLowerCase().replace(/[،،]/g, '')) ||
+      f.keywords.some((k) => {
+        // Check if keyword contains Arabic characters
+        const hasArabic = /[\u0600-\u06FF]/.test(k);
+        if (hasArabic) {
+          return normCleanQuestionAr.includes(normalizeArabic(k).toLowerCase().replace(/[،،]/g, ''));
+        } else {
+          return normCleanQuestionEn.includes(k.toLowerCase());
+        }
+      })
   );
 
   if (matchedFake) {
@@ -1405,8 +1419,17 @@ export async function executeAskStage1(
       topRetrievedIds: [],
       executionTimeMs: Math.round(performance.now() - startTime),
     };
-    askCache.set(normKey, res);
     return res;
+  }
+
+  const normKey = normalizeArabic(rawQuestion).toLowerCase().replace(/\s+/g, ' ');
+  const cached = askCache.get(normKey);
+  if (cached) {
+    return {
+      ...cached,
+      cached: true,
+      executionTimeMs: Math.round(performance.now() - startTime),
+    };
   }
 
   const language: 'ar' | 'en' = /[a-z]/i.test(rawQuestion) ? 'en' : 'ar';

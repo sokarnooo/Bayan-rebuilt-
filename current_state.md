@@ -9,8 +9,8 @@
   - Zero secret leaks; `compile_applet` and `lint_applet` clean.
 - **Server Key & Hourly Quota Rate Limiting (Part 10)**:
   - 24 Pacific clock hour buckets (`America/Los_Angeles`) with SAFETY factor $0.8$.
-  - Hourly budgets: `gemini-2.5-flash-lite` (RPD 500 $\rightarrow$ 16 req/hr), `gemini-2.5-flash` (RPD 1500 $\rightarrow$ 50 req/hr), `gemma-2-27b-it` (RPD 14,400 $\rightarrow$ 480 req/hr).
-  - Failover chains per action: OCR (`gemini-2.5-flash` $\rightarrow$ `gemini-2.5-flash-lite`), Ask Call 1/Call 2 (`gemini-2.5-flash-lite` $\rightarrow$ `gemini-2.5-flash`).
+  - Hourly budgets (owner-pinned, live-verified 2026-10-06): `gemini-3.5-flash-lite` (RPD 500 $\rightarrow$ 16 req/hr), `gemini-3.1-flash-lite` (RPD 500 $\rightarrow$ 16 req/hr), `gemma-4-31b-it` (RPD 14,400 $\rightarrow$ 480 req/hr). No other model id remains in the codebase.
+  - Failover chains per action — identical order for all three actions: `gemini-3.5-flash-lite` $\rightarrow$ `gemini-3.1-flash-lite` $\rightarrow$ `gemma-4-31b-it`.
   - Spend priority: Call 2 Summary $>$ OCR $>$ Call 1 Expansion (skipped if primary bucket $< 50\%$).
   - Graceful degradation: Ask never fails when quota is exhausted; returns local search cards with «تعذّر إنشاء الملخص الآلي الآن؛ النصوص أدناه هي المصدر».
   - Fairness: Per-IP hourly cap $\max(2, \lfloor 0.2 \times \text{totalHourlyBudget} \rfloor)$ plus 10 req/min guard.
@@ -30,7 +30,7 @@
   - Cold time-to-cards: **$83$ ms – $184$ ms** ($< 2$ s target met).
   - Cold time-to-summary: **$3.04$ s – $8.00$ s** ($< 12$ s target met).
   - Baseline comparison on 133 core cases: **0 / 133 differences** (100.0% matching).
-  - Dual-call architecture: Call 1 expansion on `gemini-3.1-flash-lite`, Call 2 evidence verification on `gemini-flash-latest`/`gemini-3.1-flash-lite` with server failover.
+  - Dual-call architecture: Call 1 and Call 2 both attempt `gemini-3.5-flash-lite` then `gemini-3.1-flash-lite` on the BYOK path, and `gemini-3.5-flash-lite` $\rightarrow$ `gemini-3.1-flash-lite` $\rightarrow$ `gemma-4-31b-it` on the server-key path via `quotaManager`.
   - Al-Tafsir Al-Muyassar integrated into build-time prebuild (6,236 entries verified) and indexed alongside verse text.
   - Ayah cards display a dedicated «التفسير الميسر» block with single best sentence chosen by code and attribution «التفسير الميسر — مجمع الملك فهد، عبر QuranEnc».
   - Ranking fixes: Score Hadiths (matn-only) and Ayat (verse + half-weight tafsir) in separate lists (top 5 Hadiths, top 3 Ayat); order groups by top score; strong IDF weighting for rare terms (`شوال`, `القبلة`, `فانكحوا`, `marry`, `wives`).

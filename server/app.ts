@@ -1,6 +1,7 @@
 import express from 'express';
 import { loadCorpus } from './corpus/loader.ts';
 import { initAyahEngine, searchAyah } from './matching/ayahMatcher.ts';
+import { initAyahEngineEn, searchAyahEn } from './matching/ayahMatcherEn.ts';
 import { initHadithEngine, searchHadith, getIndexedCounts } from './matching/hadithMatcher.ts';
 import { askQuestion, executeAskStage1, executeAskVerdict, getGeminiClient } from './matching/askEngine.ts';
 import { quotaManager } from './quota.config.ts';
@@ -36,6 +37,8 @@ export const REGISTERED_ROUTES = [
   'GET /api/corpus/stats',
   'POST /api/ayah/search',
   'POST /api/ayah/match',
+  'POST /api/ayah/search/en',
+  'POST /api/ayah/match/en',
   'POST /api/hadith/search',
   'POST /api/hadith/match',
   'POST /api/ask',
@@ -97,6 +100,19 @@ app.post('/api/ayah/search', (req, res) => {
 app.post('/api/ayah/match', (req, res) => {
   const query = req.body?.query || req.body?.text || '';
   const result = searchAyah(query);
+  res.json(result);
+});
+
+// English Ayah matching endpoint
+app.post('/api/ayah/search/en', (req, res) => {
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchAyahEn(query);
+  res.json(result);
+});
+
+app.post('/api/ayah/match/en', (req, res) => {
+  const query = req.body?.query || req.body?.text || '';
+  const result = searchAyahEn(query);
   res.json(result);
 });
 
@@ -198,7 +214,7 @@ app.post('/api/ocr', async (req, res) => {
     let retryAfter = 0;
 
     if (userKey) {
-      modelToUse = 'gemini-2.5-flash';
+      modelToUse = 'gemini-3.5-flash-lite';
     } else {
       const acq = quotaManager.acquireModel('ocr');
       modelToUse = acq.model;

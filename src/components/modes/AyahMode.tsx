@@ -105,7 +105,8 @@ export const AyahMode: React.FC<AyahModeProps> = ({ language, onQuotaNotice }) =
     setExpandedAll(false);
 
     try {
-      const res = await fetch('/api/ayah/search', {
+      const endpoint = isAr ? '/api/ayah/search' : '/api/ayah/search/en';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q }),

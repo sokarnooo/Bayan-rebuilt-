@@ -2,7 +2,7 @@
 
 ## 1. Endpoint & Authentication
 - `POST /api/ask` payload: `{ "question": string, "language"?: "ar" | "en" }`.
-- Server-side only key: `process.env.GEMINI_API_KEY` (never exposed to client). Model: `gemini-2.5-flash`.
+- Server-side only key: `process.env.GEMINI_API_KEY` (never exposed to client). Models (owner-pinned, live-verified): `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemma-4-31b-it` (failover order, identical for OCR and both Ask calls).
 
 ## 2. Gemini Call 1 — Classification & Search Term Expansion (Temp: 0, Response: JSON)
 **System Prompt 1:**

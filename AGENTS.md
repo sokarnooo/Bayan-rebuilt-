@@ -17,7 +17,7 @@
 - **Frontend**: React 18, TypeScript, Vite, Tailwind, Lucide icons.
 - **Backend**: Node 20, Express, In-memory integer-based matching engine.
 - **Data**: Quran (fawazahmed0/quran-api), Hadith (fawazahmed0/hadith-api).
-- **AI**: @google/genai (Gemini 1.5/2.0 Flash) for Ask mode and OCR.
+- **AI**: @google/genai (Gemini 3.5 Flash Lite / Gemini 3.1 Flash Lite / Gemma 4 31B) for Ask mode and OCR.
 - **Commands**:
   - `npm run dev`: Starts Express server + Vite middleware on port 3000.
   - `npm run build`: Downloads corpus from pinned SHAs and generates gzipped index.

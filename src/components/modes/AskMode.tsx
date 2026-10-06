@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { InterfaceLanguage } from '../../types';
+import { OcrButton } from '../common/OcrButton';
 import {
   MessageSquareQuote,
   Sparkles,
@@ -177,11 +178,20 @@ export const AskMode: React.FC<AskModeProps> = ({ language, onQuotaNotice, onOpe
     <div className="space-y-6">
       {/* Search Input Box */}
       <form onSubmit={handleSearch} className="rounded-xl bg-[#12183F] border border-[#6150EA]/30 p-4 shadow-xl focus-within:border-[#2EF2C2]/60 transition">
-        <label className="block text-sm font-medium text-[#F2F4FF]/90 mb-2">
-          {isAr
-            ? 'السؤال الشرعي بالدليل (توسيع استعلام + استرجاع ثنائي اللغة):'
-            : 'Question with evidence (Query expansion + cross-language retrieval):'}
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-[#F2F4FF]/90 mb-2">
+            {isAr
+              ? 'السؤال الشرعي بالدليل (توسيع استعلام + استرجاع ثنائي اللغة):'
+              : 'Question with evidence (Query expansion + cross-language retrieval):'}
+          </label>
+          <OcrButton
+            language={language}
+            onTextExtracted={(extractedText) => {
+              setQuestion(extractedText);
+            }}
+            onQuotaNotice={onQuotaNotice}
+          />
+        </div>
 
         <textarea
           rows={3}

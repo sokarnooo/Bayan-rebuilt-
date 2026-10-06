@@ -6,6 +6,51 @@ Goal: Verifiable Quranic verse and Hadith text verification against authentic so
 
 ---
 
+### 2026-10-06 — AI Model Pool Swap to Owner-Pinned Models (OCR + Ask) & OCR 500 Fix
+- **Goal**: Replace the entire AI model pool with the three owner-pinned models, make all three `ACTION_CHAINS` share one order, purge every other model id from the codebase, and fix the reproduced `POST /api/ocr` HTTP 500.
+- **Change (files)**: `server/quota.config.ts`, `server/app.ts`, `server/matching/askEngine.ts`, `eval/baseline_llm.ts`, `AGENTS.md`, `ASK_DESIGN.md`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`. (No deletions.)
+- **Why**: `GET /api/quota` showed `gemini-3.1-flash-lite unavailable=true remaining=0`, so the OCR failover chain fell through to `gemini-1.5-flash`, which returns 404 «not found for API version v1beta». Every OCR call therefore died with HTTP 500. `gemini-2.5-flash*` are also 404 «no longer available to new users» and `gemini-flash-latest` / `gemma-2-*` are not in the pinned set. The dead ids were hardcoded in four files.
+- **Key Changes**:
+  1. `MODEL_CONFIGS` reduced to exactly three entries, `hourlyBudget` still derived as `floor(rpd * SAFETY_FACTOR / 24)` with `SAFETY_FACTOR = 0.8`:
+     - `gemini-3.5-flash-lite` — RPD 500 → 16 req/hr
+     - `gemini-3.1-flash-lite` — RPD 500 → 16 req/hr
+     - `gemma-4-31b-it` — RPD 14400 → 480 req/hr
+  2. `ACTION_CHAINS.ocr`, `.ask_call1`, `.ask_call2` all set to `['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-31b-it']`.
+  3. `server/app.ts` BYOK branch: `'gemini-2.5-flash'` → `'gemini-3.5-flash-lite'` (still bypasses `quotaManager.acquireModel`, verified by counter).
+  4. `server/matching/askEngine.ts` lines 1147 and 1265: attempt 0 → `'gemini-3.5-flash-lite'`, attempt 1 → `'gemini-3.1-flash-lite'`. Model-id strings only; retrieval and verdict logic untouched.
+  5. `eval/baseline_llm.ts`: model set to `'gemini-3.5-flash-lite'`.
+  6. Docs realigned (`AGENTS.md` stack line, `ASK_DESIGN.md` §1 model line, `current_state.md` quota/failover/dual-call lines). Historical `DEVLOG.md` entries were left verbatim as the dated record.
+- **Verification (real output, `node v26.7.0`, key read from `.env` as `$GEMINI_API_KEY`, never printed)**:
+  1. **Dead-id grep** — before: 14 code hits (`quota.config.ts` ×9, `app.ts` ×1, `askEngine.ts` ×2, `baseline_llm.ts` ×1) + 11 doc hits. After: **0 hits in `.ts`/`.tsx`/`.js`/`.json`**. Only remaining matches are historical `DEVLOG.md` entries and the `current_state.md` lines this entry updates.
+  2. **`npm run lint`** (`tsc --noEmit`) → exit 0, zero errors.
+  3. **Dev server restart** — `kill 124964`, relaunched via `npm run dev`, log at `/home/hhh/.hermes/cache/scratch/bayan-dev.log`. `GET /api/health` → `ready:true`, 34,195 hadiths + 6,236 ayat, `loadTimeMs: 252`.
+  4. **`POST /api/ocr` → HTTP 200**, extracted text `إنما الأعمال بالنيات` (exact match to source image text, 0 differences). Image was a real 820×160 white JPEG containing the Arabic phrase at size 54 in `/usr/share/fonts/noto/NotoNaskhArabic-Regular.ttf`. `pip` was unavailable in the container and no `arabic-reshaper`/`python-bidi`, so the shaping was done with `pango-view` (Pango 1.58.2 / HarfBuzz + BiDi), which was visually confirmed to produce connected, correctly ordered Arabic before the call.
+  5. **`GET /api/quota`** → exactly the three pinned ids: `gemini-3.5-flash-lite` (rpd 500, budget 16), `gemini-3.1-flash-lite` (rpd 500, budget 16), `gemma-4-31b-it` (rpd 14400, budget 480). No dead id present. After the OCR call, `gemini-3.5-flash-lite` remaining went 8 → 7 and `actionCounters.ocr` = 1, proving the chain head served the request.
+  6. **BYOK path verified** — same image with the `x-gemini-api-key` header → **HTTP 200**, text `إنما الأعمال بالنيات`. `actionCounters.ocr` stayed at 1, confirming BYOK still bypasses `quotaManager.acquireModel`.
+  7. **Evaluation harness** `npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1`:
+     - `TOTALS: 157/181 (87%)` — identical to the owner baseline.
+     - `ask_relevance: 16/28 (57%)` — identical to baseline.
+     - `ask_adversarial: 8/20 (40%)` — identical to baseline.
+     - **Core gate: 133/133 (100%)**. All 24 reported failures are `ask_relevance` / `ask_adversarial`; zero core regressions. `eval/cases.json` was not touched.
+- **Observed upstream demand (not a config defect, reported as measured)**: during the harness run the quota manager marked models unavailable after upstream errors. A direct probe immediately after gave: `gemini-3.5-flash-lite` → HTTP 200; `gemini-3.1-flash-lite` → HTTP 503 «high demand, try again later»; `gemma-4-31b-it` → HTTP 500 «Internal error encountered». Ask degraded gracefully to the documented local-cards path, which is why the numbers equal baseline. `gemini-3.5-flash` (non-lite) was not adopted per the owner's 503 «high demand» finding.
+- **Limits**: `ask_relevance` and `ask_adversarial` were explicitly out of scope and left untouched.
+- **Commit**: `pending` (owner commits)
+
+---
+
+### 2026-10-06 — OCR Model Update to Gemini 3.1 Flash Lite
+- **Goal**: Update OCR primary model to `gemini-3.1-flash-lite` (official API ID: `models/gemini-3.1-flash-lite`) as specified in Part 11 requirements, with fallback to `gemini-1.5-flash`.
+- **Change (files)**: `server/quota.config.ts`
+- **Why**: Part 11 specifies exact models: Gemini 3.5 Flash Lite, Gemini 3.1 Flash Lite, Gemma 4 31B. The OCR chain must use models that support image input.
+- **Key Changes**:
+  1. Added `gemini-3.1-flash-lite` to MODEL_CONFIGS with RPD 500, hourly budget 16 req/hr
+  2. Updated ACTION_CHAINS.ocr to `['gemini-3.1-flash-lite', 'gemini-1.5-flash']`
+  3. Ask chains remain on `gemini-1.5-flash` / `gemini-2.0-flash` (text-only)
+- **Verification**: Build passes, server starts with new model config registered
+- **Commit**: `pending`
+
+---
+
 ### 2026-10-05 — Task 10: Server Key & Hourly Quota Rate Limiting (Part 10)
 - **Goal**: Implement server-side default API key with evenly distributed hourly limits across 24 Pacific clock hours, priority degradation on Ask, per-IP fairness caps, failover chains, OCR and Quota endpoints, UI remaining requests readouts, and verify zero API key leakage.
 - **Change (files)**: `server/quota.config.ts`, `server/app.ts`, `server/matching/askEngine.ts`, `src/components/common/OcrButton.tsx`, `src/components/modes/AskMode.tsx`, `src/components/modes/AyahMode.tsx`, `src/components/modes/HadithMode.tsx`, `PROGRESS.md`, `DEVLOG.md`, `current_state.md`.

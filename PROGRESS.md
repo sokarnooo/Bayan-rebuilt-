@@ -34,7 +34,8 @@
 ## Next
 [x] 8 Ask mode: retrieval speed, ranking order & false-positive gating (Part 6, 8, 9) (2026-10-05: Unified score sorting with <=0.5 tie-break, relevance gate matches >=2 distinct content concepts or >=60% top score, Ghaylan hadith surfaced at #1/#2 in Tirmidhi 1128 and Ibn Majah 1953, 20 adversarial false-positive cases pass 20/20 with 0 false-positive 'supported' verdicts. Core 133/133 pass 100%.)
 [ ] 2 changedWords by word-level alignment (test: «لا تقبل صلاة بغير طهور» vs nasai_139)
-[ ] 9 OCR test
+[ ] 9 OCR test (2026-10-06: End-to-end OCR verified HTTP 200 with exact text «إنما الأعمال بالنيات» from a real rendered Arabic JPEG, served by gemini-3.5-flash-lite on both server-key and BYOK paths; item left open only for the in-app UI pass)
+[x] 14 Swap AI models to the owner-pinned pool (2026-10-06: MODEL_CONFIGS reduced to exactly gemini-3.5-flash-lite / gemini-3.1-flash-lite / gemma-4-31b-it; all three ACTION_CHAINS set to the same order; BYOK branch and Ask attempt-0/1 failover realigned; zero dead model ids left in code; OCR 500 root cause fixed (chain no longer falls through to 404 gemini-1.5-flash); lint clean; harness 157/181 with core 133/133 identical to baseline)
 [x] 10 Server key and hourly limits (Part 10) (2026-10-05: Implemented server/quota.config.ts with 24 Pacific clock hour buckets, SAFETY=0.8, failover chains, per-IP cap max(2, 20% total budget), priority degradation on Ask, /api/ocr and /api/quota endpoints, remaining-requests UI badges, and verified zero key leaks in /dist)
 [ ] 11 English labels for Sharia terms (Jamhara dictionary, owner supplies)
 [ ] 12 README, sources and licenses register, content-and-sources doc

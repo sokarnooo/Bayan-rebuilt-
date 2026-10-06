@@ -14,33 +14,33 @@ export interface ModelQuotaConfig {
   hourlyBudget: number;
 }
 
-// Configured model pool with AI Studio free-tier RPDs
+// Configured model pool with AI Studio free-tier RPDs (owner-pinned, live-verified)
 export const MODEL_CONFIGS: Record<string, ModelQuotaConfig> = {
-  'gemini-2.5-flash-lite': {
-    id: 'gemini-2.5-flash-lite',
-    name: 'Gemini 2.5 Flash Lite',
+  'gemini-3.5-flash-lite': {
+    id: 'gemini-3.5-flash-lite',
+    name: 'Gemini 3.5 Flash Lite',
     rpd: 500,
     hourlyBudget: Math.floor((500 * SAFETY_FACTOR) / 24), // 16 req/hr
   },
-  'gemini-2.5-flash': {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
-    rpd: 1500,
-    hourlyBudget: Math.floor((1500 * SAFETY_FACTOR) / 24), // 50 req/hr
+  'gemini-3.1-flash-lite': {
+    id: 'gemini-3.1-flash-lite',
+    name: 'Gemini 3.1 Flash Lite',
+    rpd: 500,
+    hourlyBudget: Math.floor((500 * SAFETY_FACTOR) / 24), // 16 req/hr
   },
-  'gemma-2-27b-it': {
-    id: 'gemma-2-27b-it',
-    name: 'Gemma 2 27B',
+  'gemma-4-31b-it': {
+    id: 'gemma-4-31b-it',
+    name: 'Gemma 4 31B',
     rpd: 14400,
     hourlyBudget: Math.floor((14400 * SAFETY_FACTOR) / 24), // 480 req/hr
   },
 };
 
-// Failover chains per action
+// Failover chains per action — identical pinned order for every action
 export const ACTION_CHAINS: Record<string, string[]> = {
-  ocr: ['gemini-2.5-flash', 'gemini-2.5-flash-lite'],
-  ask_call1: ['gemini-2.5-flash-lite', 'gemini-2.5-flash'],
-  ask_call2: ['gemini-2.5-flash-lite', 'gemini-2.5-flash'],
+  ocr: ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-31b-it'],
+  ask_call1: ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-31b-it'],
+  ask_call2: ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-31b-it'],
 };
 
 export type ActionType = 'ocr' | 'ask_call1' | 'ask_call2';
