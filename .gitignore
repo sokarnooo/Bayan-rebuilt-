@@ -3,3 +3,7 @@ dist
 .env
 # Corpus data and generated index
 server/corpus/data/
+
+# Submission deck and screenshots — kept out of the web app repo.
+# The PDF lives with the submission, not in the source tree.
+docs/
