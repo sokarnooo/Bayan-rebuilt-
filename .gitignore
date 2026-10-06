@@ -1,9 +1,23 @@
 node_modules
 dist
 .env
-# Corpus data and generated index
+
+# Corpus data and generated index (re-downloaded by `npm run build`)
 server/corpus/data/
 
 # Submission deck and screenshots — kept out of the web app repo.
 # The PDF lives with the submission, not in the source tree.
 docs/
+
+# Agent working files — not part of the published repository.
+AGENTS.md
+ASK_DESIGN.md
+PROGRESS.md
+current_state.md
+
+# Scratch output from test runs
+tmp_*.txt
+tmp_*.json
+tmp_*.log
+eval_output.txt
+test-full-corpus.ts

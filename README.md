@@ -393,6 +393,6 @@ npx tsx eval/run.ts http://localhost:3000 --quiet --runs 1
 - **Escalation is never removed.** Below the evidence threshold the tool refers the user to qualified scholars instead of guessing.
 - **Automated evaluation: 177/181 cases (98%)**, including 20/20 on adversarial questions that reuse real corpus vocabulary but assert a false claim — all correctly refused.
 
-See [DEVLOG.md](DEVLOG.md) for the full change history and [ASK_DESIGN.md](ASK_DESIGN.md) for the retrieval design rationale.
+See [DEVLOG.md](DEVLOG.md) for the full change history, including the measured retrieval benchmarks and every verification run behind the numbers quoted above.
 
 </div>
